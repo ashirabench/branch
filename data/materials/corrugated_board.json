@@ -1,0 +1,33 @@
+{
+  "label": "corrugated board",
+  "datasets": {
+    "mixed fibre, single wall": [
+      "corrugated_board_box",
+      1.0
+    ]
+  },
+  "datasets_source": "SOURCE: BAFU:2026 dataset 'Packaging, corrugated board, mixed fibre, single wall, at plant'; it is a formed box, so no conversion step is added, and its fibre mix already contains recycled fibre",
+  "conversion": null,
+  "recycled": null,
+  "end_of_life": {
+    "model": "split",
+    "recycling_rate": [
+      "uniform",
+      {
+        "low": 0.4,
+        "high": 0.95
+      },
+      "ASSUMPTION: 40 to 95% of corrugated board packaging recycled; no source read for a default. Germany has a national value in data/regions/DE.json"
+    ],
+    "incineration_share": [
+      "uniform",
+      {
+        "low": 0.2,
+        "high": 0.8
+      },
+      "ASSUMPTION: share of non recycled board incinerated, rest landfilled"
+    ],
+    "incineration": "disposal_board_incineration",
+    "landfill": "disposal_board_landfill"
+  }
+}

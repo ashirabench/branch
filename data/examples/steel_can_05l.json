@@ -1,0 +1,20 @@
+{
+  "id": "stc",
+  "name": "Steel can 0.5 L",
+  "volume_l": 0.5,
+  "refillable": false,
+  "components": [
+    {
+      "id": "can",
+      "material": "steel",
+      "mass_prior": [
+        "uniform",
+        {
+          "low": 25,
+          "high": 35
+        },
+        "ASSUMPTION: illustrative mass of a 0.5 L steel can, not measured; replace it with the weighed mass"
+      ]
+    }
+  ]
+}

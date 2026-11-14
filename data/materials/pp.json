@@ -1,0 +1,33 @@
+{
+  "label": "polypropylene",
+  "datasets": {
+    "PP granulate": [
+      "pp_granulate",
+      1.0
+    ]
+  },
+  "datasets_source": "SOURCE: BAFU:2026 dataset 'Polypropylene, granulate, at plant'; at end of life, PROXY: BAFU:2026 has no current polypropylene landfill dataset; plastics mixture is used",
+  "conversion": "injection_moulding",
+  "recycled": null,
+  "end_of_life": {
+    "model": "split",
+    "recycling_rate": [
+      "beta",
+      {
+        "a": 4,
+        "b": 6
+      },
+      "ASSUMPTION: about 40% collected for recycling, the default of the other plastics"
+    ],
+    "incineration_share": [
+      "uniform",
+      {
+        "low": 0.2,
+        "high": 0.8
+      },
+      "ASSUMPTION: share of the non recycled material incinerated, rest landfilled"
+    ],
+    "incineration": "disposal_pp_incineration",
+    "landfill": "disposal_pet_landfill"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "label": "steel sheet (tinplate)",
+  "datasets": {
+    "unalloyed steel": [
+      "steel_unalloyed",
+      1.0
+    ]
+  },
+  "datasets_source": "SOURCE: BAFU:2026 dataset 'Steel, converter, unalloyed, at plant'; PROXY for tinplate: the tin coating is not modelled",
+  "conversion": "sheet_rolling_steel",
+  "recycled": null,
+  "end_of_life": {
+    "model": "split",
+    "recycling_rate": [
+      "uniform",
+      {
+        "low": 0.4,
+        "high": 0.95
+      },
+      "ASSUMPTION: 40 to 95% of steel packaging recycled; no source read for a default. Germany has a national value in data/regions/DE.json"
+    ],
+    "incineration_share": [
+      "uniform",
+      {
+        "low": 0.2,
+        "high": 0.8
+      },
+      "ASSUMPTION: share of the non recycled material incinerated, rest landfilled"
+    ],
+    "incineration": "disposal_tin_sheet_incineration",
+    "landfill": "disposal_tin_sheet_landfill"
+  }
+}

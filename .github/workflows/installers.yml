@@ -1,0 +1,87 @@
+name: installers
+
+# Builds "BRANCH for openLCA" for macOS (.dmg) and Windows (setup .exe).
+# Runs when a tag v* is pushed (and publishes the release) or when started by hand in the Actions tab.
+# It does not run on every push: two macOS builds per push used up a month of Actions minutes.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15        # Apple silicon (GitHub retired macos-14 on 2 Nov 2026)
+            arch: mac-apple-silicon
+          - os: macos-15-intel  # Intel
+            arch: mac-intel
+          - os: windows-latest
+            arch: windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[app,olca,report]" pyinstaller
+      - name: Tests
+        run: |
+          pip install pytest
+          pytest -q
+      - name: Build the app
+        run: pyinstaller packaging/branch.spec --noconfirm
+      - name: Smoke test (the built app starts and runs one whole comparison)
+        shell: bash
+        env:
+          BRANCH_DEMO: "1"
+          BRANCH_NO_BROWSER: "1"
+        run: |
+          if [ "$RUNNER_OS" = "macOS" ]; then BIN="dist/BRANCH for openLCA.app/Contents/MacOS/BRANCH for openLCA"; else BIN="dist/BRANCH for openLCA/BRANCH for openLCA.exe"; fi
+          "$BIN" > smoke.log 2>&1 &
+          for i in $(seq 1 60); do sleep 3; grep -q "running at" smoke.log && break; done
+          cat smoke.log
+          URL=$(grep -o "http://127.0.0.1:[0-9]*" smoke.log | tail -1)
+          curl -sf "$URL" > /dev/null && echo "page served at $URL"
+          # one whole comparison in the built app: version on the page, questions, manager report
+          python packaging/smoke_session.py "$URL"
+      - name: Package (macOS dmg)
+        if: runner.os == 'macOS'
+        run: |
+          mkdir dmg && cp -R "dist/BRANCH for openLCA.app" dmg/ && ln -s /Applications dmg/Applications
+          hdiutil create -volname "BRANCH for openLCA" -srcfolder dmg -ov -format UDZO "BRANCH-for-openLCA-${{ matrix.arch }}.dmg"
+      - name: Package (Windows installer)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" packaging\windows.iss
+          Move-Item "packaging\Output\BRANCH-for-openLCA-setup.exe" "BRANCH-for-openLCA-windows-setup.exe"
+      - name: Publish to the release (tags only)
+        # each build uploads its own installer, so the release does not depend on artifact storage
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release view "$TAG" > /dev/null 2>&1 || gh release create "$TAG" --title "$TAG" --notes-file packaging/release_notes.md || true
+          gh release upload "$TAG" BRANCH-for-openLCA-* --clobber
+      - name: Keep the installer of this run for one day (other runs)
+        if: "!startsWith(github.ref, 'refs/tags/v')"
+        continue-on-error: true   # a full artifact storage must not fail a build that passed
+        uses: actions/upload-artifact@v4
+        with:
+          name: BRANCH-for-openLCA-${{ matrix.arch }}
+          retention-days: 1
+          path: |
+            BRANCH-for-openLCA-*.dmg
+            BRANCH-for-openLCA-*-setup.exe

@@ -1,0 +1,50 @@
+{
+  "code": "BR-AM",
+  "name": "Amazonas (Manaus)",
+  "parent": "BR-N",
+  "electricity": {
+    "options": {
+      "national grid (SIN)": [
+        "electricity_mv_BR",
+        0.9
+      ],
+      "isolated system (oil fired)": [
+        "electricity_oil_power_plant",
+        0.1
+      ]
+    },
+    "source": "ASSUMPTION: Manaus is on the national grid since 2013; towns in the interior run on isolated, mostly oil fired systems",
+    "question": "Is the filling plant on the national grid (SIN) or on an isolated system?"
+  },
+  "distribution": [
+    {
+      "mode": "lorry",
+      "km": [
+        "triangular",
+        {
+          "low": 5,
+          "mode": 25,
+          "high": 80
+        },
+        "ASSUMPTION: bottling plant in Manaus to shops in the metropolitan area"
+      ]
+    }
+  ],
+  "supply": [
+    {
+      "mode": "barge",
+      "km": [
+        "uniform",
+        {
+          "low": 1500,
+          "high": 4500
+        },
+        "ASSUMPTION: packaging shipped to Manaus by river or cabotage from producers in Belém or the South-east; replace with supplier data"
+      ]
+    }
+  ],
+  "sources_needed": [
+    "Origin and transport mode of packaging supplied to the Manaus Free Trade Zone",
+    "Share of production in isolated electricity systems (ANEEL / ONS)"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "pbag",
+  "name": "Kraft paper pouch 1 L",
+  "volume_l": 1.0,
+  "refillable": false,
+  "components": [
+    {
+      "id": "pouch",
+      "material": "kraft_paper",
+      "mass_prior": [
+        "uniform",
+        {
+          "low": 15,
+          "high": 30
+        },
+        "ASSUMPTION: illustrative mass of a 1 L paper pouch, not measured; replace it with the weighed mass"
+      ]
+    },
+    {
+      "id": "liner",
+      "material": "ldpe",
+      "mass_prior": [
+        "uniform",
+        {
+          "low": 3,
+          "high": 8
+        },
+        "ASSUMPTION: illustrative mass of its plastic liner, not measured; replace it with the weighed mass"
+      ]
+    }
+  ]
+}

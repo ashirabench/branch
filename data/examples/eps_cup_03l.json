@@ -1,0 +1,20 @@
+{
+  "id": "epsc",
+  "name": "EPS cup 0.3 L",
+  "volume_l": 0.3,
+  "refillable": false,
+  "components": [
+    {
+      "id": "cup",
+      "material": "eps",
+      "mass_prior": [
+        "uniform",
+        {
+          "low": 2,
+          "high": 4
+        },
+        "ASSUMPTION: illustrative mass of a 0.3 L expanded polystyrene cup, not measured; replace it with the weighed mass"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "psc",
+  "name": "Polystyrene cup 0.5 L",
+  "volume_l": 0.5,
+  "refillable": false,
+  "components": [
+    {
+      "id": "cup",
+      "material": "ps",
+      "mass_prior": [
+        "uniform",
+        {
+          "low": 8,
+          "high": 14
+        },
+        "ASSUMPTION: illustrative mass of a 0.5 L polystyrene cup, not measured; replace it with the weighed mass"
+      ]
+    }
+  ]
+}

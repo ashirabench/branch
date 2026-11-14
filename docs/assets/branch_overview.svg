@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+  </defs>
+  <rect width="960" height="420" rx="14" fill="#ffffff"/>
+
+  <!-- Inputs -->
+  <rect x="24" y="110" width="170" height="140" rx="10" fill="#f3f1ea" stroke="#8a8370"/>
+  <text x="109" y="138" text-anchor="middle" font-size="15" font-weight="700" fill="#222">Input</text>
+  <text x="109" y="166" text-anchor="middle" font-size="13" fill="#333">Two products to compare</text>
+  <text x="109" y="186" text-anchor="middle" font-size="13" fill="#333">Bill of materials</text>
+  <text x="109" y="206" text-anchor="middle" font-size="13" fill="#333">Location</text>
+  <text x="109" y="234" text-anchor="middle" font-size="11" fill="#666">nothing else</text>
+
+  <!-- Agent -->
+  <rect x="236" y="40" width="440" height="280" rx="12" fill="#eef4f0" stroke="#3f7d5a" stroke-width="1.5"/>
+  <text x="456" y="64" text-anchor="middle" font-size="16" font-weight="700" fill="#1f4d34">BRANCH BDI agent (no language model)</text>
+
+  <rect x="258" y="86" width="190" height="84" rx="8" fill="#fff" stroke="#3f7d5a"/>
+  <text x="353" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#222">Beliefs</text>
+  <text x="353" y="128" text-anchor="middle" font-size="12" fill="#333">every open ISO 14044 / ILCD</text>
+  <text x="353" y="144" text-anchor="middle" font-size="12" fill="#333">choice as a random variable</text>
+  <text x="353" y="160" text-anchor="middle" font-size="10" fill="#666">priors from data and codified rules</text>
+
+  <rect x="466" y="86" width="190" height="84" rx="8" fill="#fff" stroke="#3f7d5a"/>
+  <text x="561" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#222">Desire</text>
+  <text x="561" y="128" text-anchor="middle" font-size="12" fill="#333">a verdict with P(reversal) &lt; τ</text>
+  <text x="561" y="144" text-anchor="middle" font-size="12" fill="#333">with the fewest questions</text>
+
+  <text x="456" y="192" text-anchor="middle" font-size="13" font-weight="700" fill="#222">Intentions</text>
+  <rect x="262" y="206" width="120" height="44" rx="22" fill="#d9ebe0" stroke="#3f7d5a"/>
+  <text x="322" y="233" text-anchor="middle" font-size="13" fill="#1f4d34">compute</text>
+  <rect x="396" y="206" width="120" height="44" rx="22" fill="#d9ebe0" stroke="#3f7d5a"/>
+  <text x="456" y="233" text-anchor="middle" font-size="13" fill="#1f4d34">certify</text>
+  <rect x="530" y="206" width="120" height="44" rx="22" fill="#fbe4c9" stroke="#c17a2b"/>
+  <text x="590" y="233" text-anchor="middle" font-size="13" fill="#7a4410">ask</text>
+  <line x1="382" y1="228" x2="394" y2="228" stroke="#444" marker-end="url(#a)"/>
+  <line x1="516" y1="228" x2="528" y2="228" stroke="#444" marker-end="url(#a)"/>
+  <path d="M560,252 C560,296 322,296 322,254" fill="none" stroke="#444" stroke-dasharray="4 3" marker-end="url(#a)"/>
+  <text x="390" y="306" text-anchor="middle" font-size="11" fill="#555">reconsider after every round</text>
+  <text x="590" y="304" text-anchor="middle" font-size="11" fill="#555">3 questions per round, τ = 2.5%</text>
+
+  <!-- Outputs -->
+  <rect x="716" y="70" width="220" height="220" rx="10" fill="#f3f1ea" stroke="#8a8370"/>
+  <text x="826" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#222">Output</text>
+  <text x="826" y="128" text-anchor="middle" font-size="13" fill="#333">Certified verdict</text>
+  <text x="826" y="148" text-anchor="middle" font-size="12" fill="#555">and its probability of being wrong</text>
+  <text x="826" y="178" text-anchor="middle" font-size="13" fill="#333">openLCA JSON-LD model</text>
+  <text x="826" y="198" text-anchor="middle" font-size="12" fill="#555">open, inspect and edit in openLCA</text>
+  <text x="826" y="228" text-anchor="middle" font-size="13" fill="#333">ISO 14044 report</text>
+  <text x="826" y="248" text-anchor="middle" font-size="12" fill="#555">who decided each choice:</text>
+  <text x="826" y="264" text-anchor="middle" font-size="12" fill="#555">human, database, rule, "don't know"</text>
+
+  <line x1="194" y1="180" x2="234" y2="180" stroke="#444" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="676" y1="180" x2="714" y2="180" stroke="#444" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- Human in the loop -->
+  <rect x="420" y="350" width="340" height="54" rx="10" fill="#fbe4c9" stroke="#c17a2b"/>
+  <text x="590" y="373" text-anchor="middle" font-size="13" font-weight="700" fill="#7a4410">Human in the loop</text>
+  <text x="590" y="392" text-anchor="middle" font-size="11" fill="#7a4410">value laden choices, then only what can flip the verdict</text>
+  <line x1="610" y1="252" x2="610" y2="348" stroke="#c17a2b" stroke-width="1.5" marker-start="url(#a)" marker-end="url(#a)"/>
+</svg>

@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use BRANCH, please cite it as below."
+title: "Asking Only What Can Flip the Verdict: A Human-in-the-Loop BDI Agent for Comparative Life Cycle Assessment"
+authors:
+  - family-names: Benchimol
+    given-names: Ashira
+    affiliation: "Department of Informatics Engineering, University of Coimbra"
+version: 0.1.1
+date-released: 2026-11-14
+license: MPL-2.0
+repository-code: "https://github.com/ashirabench/branch"
+keywords:
+  - life cycle assessment
+  - openLCA
+  - BDI agent
+  - active learning
+  - human-centered AI

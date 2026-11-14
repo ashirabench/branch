@@ -1,0 +1,9 @@
+numpy
+scipy
+pandas
+matplotlib
+pytest
+# openLCA bridge and factor extraction (needs openLCA 2.x with the IPC server)
+olca-ipc>=2.0
+olca-schema>=2.0
+# GPU (DGX Spark): pip install cupy-cuda12x  (or cupy-cuda13x, matching nvcc --version)

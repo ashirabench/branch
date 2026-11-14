@@ -1,0 +1,21 @@
+{
+  "id": "glass",
+  "name": "Refillable glass",
+  "volume_l": 1.0,
+  "refillable": true,
+  "components": [
+    {
+      "id": "bottle",
+      "material": "glass",
+      "mass_prior": [
+        "triangular",
+        {
+          "low": 400,
+          "mode": 550,
+          "high": 750
+        },
+        "ASSUMPTION: typical 1 L refillable glass bottle"
+      ]
+    }
+  ]
+}

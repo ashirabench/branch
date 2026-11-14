@@ -1,0 +1,88 @@
+{
+  "code": "BR-N",
+  "name": "Northern Brazil",
+  "parent": "BR",
+  "distribution": [
+    {
+      "mode": "lorry",
+      "km": [
+        "uniform",
+        {
+          "low": 20,
+          "high": 600
+        },
+        "ASSUMPTION: Northern Brazil, bottling plant to shops by road; replace with regional logistics data"
+      ]
+    }
+  ],
+  "priors": {
+    "pet.recycling_rate": [
+      "beta",
+      {
+        "a": 2,
+        "b": 8
+      },
+      "ASSUMPTION: Northern Brazil below the national rate (about 20%); replace with SNIS or ABREMA regional data"
+    ],
+    "aluminium.recycling_rate": [
+      "beta",
+      {
+        "a": 7,
+        "b": 3
+      },
+      "ASSUMPTION: cans are collected by waste pickers everywhere in Brazil (about 70%); replace with ABRALATAS regional data"
+    ],
+    "liquid_packaging_board.recycling_rate": [
+      "beta",
+      {
+        "a": 1,
+        "b": 9
+      },
+      "ASSUMPTION: little carton recycling capacity in Northern Brazil (about 10%); replace with regional data"
+    ],
+    "pet.incineration_share": [
+      "uniform",
+      {
+        "low": 0.0,
+        "high": 0.1
+      },
+      "ASSUMPTION: almost no incineration in Northern Brazil; non recycled waste goes to landfills and dumps"
+    ],
+    "aluminium.incineration_share": [
+      "uniform",
+      {
+        "low": 0.0,
+        "high": 0.1
+      },
+      "ASSUMPTION: almost no incineration in Northern Brazil"
+    ],
+    "liquid_packaging_board.incineration_share": [
+      "uniform",
+      {
+        "low": 0.0,
+        "high": 0.1
+      },
+      "ASSUMPTION: almost no incineration in Northern Brazil"
+    ],
+    "ldpe.incineration_share": [
+      "uniform",
+      {
+        "low": 0.0,
+        "high": 0.1
+      },
+      "ASSUMPTION: almost no incineration in Northern Brazil"
+    ],
+    "hdpe.incineration_share": [
+      "uniform",
+      {
+        "low": 0.0,
+        "high": 0.1
+      },
+      "ASSUMPTION: almost no incineration in Northern Brazil"
+    ]
+  },
+  "sources_needed": [
+    "SNIS (Sistema Nacional de Informações sobre Saneamento) waste data for the North region",
+    "Share of waste going to dumps (lixões) versus sanitary landfills"
+  ]
+}

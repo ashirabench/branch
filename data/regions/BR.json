@@ -1,0 +1,122 @@
+{
+  "code": "BR",
+  "name": "Brazil",
+  "parent": "GLO",
+  "electricity": "electricity_mv_BR",
+  "priors": {
+    "glass.bottle.mass_g": [
+      "triangular",
+      {"low": 400, "mode": 550, "high": 950},
+      "ASSUMPTION on the shape; the upper bound was widened from 750 g on 13 Nov 2026 to include the 950 g of the 1 L returnable soft drink bottle in Brazil (Morini, Hotza and Ribeiro 2019, masses from the manufacturer)"
+    ],
+    "pet.recycling_rate": [
+      "beta",
+      {"a": 11.3, "b": 8.7},
+      "SOURCE: 56.4% of post consumer PET packaging recycled in Brazil in 2021 and just over 56% in 2024, 410 kt (ABIPET, Censo da Reciclagem do PET no Brasil, 2022 and 2025 editions)"
+    ],
+    "hdpe.recycling_rate": [
+      "beta",
+      {"a": 4.6, "b": 15.4},
+      "SOURCE: 23.1% of plastic packaging recycled in Brazil in 2020 (Picplast, cited by CEMPRE, Recycling Rates in Brazil); all plastics together"
+    ],
+    "ldpe.recycling_rate": [
+      "beta",
+      {"a": 4.6, "b": 15.4},
+      "SOURCE: 23.1% of plastic packaging recycled in Brazil in 2020 (Picplast, cited by CEMPRE, Recycling Rates in Brazil); all plastics together"
+    ],
+    "aluminium.recycling_rate": [
+      "beta",
+      {"a": 19, "b": 1},
+      "SOURCE: aluminium beverage cans recycled in Brazil: 100% in 2022, 98.7% in 2021 (ABRALATAS and Recicla Latas, cited by CEMPRE); collected mostly by waste pickers"
+    ],
+    "pet.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama dos Resíduos Sólidos no Brasil 2024); no incineration, dumps are modelled with the landfill dataset"
+    ],
+    "hdpe.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "ldpe.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "aluminium.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "liquid_packaging_board.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "corrugated_board.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "pp.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "ps.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "eps.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "pvc.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "pla.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "steel.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "kraft_paper.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "cartonboard.incineration_share": [
+      "beta",
+      {"a": 1, "b": 30},
+      "SOURCE: municipal waste in Brazil in 2023: 58.5% to sanitary landfills, 41.5% to dumps and controlled landfills, under 0.2% to refuse derived fuel (ABREMA, Panorama 2024); dumps are modelled with the landfill dataset"
+    ],
+    "pp.recycling_rate": [
+      "beta",
+      {"a": 4.6, "b": 15.4},
+      "SOURCE: 23.1% of plastic packaging recycled in Brazil in 2020 (Picplast, cited by CEMPRE, Recycling Rates in Brazil); all plastics together"
+    ],
+    "glass.end_of_life": {
+      "weights": {"recycling (cut-off)": 0.25, "landfill": 0.74, "incineration": 0.01},
+      "source": "SOURCE: 25.1% of glass packaging recycled in Brazil in 2024 (Circula Vidro audit, reported by the Paraná state government, 2025), 25.8% in 2018 (Abividro, cited by CEMPRE); the rest goes to landfills and dumps, there is no incineration (ABREMA, Panorama 2024)"
+    },
+    "liquid_packaging_board.recycling_rate": [
+      "beta",
+      {"a": 7.8, "b": 12.2},
+      "SOURCE: 39.1% of beverage cartons recycled in Brazil in 2023, 104 kt, 32.5% in 2022 (Tetra Pak Brasil, February 2024)"
+    ]
+  },
+  "sources_needed": [
+    "Recycled content of PET bottles in Brazil (ABIPET reports 29% of recycled PET going back into bottles, not the content of a bottle)",
+    "Trips of refillable glass bottles in Brazil",
+    "Brazilian National Energy Balance (BEN) for the electricity mix"
+  ]
+}

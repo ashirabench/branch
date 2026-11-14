@@ -1,0 +1,69 @@
+{
+  "id": "carton",
+  "name": "Beverage carton 1 L",
+  "volume_l": 1.0,
+  "refillable": false,
+  "components": [
+    {
+      "id": "board",
+      "material": "liquid_packaging_board",
+      "mass_prior": [
+        "triangular",
+        {
+          "low": 18,
+          "mode": 21,
+          "high": 25
+        },
+        "ASSUMPTION: board layer of a 1 L aseptic carton; replace with a sourced mass"
+      ]
+    },
+    {
+      "id": "pe_layers",
+      "material": "ldpe",
+      "mass_prior": [
+        "triangular",
+        {
+          "low": 4,
+          "mode": 5.5,
+          "high": 7
+        },
+        "ASSUMPTION: polyethylene layers; replace with a sourced mass"
+      ]
+    },
+    {
+      "id": "foil",
+      "material": "aluminium",
+      "conversion": "sheet_rolling_aluminium",
+      "mass_prior": [
+        "triangular",
+        {
+          "low": 0.8,
+          "mode": 1.2,
+          "high": 1.6
+        },
+        "ASSUMPTION: aluminium foil layer; replace with a sourced mass"
+      ],
+      "recycled_content_prior": [
+        "uniform",
+        {
+          "low": 0.2,
+          "high": 0.7
+        },
+        "ASSUMPTION: recycled content of the aluminium foil of a beverage carton; no source found"
+      ]
+    },
+    {
+      "id": "cap",
+      "material": "hdpe",
+      "mass_prior": [
+        "triangular",
+        {
+          "low": 2,
+          "mode": 2.6,
+          "high": 3.5
+        },
+        "ASSUMPTION: screw cap; replace with a sourced mass"
+      ]
+    }
+  ]
+}

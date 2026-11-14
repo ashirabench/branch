@@ -1,0 +1,8 @@
+.git
+.venv
+data/factors
+outputs
+results
+**/__pycache__
+BAFU-*
+lca_data

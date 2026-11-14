@@ -1,0 +1,13 @@
+choice,region,pair,value,unit,place_of_the_value,source,read_in_original,comparable,note
+can.body_and_lid.mass_g,PT,aluminium_can_330ml|beverage_carton_1l,12.1,g,Europe (2018 production),Metal Packaging Europe 2022,yes,yes,sector average; the summary does not say whether the end is included
+can.body_and_lid.mass_g,DE,aluminium_can_330ml|beverage_carton_1l,12.1,g,Europe (2018 production),Metal Packaging Europe 2022,yes,yes,sector average; the summary does not say whether the end is included
+glass.bottle.mass_g,PT,pet_bottle_1l|glass_refillable_1l,452,g,Italy,Tua Grosso and Rigamonti 2020,yes,yes,one bottling plant
+glass.bottle.mass_g,DE,pet_bottle_1l|glass_refillable_1l,480,g,Germany,Schonert et al. 2002,yes,yes,light glass pool bottle; 10 g of coating not counted
+glass.bottle.mass_g,BR,pet_bottle_1l|glass_refillable_1l,950,g,Brazil,Morini Hotza and Ribeiro 2019,yes,yes,masses from the manufacturer; upper bound widened to include it
+pet.bottle.mass_g,DE,pet_bottle_1l|glass_refillable_1l,32,g,Germany,Schonert et al. 2002,yes,yes,scenario of 2002; bottles have become lighter since
+glass.wash_heat_mj,PT,pet_bottle_1l|glass_refillable_1l,0.459,MJ,Italy,Tua Grosso and Rigamonti 2020,yes,yes,one bottling plant; upper bound widened to include it
+glass.wash_water_kg,PT,pet_bottle_1l|glass_refillable_1l,0.67,kg,Italy,Tua Grosso and Rigamonti 2020,yes,yes,one bottling plant
+glass.wash_kwh,PT,pet_bottle_1l|glass_refillable_1l,0.044,kWh,Italy,Tua Grosso and Rigamonti 2020,yes,no,electricity of the whole bottling plant per bottle; the paper does not separate washing from filling so it is not compared with the washing prior
+glass.trips,DE,pet_bottle_1l|glass_refillable_1l,50,trips,Germany,Schonert et al. 2002,yes,yes,scenario value of the study and not a measurement
+distribution_km,PT,pet_bottle_1l|glass_refillable_1l,215,km,Italy,Tua Grosso and Rigamonti 2020,yes,yes,200 km to the distributor plus 15 km to the client
+can.aluminium.recycled_content,PT,aluminium_can_330ml|beverage_carton_1l,0.70,share,Europe (2021),Ardagh Metal Packaging 2022,yes,yes,declared by one can maker; upper end of the range

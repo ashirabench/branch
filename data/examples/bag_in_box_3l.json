@@ -1,0 +1,26 @@
+{
+  "id": "bib",
+  "name": "Bag in box 3 L",
+  "volume_l": 3.0,
+  "refillable": false,
+  "components": [
+    {
+      "id": "box",
+      "material": "corrugated_board",
+      "mass_prior": [
+        "uniform",
+        {"low": 120, "high": 220},
+        "ASSUMPTION: illustrative mass of the box of a 3 L bag in box, not measured; replace it with the weighed mass"
+      ]
+    },
+    {
+      "id": "bag",
+      "material": "ldpe",
+      "mass_prior": [
+        "uniform",
+        {"low": 30, "high": 60},
+        "ASSUMPTION: illustrative mass of the bag and tap of a 3 L bag in box, not measured; replace it with the weighed mass"
+      ]
+    }
+  ]
+}

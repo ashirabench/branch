@@ -1,0 +1,20 @@
+{
+  "id": "ppb",
+  "name": "PP bottle 1 L",
+  "volume_l": 1.0,
+  "refillable": false,
+  "components": [
+    {
+      "id": "bottle",
+      "material": "pp",
+      "mass_prior": [
+        "uniform",
+        {
+          "low": 30,
+          "high": 45
+        },
+        "ASSUMPTION: illustrative mass of a 1 L polypropylene bottle with cap, not measured; replace it with the weighed mass"
+      ]
+    }
+  ]
+}

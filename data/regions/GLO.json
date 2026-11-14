@@ -1,0 +1,19 @@
+{
+  "code": "GLO",
+  "name": "Global defaults",
+  "distribution": [
+    {
+      "mode": "lorry",
+      "km": [
+        "uniform",
+        {
+          "low": 50,
+          "high": 400
+        },
+        "ASSUMPTION: one way distance from the bottling plant to the shops, the same for both"
+      ]
+    }
+  ],
+  "supply": [],
+  "sources_needed": []
+}

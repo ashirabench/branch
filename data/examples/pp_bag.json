@@ -1,0 +1,48 @@
+{
+  "id": "pp_bag",
+  "name": "Polypropylene bag",
+  "functional_unit": "carrying the shopping of one household for one year",
+  "units_per_functional_unit": 1.0,
+  "exchanges": [
+    {
+      "id": "plastic",
+      "stage": "material",
+      "process": "Polypropylene, granulate, at plant",
+      "amount": [
+        0.08,
+        0.15
+      ],
+      "source": "ASSUMPTION: illustrative range for the example, not measured; replace it with your own value"
+    },
+    {
+      "id": "forming",
+      "stage": "manufacturing",
+      "process": "Extrusion, plastic film",
+      "amount": [
+        0.08,
+        0.15
+      ],
+      "source": "ASSUMPTION: illustrative range for the example, not measured; replace it with your own value"
+    },
+    {
+      "id": "sea freight",
+      "stage": "transport",
+      "process": "Transport, transoceanic freight ship",
+      "amount": [
+        0.4,
+        2.5
+      ],
+      "source": "ASSUMPTION: illustrative range for the example, not measured; replace it with your own value"
+    },
+    {
+      "id": "disposal",
+      "stage": "end_of_life",
+      "process": "Disposal, polypropylene, 15.9% water, to municipal incineration",
+      "amount": [
+        0.08,
+        0.15
+      ],
+      "source": "ASSUMPTION: illustrative range for the example, not measured; replace it with your own value"
+    }
+  ]
+}

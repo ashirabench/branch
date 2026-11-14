@@ -1,0 +1,21 @@
+{
+  "id": "can",
+  "name": "Aluminium can 330 ml",
+  "volume_l": 0.33,
+  "refillable": false,
+  "components": [
+    {
+      "id": "body_and_lid",
+      "material": "aluminium",
+      "mass_prior": [
+        "triangular",
+        {
+          "low": 10,
+          "mode": 13,
+          "high": 16
+        },
+        "ASSUMPTION: 330 ml can, body and lid; replace with a sourced mass"
+      ]
+    }
+  ]
+}

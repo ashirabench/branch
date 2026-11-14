@@ -1,0 +1,21 @@
+{
+  "id": "pet",
+  "name": "PET single use",
+  "volume_l": 1.0,
+  "refillable": false,
+  "components": [
+    {
+      "id": "bottle",
+      "material": "pet",
+      "mass_prior": [
+        "triangular",
+        {
+          "low": 25,
+          "mode": 32,
+          "high": 42
+        },
+        "ASSUMPTION: typical 1 L PET bottle with cap and label"
+      ]
+    }
+  ]
+}

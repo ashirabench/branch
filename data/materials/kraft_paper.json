@@ -1,0 +1,38 @@
+{
+  "label": "kraft paper",
+  "datasets": {
+    "unbleached": [
+      "kraft_paper_unbleached",
+      0.5
+    ],
+    "bleached": [
+      "kraft_paper_bleached",
+      0.5
+    ]
+  },
+  "datasets_source": "SOURCE: BAFU:2026 kraft paper datasets; ASSUMPTION on the weights; at end of life, PROXY: the landfill dataset is 'Disposal, paper, 11.2% water'; the packaging paper one is obsolete in BAFU:2026",
+  "dataset_question": "Is the paper of the {c} unbleached (brown) or bleached (white)?",
+  "conversion": null,
+  "recycled": null,
+  "end_of_life": {
+    "model": "split",
+    "recycling_rate": [
+      "uniform",
+      {
+        "low": 0.4,
+        "high": 0.95
+      },
+      "ASSUMPTION: 40 to 95% of paper packaging recycled; no source read for a default. Germany has a national value in data/regions/DE.json"
+    ],
+    "incineration_share": [
+      "uniform",
+      {
+        "low": 0.2,
+        "high": 0.8
+      },
+      "ASSUMPTION: share of the non recycled material incinerated, rest landfilled"
+    ],
+    "incineration": "disposal_packaging_paper_incineration",
+    "landfill": "disposal_paper_landfill"
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "code": "DE",
+  "name": "Germany",
+  "parent": "GLO",
+  "electricity": "electricity_mv_DE",
+  "priors": {
+    "pet.recycling_rate": [
+      "beta",
+      {"a": 39, "b": 1},
+      "SOURCE: 97.6% of PET beverage bottles recycled in Germany in 2023, 96.1% of deposit bottles returned through the deposit system (GVM study for Forum PET, November 2024)"
+    ],
+    "hdpe.recycling_rate": [
+      "beta",
+      {"a": 10.4, "b": 9.6},
+      "SOURCE: 52.2% of plastic packaging recycled in Germany in 2023 (BMUV, packaging waste statistics from the GVM survey, 2025; EU calculation rules); all plastics together"
+    ],
+    "ldpe.recycling_rate": [
+      "beta",
+      {"a": 10.4, "b": 9.6},
+      "SOURCE: 52.2% of plastic packaging recycled in Germany in 2023 (BMUV, packaging waste statistics from the GVM survey, 2025); all plastics together, films are usually below the average"
+    ],
+    "aluminium.recycling_rate": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: 99% of aluminium beverage cans recycled in Germany, where cans carry a deposit (European Aluminium and Metal Packaging Europe, beverage can recycling results 2023); 68.0% for all aluminium packaging in 2023 (BMUV, 2025)"
+    ],
+    "pet.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled, 69% recycled (EEA country profile 2025, Eurostat env_wasmun); untreated waste may not be landfilled since 2005"
+    ],
+    "hdpe.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "ldpe.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "aluminium.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "liquid_packaging_board.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "corrugated_board.recycling_rate": [
+      "beta",
+      {"a": 17.3, "b": 2.7},
+      "SOURCE: 86.6% of paper and cardboard packaging recycled in Germany in 2023 (6,709.4 of 7,748.4 kt) and 86.8% in 2024 (6,803.0 of 7,840.4 kt) (BMUV, packaging waste statistics from the GVM survey, page dated 6 November 2026); all paper and cardboard packaging together"
+    ],
+    "corrugated_board.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "pp.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "ps.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "eps.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "pvc.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "pla.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "steel.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "kraft_paper.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "cartonboard.incineration_share": [
+      "beta",
+      {"a": 29, "b": 1},
+      "SOURCE: municipal waste in Germany in 2022: 30% incinerated, about 1% landfilled (EEA country profile 2025, Eurostat env_wasmun)"
+    ],
+    "pp.recycling_rate": [
+      "beta",
+      {"a": 10.4, "b": 9.6},
+      "SOURCE: 52.2% of plastic packaging recycled in Germany in 2023 (BMUV, packaging waste statistics from the GVM survey, 2025; EU calculation rules); all plastics together"
+    ],
+    "kraft_paper.recycling_rate": [
+      "beta",
+      {"a": 17.3, "b": 2.7},
+      "SOURCE: 86.6% of paper and cardboard packaging recycled in Germany in 2023 (6,709.4 of 7,748.4 kt) and 86.8% in 2024 (6,803.0 of 7,840.4 kt) (BMUV, packaging waste statistics from the GVM survey, page dated 6 November 2026); all paper and cardboard packaging together"
+    ],
+    "cartonboard.recycling_rate": [
+      "beta",
+      {"a": 17.3, "b": 2.7},
+      "SOURCE: 86.6% of paper and cardboard packaging recycled in Germany in 2023 (6,709.4 of 7,748.4 kt) and 86.8% in 2024 (6,803.0 of 7,840.4 kt) (BMUV, packaging waste statistics from the GVM survey, page dated 6 November 2026); all paper and cardboard packaging together"
+    ],
+    "steel.recycling_rate": [
+      "beta",
+      {"a": 17.2, "b": 2.8},
+      "SOURCE: 85.4% of tinplate packaging recycled in Germany in 2023 (426.3 of 499.2 kt) and 86.6% in 2024 (426.1 of 492.0 kt) (BMUV, packaging waste statistics from the GVM survey, page dated 6 November 2026)"
+    ],
+    "glass.end_of_life": {
+      "weights": {"recycling (cut-off)": 0.81, "landfill": 0.01, "incineration": 0.18},
+      "source": "SOURCE: 80.6% of glass packaging recycled in Germany in 2023 (BMUV, packaging waste statistics from the GVM survey, 2025); the rest follows municipal waste, 30% incinerated and about 1% landfilled in 2022 (EEA country profile 2025)"
+    },
+    "liquid_packaging_board.recycling_rate": [
+      "beta",
+      {"a": 13.8, "b": 6.2},
+      "SOURCE: beverage cartons collected by the dual systems in Germany: about 69% recycled in 2023, below the 80% statutory target (ZSVR, recycling rates 2018 to 2023, read from the published chart); 112.5 kt recycled in 2022 (UBA Texte 156/2024)"
+    ],
+    "pet.recycled_content": [
+      "beta",
+      {"a": 9.6, "b": 10.4},
+      "SOURCE: 48% recycled PET in deposit single use PET bottles in Germany in 2023, 46.9% across all new PET bottles (GVM study for Forum PET, November 2024)"
+    ],
+    "refillable.trips": [
+      "triangular",
+      {"low": 15, "mode": 36, "high": 50},
+      "SOURCE: refillable bottles in Germany: pool glass bottles 36 to 38 trips, individual glass bottles 23, refillable PET 19 (Unternehmensberatung Weihenstephan for BVE and HDE, 2013, reported by Lebensmittel Praxis); the range covers individual bottles and well run pools"
+    ]
+  },
+  "sources_needed": [
+    "ZSVR table value for beverage cartons (the 69% is read from a chart)",
+    "A newer trip count for Mehrweg bottles than the 2013 Weihenstephan study"
+  ]
+}

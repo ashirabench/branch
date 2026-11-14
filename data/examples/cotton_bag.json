@@ -1,0 +1,38 @@
+{
+  "id": "cotton_bag",
+  "name": "Cotton bag",
+  "functional_unit": "carrying the shopping of one household for one year",
+  "units_per_functional_unit": 1.0,
+  "exchanges": [
+    {
+      "id": "fabric",
+      "stage": "material",
+      "process": "Textile, woven cotton, at plant",
+      "amount": [
+        0.1,
+        0.2
+      ],
+      "source": "ASSUMPTION: illustrative range for the example, not measured; replace it with your own value"
+    },
+    {
+      "id": "sea freight",
+      "stage": "transport",
+      "process": "Transport, transoceanic freight ship",
+      "amount": [
+        0.5,
+        3.0
+      ],
+      "source": "ASSUMPTION: illustrative range for the example, not measured; replace it with your own value"
+    },
+    {
+      "id": "disposal",
+      "stage": "end_of_life",
+      "process": "Disposal, textiles, soiled, 25% water, to municipal incineration",
+      "amount": [
+        0.1,
+        0.2
+      ],
+      "source": "ASSUMPTION: illustrative range for the example, not measured; replace it with your own value"
+    }
+  ]
+}

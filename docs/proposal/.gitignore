@@ -1,0 +1,7 @@
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+build.log
+BRANCH_Project_Proposal_v2.pdf

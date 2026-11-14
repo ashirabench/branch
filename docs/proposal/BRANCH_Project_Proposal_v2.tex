@@ -1,0 +1,273 @@
+%% BRANCH project proposal, version 2 (wording revised 4 November 2026). IJCAI two column format.
+%% Build: latexmk -pdf BRANCH_Project_Proposal_v2.tex
+\documentclass{article}
+\pdfpagewidth=8.5in
+\pdfpageheight=11in
+\usepackage{ijcai26}
+\usepackage{times}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[small]{caption}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[round,authoryear]{natbib}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{6pt}{3pt}
+\titlespacing*{\subsection}{0pt}{4pt}{2pt}
+\setlength{\bibsep}{0pt}
+\setcitestyle{aysep={}}
+\setlist{nosep,leftmargin=*}
+\urlstyle{same}
+
+\title{BRANCH: A BDI Agent without a Language Model that Completes an openLCA Life Cycle Assessment
+from a Bill of Materials and a Location, Keeping the Human in Command}
+\author{Ashira Benchimol
+\affiliations
+Department of Informatics Engineering, University of Coimbra\\
+Project Proposal, version 2 (26 October 2026, wording revised on 4 November 2026),
+Human Centered Artificial Intelligence, 2026/2027}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+openLCA is the reference open source tool for life cycle assessment (LCA), but it calculates and does not
+advise. Before the first result appears, the user must take every modelling choice that ISO 14044 and the
+ILCD Handbook leave to expert judgement. I propose BRANCH, an agent for openLCA that contains no language
+model. BRANCH is a BDI agent, which reasons with beliefs, desires and intentions. From a bill of materials and a location, it completes all remaining modelling
+choices as explicit random variables and computes the result by Monte Carlo from impact factors that it
+takes from openLCA. It asks the human only the questions whose answer can reverse the verdict, and it
+chooses them with a decision flip query strategy derived from active learning. It returns an importable
+openLCA model and a report structured by ISO 14044. A first prototype on real data reaches a certified
+verdict with less than half the questions of uncertainty sampling. The project draws on four topics of
+the course, namely autonomous agents, human and AI cooperation, human oversight and trustworthy AI.
+\end{abstract}
+
+\section{Problem and Motivation}
+Life cycle assessment quantifies the environmental impacts of a product from raw material extraction to
+the end of its life \citep{iso14040}. European regulation now asks companies for information of LCA
+quality. The Packaging and Packaging Waste Regulation (EU) 2025/40 \citep{ppwr2024}, the Corporate
+Sustainability Reporting Directive, the Environmental Footprint recommendation and the forthcoming Digital
+Product Passport all require defensible and comparable environmental data for each product. Most of the
+firms that must comply are small and medium enterprises without an LCA expert.
+
+openLCA is free and widely used, reads every major inventory database and implements the Environmental
+Footprint impact methods. Yet before the first number appears, the user must take dozens of
+decisions that ISO 14044 and the ILCD Handbook leave to expert judgement \citep{ilcd2010,iso14040}. The
+user chooses the functional unit, the decision context (Situation A, B or C), the system boundary and its
+cut off, the allocation rule, the end of life model, the recycled content, the electricity mix of the
+location and the transport scenario. The user also decides which of several near identical datasets
+represents a material, for instance bottle grade PET in Portugal. Each decision is a branch in a tree, and only some
+branches reverse the verdict between two alternatives.
+
+The ILCD Handbook prescribes an iterative approach in which the analyst refines a rough model only where
+it matters \citep[25]{ilcd2010}, but a non expert cannot know what matters. The outcome is either no LCA
+at all or an LCA whose conclusion rests on defaults that the user never saw. The problem I address is therefore not computing an LCA, because openLCA already does that. The problem is
+deciding, for a given product and place, which modelling choices a human must make and which ones data can
+settle, and making that division explicit, auditable and cheap. This is a human centered AI problem,
+because I look for the adequate level of automation while the human keeps control of the choices that
+carry values.
+
+\section{Background}
+An LCA is only as good as the modelling choices behind it. ISO 14040 fixes the four phases and requires
+that any comparison between products treat uncertainty and sensitivity explicitly \citep{iso14040}. The
+ILCD Handbook makes those requirements operational and shows how many choices a practitioner must take
+before computing anything \citep{ilcd2010}. Two papers in this course illustrate the stakes. Whether capital goods are inside the
+boundary changes the result for some product groups and not for others \citep{frischknecht2007}, and the
+same product can receive very different carbon footprints depending on boundary and allocation
+\citep{schmidt2009}. The problem, then, is not calculating but choosing.
+
+Current tools help only halfway. openLCA propagates uncertainty by Monte Carlo and ranks inputs by their
+contribution to the variance of the result, but an input can be very uncertain and still never change
+which product wins.
+
+A BDI agent holds beliefs about the world, forms
+desires, commits to intentions and reconsiders them as new information arrives
+\citep{wooldridge2009,russell2020}. In BRANCH, the beliefs are the open modelling choices and the desire
+is a robust verdict. At each step, the intention is to compute, to ask or to stop.
+
+Deciding what to ask is an active learning problem. In active learning, the machine picks the instances
+it most needs labelled, and it uses uncertainty sampling such as least confident, margin and entropy
+\citep{settles2009}. The query strategy, together with the batch size, determines how little labelled
+data suffices \citep{faria2022}. In BRANCH, the instance is a modelling choice and the label is the
+human's decision. This design also keeps the human in command, because value laden choices stay with the
+person and routine ones go to the agent. This division of control distinguishes human in the loop cooperation
+from machine in the loop cooperation \citep{shneiderman2022,dafoe2020}.
+
+Recent systems automate LCA with large language model agents that start from a product name or photo
+\citep{zhang2026}; the modelling choices stay with the agent rather than with the user. To my knowledge,
+no tool takes a bill of materials and a location, builds the openLCA model and asks only about the choices
+that could change the conclusion.
+
+\section{Goals}
+The aim is to design, implement and evaluate BRANCH (Belief Revising Agent for Non expert Certified Human
+in command LCA), a companion agent for openLCA with four abilities.
+\begin{enumerate}
+\item BRANCH accepts as input only a bill of materials (material type and mass of each component), the
+location of production and use, and optionally a second alternative.
+\item It completes every remaining ISO 14044 and ILCD modelling choice from data and codified rules, and
+it keeps each choice as an explicit random variable instead of a hidden default.
+\item It asks the human only the questions whose answer can flip the verdict, in order of decision value.
+It accepts ``I don't know'' as an answer, and it stops when the verdict is robust.
+\item It exports an importable openLCA product system and a report structured by ISO 14044.
+\end{enumerate}
+I will consider the project successful if three conditions hold.
+\begin{enumerate}[label=(\roman*)]
+\item On a benchmark of packaging cases, BRANCH reproduces openLCA results built by experts within an
+agreed tolerance.
+\item BRANCH reaches a certified verdict with fewer questions than the uncertainty sampling baselines.
+\item At least 95 percent of certified verdicts hold under expert models that were built independently
+of the agent's own priors.
+\end{enumerate}
+The project will contribute a decision flip query strategy for LCA, a BDI formalisation of the ILCD
+iterative approach and an open source companion for openLCA, released under MPL 2.0 like openLCA.
+
+\section{Approach}
+\subsection{Beliefs}
+BRANCH is a symbolic and probabilistic agent, and it contains no language model. It keeps a probability
+distribution over every unstated modelling choice. Discrete choices, such as the allocation rule, the end
+of life model, the decision context and the selection among candidate datasets, receive categorical
+priors derived from ILCD and Environmental Footprint provisions. Continuous choices, such as recycled
+content, collection and recycling rates, transport distance, reuse trips, washing energy and the
+emission factor of electricity, receive priors centered on the statistics of the location. The spread of
+these priors comes from the pedigree data of the database. The bill of materials and the location fix the
+deterministic part of the belief base. BRANCH flags value laden choices, such as the inclusion of capital
+goods, and always asks about them.
+
+\subsection{Desires and intentions}
+The desire is a verdict (the impact of A, or the sign of A minus B) whose probability of reversal stays
+below 5 percent, obtained with the fewest questions.
+A control loop in the style of Wooldridge chooses the intentions. The agent can compute, which means that
+it propagates its beliefs by Monte Carlo. It can ask the human one question, or it can certify, which
+means that it stops and reports. The agent reconsiders its plan whenever an answer changes the ranking of
+the open choices.
+
+\subsection{Query strategy}
+For each open choice, the agent estimates by preposterior analysis how much the risk of a wrong verdict
+falls once the human fixes that choice, and it selects the choice with the largest expected reduction.
+This is active learning turned towards the human. The instance is a modelling choice and the label is the
+human's decision. I will compare this strategy with least confident, margin and entropy sampling over the
+same choices, with random order and with asking every question.
+
+Version 1 measured that risk as $\min(p,1-p)$, where $p$ is the probability that A beats B. The prototype
+showed that this measure makes the agent stall. When no single answer can carry $p$ across 0.5, every
+question looks useless. I now use $p(1-p)$. Its expected reduction is the variance of $p$ across answers,
+which is a sensitivity index of the verdict rather than of the impact.
+
+\subsection{Outputs}
+BRANCH writes the resolved model as openLCA JSON-LD, with its processes, flows, product systems and
+parameters, so that the user can open, inspect and edit it in openLCA. JSON-LD is the exchange format of
+openLCA itself and the cheapest way to hand a finished model back to it. The report lists the verdict, its estimated probability and the impacts of
+both alternatives. It also lists every choice with its provenance (human, database, rule or ``don't
+know'') and the smallest change in a single choice that reverses the verdict. When the comparison will be
+disclosed to the public, the agent states at the start and in the report that ISO 14044 requires a
+critical review panel. BRANCH prepares the study for that review but does not replace it.
+
+\subsection{Existing implementations}
+I use openLCA, olca-ipc and olca-schema as they are. LCA is linear in the amounts of each exchange, so
+openLCA computes once, through olca-ipc, the impact of every candidate dataset per unit (per kg, kWh or
+tonne kilometre). Monte Carlo then runs in Python on these factors, because the simulation built into
+openLCA cannot be conditioned on partial answers. Each step takes milliseconds, so the person never waits.
+The BDI loop and the query strategy are new code.
+
+\section{Materials}
+The software consists of openLCA 2.6, the olca-ipc and olca-schema Python packages, Python with NumPy
+and SciPy, and GitHub. The inventory comes from the Life Cycle Inventory database of the Swiss Federal Administration,
+BAFU:2026, which openLCA Nexus distributes for free \citep{bafu2026}. I combine it with the free openLCA
+LCIA methods pack and its Environmental Footprint 3.1 method. I first planned to use the Environmental
+Footprint database, but it is free only for registered Environmental Footprint studies and its licence
+agreements expired in December 2025, so I replaced it. The terms of BAFU:2026 allow its use in calculators
+but forbid redistribution, so each user extracts the factors on their own computer.
+
+Eurostat provides the recycling rates of packaging waste,
+ENTSO-E and the Brazilian National Energy Balance provide the emission factors of electricity, and the
+Environmental Footprint rules provide the default transport distances. The benchmark uses the bills of
+materials of beverage packaging (single use PET, refillable glass, aluminium cans and beverage cartons)
+for Portugal, Germany and Brazil. I chose these products because published comparative LCAs exist for
+them and their verdict is known to depend on reuse rates, recycled content and distance. The expert
+models come from the ELCD PET bottle case study on openLCA Nexus and from the published studies.
+
+\section{Evaluation}
+\paragraph{Accuracy.} For each benchmark case, I will compute the relative error between BRANCH and the
+expert model in every Environmental Footprint category, with bootstrap confidence intervals.
+
+\paragraph{Question efficiency.} A simulated human answers from an expert model. Following
+\citet{faria2022}, I will count the questions each strategy needs to reach a certified verdict over 30
+runs and batch sizes from 1 to 5, and I will compare the strategies with paired Wilcoxon tests.
+
+\paragraph{Calibration.} I will measure the share of certified verdicts that turn out wrong, with exact
+binomial intervals, under two simulated humans. The first answers from the agent's own priors and the second
+from their tails, so that the agent is not judged by its own assumptions.
+
+\paragraph{Human study.} Three to five non experts and two practitioners will solve one case with openLCA
+alone and one with BRANCH. I will report their time, their errors and their trust descriptively.
+
+\subsection{Preliminary results}
+The first test compares single use PET with refillable glass, per litre delivered in Portugal, for
+climate change, with 14 open choices and factors from BAFU:2026 (Table~\ref{tab:prelim}). The decision
+flip strategy needs less than half the questions of the course baselines (Wilcoxon $p<10^{-5}$), and it
+always asks about the distribution distance first. Over 300 runs, certified verdicts were wrong in 1.0
+percent of cases with correct priors (95\% interval 0.2 to 2.9) and in 4.3 percent with wrong priors
+(2.3 to 7.3), which stays within the 5 percent target. Twelve of the fourteen priors are still
+placeholders, so I do not claim an environmental verdict yet.
+
+\begin{table}[h]
+\vspace{-4pt}
+\centering
+\small
+\begin{tabular}{lcc}
+\toprule
+Strategy & Correct priors & Wrong priors\\
+\midrule
+Decision flip, $p(1-p)$ & 4.6 & 3.2\\
+Entropy, least confident & 10.5 & 9.2\\
+Margin & 11.3 & 9.8\\
+Random & 10.5 & 9.5\\
+\bottomrule
+\end{tabular}
+\caption{Mean number of questions to a certified verdict over 30 runs.}
+\label{tab:prelim}
+\vspace{-8pt}
+\end{table}
+
+The paper will state three limitations. The agent covers attributional studies in ILCD Situation A,
+its priors are only as good as the regional statistics behind them, and it does not replace the critical
+review that ISO 14044 requires for public comparative assertions.
+
+\begin{thebibliography}{99}
+\scriptsize
+\setlength{\itemsep}{0pt}
+\bibitem[{BAFU(2026)}]{bafu2026}
+BAFU (Federal Office for the Environment). 2026. \emph{Life Cycle Inventory Database of the Swiss Federal Administration, BAFU:2026}. Version 1.1. Bern: Federal Office for the Environment. Distributed via openLCA Nexus.
+\bibitem[{Dafoe et~al.(2020)}]{dafoe2020}
+Dafoe, Allan, Edward Hughes, Yoram Bachrach, Tantum Collins, Kevin R. McKee, Joel Z. Leibo, Kate Larson, and Thore Graepel. 2020. ``Open Problems in Cooperative AI.'' arXiv preprint arXiv:2012.08630. \url{https://arxiv.org/abs/2012.08630}.
+\bibitem[{European Commission(2010)}]{ilcd2010}
+European Commission, Joint Research Centre, Institute for Environment and Sustainability. 2010. \emph{International Reference Life Cycle Data System (ILCD) Handbook: General Guide for Life Cycle Assessment, Detailed Guidance}. EUR 24708 EN. Luxembourg: Publications Office of the European Union.
+\bibitem[{European Parliament and Council(2024)}]{ppwr2024}
+European Parliament and Council. 2024. ``Regulation (EU) 2025/40 of 19 December 2024 on Packaging and Packaging Waste, Amending Regulation (EU) 2019/1020 and Directive (EU) 2019/904, and Repealing Directive 94/62/EC.'' \emph{Official Journal of the European Union} L, 22 January 2025. \url{http://data.europa.eu/eli/reg/2025/40/oj}.
+\bibitem[{Faria et~al.(2022)}]{faria2022}
+Faria, Bruno, Dylan Perdig\~ao, Joana Br\'as, and Lu\'is Macedo. 2022. ``The Joint Role of Batch Size and Query Strategy in Active Learning-Based Prediction: A Case Study in the Heart Attack Domain.'' In \emph{Progress in Artificial Intelligence: EPIA 2022}. Cham: Springer.
+\bibitem[{Frischknecht et~al.(2007)}]{frischknecht2007}
+Frischknecht, Rolf, Hans-J\"org Althaus, Christian Bauer, Gabor Doka, Thomas Heck, Niels Jungbluth, Daniel Kellenberger, and Thomas Nemecek. 2007. ``The Environmental Relevance of Capital Goods in Life Cycle Assessments of Products and Services.'' \emph{International Journal of Life Cycle Assessment} 12 (Special Issue 1): 7--17.
+\bibitem[{ISO(2006)}]{iso14040}
+ISO. 2006. \emph{ISO 14040:2006 Environmental Management: Life Cycle Assessment, Principles and Framework}. Geneva: International Organization for Standardization.
+\bibitem[{Russell and Norvig(2020)}]{russell2020}
+Russell, Stuart, and Peter Norvig. 2020. \emph{Artificial Intelligence: A Modern Approach}. 4th ed. Hoboken: Pearson.
+\bibitem[{Schmidt(2009)}]{schmidt2009}
+Schmidt, Mario. 2009. ``Carbon Accounting and Carbon Footprint: More than Just Diced Results?'' \emph{International Journal of Climate Change Strategies and Management} 1 (1): 19--30.
+\bibitem[{Settles(2009)}]{settles2009}
+Settles, Burr. 2009. \emph{Active Learning Literature Survey}. Computer Sciences Technical Report 1648. Madison: University of Wisconsin--Madison.
+\bibitem[{Shneiderman(2022)}]{shneiderman2022}
+Shneiderman, Ben. 2022. \emph{Human-Centered AI}. Oxford: Oxford University Press.
+\bibitem[{Wooldridge(2009)}]{wooldridge2009}
+Wooldridge, Michael. 2009. \emph{An Introduction to MultiAgent Systems}. 2nd ed. Chichester: Wiley.
+\bibitem[{Zhang et~al.(2026)}]{zhang2026}
+Zhang, Zhihan, et~al. 2026. ``Sustainability Assessment Using Multimodal AI Agents.'' \emph{Nature Electronics}. \url{https://doi.org/10.1038/s41928-026-01653-w}.
+\item[] \textit{Use of AI tools.} I used Claude (Anthropic) as a writing, research and coding assistant.
+The design decisions, the problem and the final wording are my own, and I checked every reference
+against its source.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,20 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.zolca
+outputs/
+.DS_Store
+results/
+data/factors/
+data/catalogue_sources/
+
+# LCA data: never in git (BAFU terms of use, size)
+BAFU-*
+BAFU-20XY*
+openLCA LCIA*
+elcd_*
+lca_data/
+*.egg-info/
+build/
+dist/

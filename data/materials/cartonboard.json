@@ -1,0 +1,46 @@
+{
+  "label": "cartonboard",
+  "datasets": {
+    "folding boxboard (FBB)": [
+      "folding_boxboard",
+      0.25
+    ],
+    "solid bleached board (SBB)": [
+      "solid_bleached_board",
+      0.25
+    ],
+    "solid unbleached board (SUB)": [
+      "solid_unbleached_board",
+      0.25
+    ],
+    "whitelined chipboard (WLC, recycled fibre)": [
+      "whitelined_chipboard",
+      0.25
+    ]
+  },
+  "datasets_source": "SOURCE: BAFU:2026 cartonboard datasets; ASSUMPTION on the weights",
+  "dataset_question": "Which cartonboard is the {c} made of?",
+  "conversion": null,
+  "recycled": null,
+  "end_of_life": {
+    "model": "split",
+    "recycling_rate": [
+      "uniform",
+      {
+        "low": 0.4,
+        "high": 0.95
+      },
+      "ASSUMPTION: 40 to 95% of cartonboard packaging recycled; no source read for a default. Germany has a national value in data/regions/DE.json"
+    ],
+    "incineration_share": [
+      "uniform",
+      {
+        "low": 0.2,
+        "high": 0.8
+      },
+      "ASSUMPTION: share of the non recycled material incinerated, rest landfilled"
+    ],
+    "incineration": "disposal_board_incineration",
+    "landfill": "disposal_board_landfill"
+  }
+}

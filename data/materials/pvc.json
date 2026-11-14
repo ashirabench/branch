@@ -1,0 +1,33 @@
+{
+  "label": "PVC",
+  "datasets": {
+    "PVC, production mix": [
+      "pvc_regional_storage",
+      1.0
+    ]
+  },
+  "datasets_source": "SOURCE: BAFU:2026 dataset 'Polyvinylchloride, at regional storage'",
+  "conversion": "thermoforming",
+  "recycled": null,
+  "end_of_life": {
+    "model": "split",
+    "recycling_rate": [
+      "uniform",
+      {
+        "low": 0.0,
+        "high": 0.5
+      },
+      "ASSUMPTION: 0 to 50% recycled; no source read"
+    ],
+    "incineration_share": [
+      "uniform",
+      {
+        "low": 0.2,
+        "high": 0.8
+      },
+      "ASSUMPTION: share of the non recycled material incinerated, rest landfilled"
+    ],
+    "incineration": "disposal_pvc_incineration",
+    "landfill": "disposal_pvc_landfill"
+  }
+}

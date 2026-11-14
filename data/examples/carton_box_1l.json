@@ -1,0 +1,32 @@
+{
+  "id": "cbox",
+  "name": "Cartonboard box 1 L",
+  "volume_l": 1.0,
+  "refillable": false,
+  "components": [
+    {
+      "id": "box",
+      "material": "cartonboard",
+      "mass_prior": [
+        "uniform",
+        {
+          "low": 25,
+          "high": 45
+        },
+        "ASSUMPTION: illustrative mass of a 1 L cartonboard box, not measured; replace it with the weighed mass"
+      ]
+    },
+    {
+      "id": "liner",
+      "material": "ldpe",
+      "mass_prior": [
+        "uniform",
+        {
+          "low": 3,
+          "high": 8
+        },
+        "ASSUMPTION: illustrative mass of its plastic liner, not measured; replace it with the weighed mass"
+      ]
+    }
+  ]
+}
