@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# The larger run fixed in experiments/PLAN_2026-11-15.md: 300 further seeds (2000 to 2299) per case
+# in the chosen setting, with experts from the tails, for Acidification and Climate change.
+#
+#   bash experiments/run_more_seeds.sh
+#
+# Writes results/more_seeds/<category>_tails/ALL_summary.csv. About 10 minutes on two cores.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+PRODUCTS=(pet_bottle_1l glass_refillable_1l aluminium_can_330ml beverage_carton_1l)
+ls data/factors/*.json >/dev/null 2>&1 || { echo "No factors in data/factors/."; exit 1; }
+for category in "Acidification" "Climate change"; do
+  out="more_seeds/$(echo "$category" | tr ' ' '_')_tails"
+  mkdir -p "results/$out"
+  for region in PT DE BR; do
+    for ((i = 0; i < ${#PRODUCTS[@]}; i++)); do
+      for ((j = i + 1; j < ${#PRODUCTS[@]}; j++)); do
+        a=${PRODUCTS[$i]}; b=${PRODUCTS[$j]}
+        python experiments/run_grid.py --case real --a "$a" --b "$b" --region "$region" \
+          --batch 3 --seeds 300 --n 20000 --tau 0.025 --truth tails --strategies decision_flip \
+          --category "$category" --ablation none --first-seed 2000 --tag "$out/${region}_${a}_vs_${b}" >/dev/null
+      done
+    done
+  done
+  python experiments/summarize_benchmark.py "results/$out" >/dev/null
+  echo "done: results/$out/ALL_summary.csv"
+done

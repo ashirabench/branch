@@ -1,0 +1,37 @@
+category,case,sessions,certified,wrong,wrong_pct,q_mean
+Acidification,BR_aluminium_can_330ml_vs_beverage_carton_1l,300,300,0,0.0,0.0
+Acidification,BR_glass_refillable_1l_vs_aluminium_can_330ml,300,300,7,2.33,4.4
+Acidification,BR_glass_refillable_1l_vs_beverage_carton_1l,300,300,1,0.33,0.0
+Acidification,BR_pet_bottle_1l_vs_aluminium_can_330ml,300,300,52,17.33,0.0
+Acidification,BR_pet_bottle_1l_vs_beverage_carton_1l,300,300,0,0.0,0.0
+Acidification,BR_pet_bottle_1l_vs_glass_refillable_1l,300,300,8,2.67,3.64
+Acidification,DE_aluminium_can_330ml_vs_beverage_carton_1l,300,300,0,0.0,0.0
+Acidification,DE_glass_refillable_1l_vs_aluminium_can_330ml,300,300,4,1.33,3.87
+Acidification,DE_glass_refillable_1l_vs_beverage_carton_1l,300,300,2,0.67,0.0
+Acidification,DE_pet_bottle_1l_vs_aluminium_can_330ml,300,300,28,9.33,0.0
+Acidification,DE_pet_bottle_1l_vs_beverage_carton_1l,300,300,0,0.0,0.0
+Acidification,DE_pet_bottle_1l_vs_glass_refillable_1l,300,300,8,2.67,4.18
+Acidification,PT_aluminium_can_330ml_vs_beverage_carton_1l,300,300,0,0.0,0.0
+Acidification,PT_glass_refillable_1l_vs_aluminium_can_330ml,300,300,4,1.33,3.93
+Acidification,PT_glass_refillable_1l_vs_beverage_carton_1l,300,300,1,0.33,0.0
+Acidification,PT_pet_bottle_1l_vs_aluminium_can_330ml,300,300,43,14.33,0.0
+Acidification,PT_pet_bottle_1l_vs_beverage_carton_1l,300,300,0,0.0,0.0
+Acidification,PT_pet_bottle_1l_vs_glass_refillable_1l,300,300,8,2.67,3.5
+Climate change,BR_aluminium_can_330ml_vs_beverage_carton_1l,300,300,0,0.0,0.0
+Climate change,BR_glass_refillable_1l_vs_aluminium_can_330ml,300,300,8,2.67,4.31
+Climate change,BR_glass_refillable_1l_vs_beverage_carton_1l,300,300,7,2.33,3.99
+Climate change,BR_pet_bottle_1l_vs_aluminium_can_330ml,300,300,4,1.33,3.82
+Climate change,BR_pet_bottle_1l_vs_beverage_carton_1l,300,300,1,0.33,0.0
+Climate change,BR_pet_bottle_1l_vs_glass_refillable_1l,300,300,3,1.0,4.46
+Climate change,DE_aluminium_can_330ml_vs_beverage_carton_1l,300,300,0,0.0,0.0
+Climate change,DE_glass_refillable_1l_vs_aluminium_can_330ml,300,300,3,1.0,4.19
+Climate change,DE_glass_refillable_1l_vs_beverage_carton_1l,300,300,14,4.67,2.48
+Climate change,DE_pet_bottle_1l_vs_aluminium_can_330ml,300,300,4,1.33,3.73
+Climate change,DE_pet_bottle_1l_vs_beverage_carton_1l,300,300,2,0.67,0.0
+Climate change,DE_pet_bottle_1l_vs_glass_refillable_1l,300,300,7,2.33,4.24
+Climate change,PT_aluminium_can_330ml_vs_beverage_carton_1l,300,300,0,0.0,0.0
+Climate change,PT_glass_refillable_1l_vs_aluminium_can_330ml,300,300,2,0.67,4.5
+Climate change,PT_glass_refillable_1l_vs_beverage_carton_1l,300,300,8,2.67,3.85
+Climate change,PT_pet_bottle_1l_vs_aluminium_can_330ml,300,300,2,0.67,4.22
+Climate change,PT_pet_bottle_1l_vs_beverage_carton_1l,300,300,1,0.33,0.0
+Climate change,PT_pet_bottle_1l_vs_glass_refillable_1l,300,300,10,3.33,4.74

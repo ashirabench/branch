@@ -28,6 +28,6 @@
       "ASSUMPTION: share of the non recycled material incinerated, rest landfilled"
     ],
     "incineration": "disposal_pp_incineration",
-    "landfill": "disposal_pet_landfill"
+    "landfill": "disposal_plastics_mixture_landfill"
   }
 }

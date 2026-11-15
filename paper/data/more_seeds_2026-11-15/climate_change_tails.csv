@@ -1,0 +1,2 @@
+strategy,batch_size,runs,cases,q_mean,q_median,certified_pct,wrong_when_certified_pct,wrong_ci95,binom_ci95,cases_no_question
+decision_flip,3,5400,18,2.695925925925926,3.0,100.0,1.4074074074074074,0.9 to 2.0,1.1 to 1.8,6

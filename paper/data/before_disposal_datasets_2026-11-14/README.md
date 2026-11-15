@@ -1,0 +1,3 @@
+# Summaries before the correction of the disposal datasets (14 November 2026)
+
+These are the benchmark and validation summaries of the paper as they were while the incineration and the landfill of PET, HDPE and LDPE used the BAFU:2026 dataset of a plastics mixture. On 14 November 2026 PET received its own incineration dataset and polyethylene its own datasets for both routes, and the benchmark ran again on 15 November 2026. No verdict changed at the central values of the 18 cases; the impact of the products moved by at most 5.1% and the mean number of questions in the chosen setting from 2.75 to 2.87.

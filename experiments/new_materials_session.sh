@@ -17,6 +17,7 @@ KEYS=(pp_granulate ps_gpps ps_hips eps_expandable pvc_regional_storage pla_granu
       steel_unalloyed sheet_rolling_steel kraft_paper_unbleached kraft_paper_bleached
       folding_boxboard solid_bleached_board solid_unbleached_board whitelined_chipboard
       disposal_pp_incineration disposal_ps_incineration disposal_ps_landfill
+      disposal_expanded_polystyrene_incineration disposal_plastics_mixture_incineration disposal_plastics_mixture_landfill
       disposal_pvc_incineration disposal_pvc_landfill disposal_tin_sheet_incineration
       disposal_tin_sheet_landfill disposal_packaging_paper_incineration disposal_paper_landfill)
 

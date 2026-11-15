@@ -38,7 +38,8 @@ def variants(added):
     for path in sorted(glob.glob(os.path.join(ROOT, "data", "examples", "*.json"))):
         with open(path) as fh:
             spec = json.load(fh)
-        for mid in sorted({c["material"] for c in spec["components"]} & set(added)):
+        # examples described only by processes of the database have no component: nothing to do here
+        for mid in sorted({c["material"] for c in spec.get("components", [])} & set(added)):
             for label in added[mid]["datasets"]:
                 v = json.loads(json.dumps(spec))
                 v.setdefault("materials", {}).setdefault(mid, {})["dataset"] = label

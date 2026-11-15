@@ -1,6 +1,6 @@
 ; Inno Setup script for "BRANCH for openLCA" (built by .github/workflows/installers.yml).
 #define Name "BRANCH for openLCA"
-#define Version "0.1.1"
+#define Version "0.1.2"
 
 [Setup]
 AppId={{6B1C2F4E-8D2A-4C55-9B7E-BRANCHOLCA01}

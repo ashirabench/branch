@@ -32,11 +32,11 @@ Every prior starts with `SOURCE:` (cited) or `ASSUMPTION:` (placeholder). Region
 | `corrugated_board.json` | corrugated board | formed box, no conversion step |
 | `cartonboard.json` | cartonboard | four grades (FBB, SBB, SUB, WLC) |
 | `kraft_paper.json` | kraft paper | bleached or unbleached; landfill dataset is a proxy |
-| `pp.json` | polypropylene | landfill uses the plastics mixture dataset |
+| `pp.json` | polypropylene | landfill uses the plastics mixture dataset (the polypropylene one is marked obsolete) |
 | `ps.json` | polystyrene | general purpose or high impact |
 | `eps.json` | expanded polystyrene | the expansion of the beads is not modelled |
 | `pvc.json` | PVC | |
-| `pla.json` | PLA | end of life uses the plastics mixture datasets |
+| `pla.json` | PLA | end of life uses the plastics mixture datasets (the database has none for PLA) |
 | `steel.json` | steel sheet | proxy for tinplate, the tin coating is not modelled |
 
 Every dataset option of these materials was checked against openLCA on 14 November 2026

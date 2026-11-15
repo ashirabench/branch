@@ -32,9 +32,16 @@ PROCESSES = {
     "lorry_16_32t": ["Transport, freight, lorry, 16t-32t gross weight, fleet average"],
     "tap_water_RER": ["Tap water, unspecified natural origin RER, at user"],
     "heat_natural_gas_furnace": ["Heat, natural gas, at industrial furnace 1MW"],
-    # BAFU:2026 has no PET specific disposal dataset: plastics mixture is a PROXY.
-    "disposal_pet_incineration": ["Disposal, plastics, mixture, 15.3% water, to municipal incineration"],
-    "disposal_pet_landfill": ["Disposal, plastics, mixture, 15.3% water, to sanitary landfill"],
+    # Disposal of plastics: the dataset of the polymer where BAFU:2026 has a current one
+    # (list of 14 November 2026: PET incineration, polyethylene incineration and landfill).
+    # The PET landfill dataset of the database is marked obsolete ("xx"), so the landfill
+    # of PET uses the plastics mixture, a PROXY; so do the materials with no dataset at all.
+    "disposal_polyethylene_terephthalate_incineration": [
+        "Disposal, polyethylene terephtalate, 0.2% water, to municipal incineration"],
+    "disposal_polyethylene_incineration": ["Disposal, polyethylene, 0.4% water, to municipal incineration"],
+    "disposal_polyethylene_landfill": ["Disposal, polyethylene, 0.4% water, to sanitary landfill"],
+    "disposal_plastics_mixture_incineration": ["Disposal, plastics, mixture, 15.3% water, to municipal incineration"],
+    "disposal_plastics_mixture_landfill": ["Disposal, plastics, mixture, 15.3% water, to sanitary landfill"],
     "disposal_glass_incineration": ["Disposal, glass, 0% water, to municipal incineration"],
     "disposal_glass_landfill": ["Disposal, glass, 0% water, to inert material landfill",
                                 "Disposal, glass, 0% water, to construction waste landfill"],
@@ -79,6 +86,8 @@ PROCESSES = {
     "whitelined_chipboard": ["Whitelined chipboard, WLC, at plant"],
     "disposal_pp_incineration": ["Disposal, polypropylene, 15.9% water, to municipal incineration"],
     "disposal_ps_incineration": ["Disposal, polystyrene, 0.2% water, to municipal incineration"],
+    "disposal_expanded_polystyrene_incineration": [
+        "Disposal, expanded polystyrene, 5% water, to municipal incineration"],
     "disposal_ps_landfill": ["Disposal, polystyrene, 0.2% water, to sanitary landfill"],
     "disposal_pvc_incineration": ["Disposal, polyvinylchloride, 0.2% water, to municipal incineration"],
     "disposal_pvc_landfill": ["Disposal, polyvinylchloride, 0.2% water, to sanitary landfill"],

@@ -46,7 +46,8 @@ def main():
     for key in sorted(factors):
         f = factors[key]
         unit = f.get("unit")
-        ok_unit = unit in expected_units(key)
+        # a process chosen by name ("proc:...") keeps the unit of the database, which the app shows to the user
+        ok_unit = key.startswith("proc:") or unit in expected_units(key)
         climate = f.get("impacts", {}).get("Climate change")
         ok_value = climate is not None and climate > 0
         problem = []

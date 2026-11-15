@@ -93,8 +93,8 @@ def _fake_factors(tmp_path):
     keys = ["pet_granulate_bottle_grade", "pet_granulate_amorphous", "stretch_blow_moulding",
             "glass_packaging_white", "glass_packaging_green", "glass_packaging_brown",
             "electricity_mv_PT", "electricity_mv_DE", "electricity_mv_BR", "lorry_16_32t",
-            "heat_natural_gas_furnace", "tap_water_RER", "disposal_pet_incineration",
-            "disposal_pet_landfill", "disposal_glass_incineration", "disposal_glass_landfill"]
+            "heat_natural_gas_furnace", "tap_water_RER", "disposal_polyethylene_terephthalate_incineration",
+            "disposal_plastics_mixture_landfill", "disposal_glass_incineration", "disposal_glass_landfill"]
     data = {"method": "test", "factors": {k: {"impacts": {"Climate change": 1.0}} for k in keys}}
     p = tmp_path / "f.json"
     p.write_text(json.dumps(data))

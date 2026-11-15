@@ -10,6 +10,8 @@ No LCA data is stored in this repository. The terms of use of the BAFU database 
 | `data/materials/` | Materials added as data files, one JSON per material (see its README) | Yes |
 | `data/examples/` | Example products for the added materials and for products described by processes | Yes |
 | `data/cff/` | Circular Footprint Formula parameters per material, to be copied from PEF Annex C (its README gives the format; no file is filled in yet) | Yes |
+| `paper/data/before_disposal_datasets_2026-11-14/` | Summaries of the paper from before PET and polyethylene received their own disposal datasets | Yes |
+| `paper/data/more_seeds_2026-11-15/` | The larger run of 5,400 sessions per category fixed in `experiments/PLAN_2026-11-15.md` | Yes |
 | `data/prior_checks.csv` | Published values read in the original documents, each with the prior it checks; `tests/test_prior_checks.py` fails when a prior excludes one of them | Yes |
 | `data/benchmark/` | Product files (bill of materials) for the benchmark: single use PET, refillable glass, aluminium can, beverage carton. Masses are ASSUMPTION ranges until sourced | Yes |
 

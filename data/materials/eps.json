@@ -6,7 +6,7 @@
       1.0
     ]
   },
-  "datasets_source": "SOURCE: BAFU:2026 dataset 'Polystyrene, expandable, at plant'; PROXY: the energy to expand and mould the beads is not modelled",
+  "datasets_source": "SOURCE: BAFU:2026 dataset 'Polystyrene, expandable, at plant'; PROXY: the energy to expand and mould the beads is not modelled; at end of life, the incineration dataset is the one of expanded polystyrene, and the landfill uses the polystyrene dataset because BAFU:2026 has none for the expanded form",
   "conversion": null,
   "recycled": null,
   "end_of_life": {
@@ -27,7 +27,7 @@
       },
       "ASSUMPTION: share of the non recycled material incinerated, rest landfilled"
     ],
-    "incineration": "disposal_ps_incineration",
+    "incineration": "disposal_expanded_polystyrene_incineration",
     "landfill": "disposal_ps_landfill"
   }
 }

@@ -1,0 +1,3 @@
+region,pair,product,openLCA,BRANCH,relative_difference,cause
+PT,data/examples/cotton_bag.json vs data/examples/pp_bag.json,Cotton bag,2.434295909319569,2.434295908268792,4.316555105011505e-10,
+PT,data/examples/cotton_bag.json vs data/examples/pp_bag.json,Polypropylene bag,0.5877401588738762,0.5877401591495073,4.689675687971577e-10,

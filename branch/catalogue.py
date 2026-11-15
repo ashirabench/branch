@@ -48,16 +48,23 @@ carries only its own production burden.
 #                   one fate for the whole item; None = recycling (cut-off)
 # --------------------------------------------------------------------------
 
-_PLASTICS_EOL = {
-    "model": "split",
-    "recycling_rate": ("beta", {"a": 4, "b": 6},
-                       "ASSUMPTION: about 40% collected for recycling; replace with Eurostat env_waspac"),
-    "incineration_share": ("uniform", {"low": 0.2, "high": 0.8},
-                           "ASSUMPTION: share of non recycled plastic incinerated, rest landfilled"),
-    # BAFU:2026 has no polymer specific disposal dataset: plastics mixture is a PROXY.
-    "incineration": "disposal_pet_incineration",
-    "landfill": "disposal_pet_landfill",
-}
+def _plastics_eol(incineration, landfill):
+    """Split end of life of a plastic, with the disposal datasets of its polymer."""
+    return {
+        "model": "split",
+        "recycling_rate": ("beta", {"a": 4, "b": 6},
+                           "ASSUMPTION: about 40% collected for recycling; replace with Eurostat env_waspac"),
+        "incineration_share": ("uniform", {"low": 0.2, "high": 0.8},
+                               "ASSUMPTION: share of non recycled plastic incinerated, rest landfilled"),
+        "incineration": incineration,
+        "landfill": landfill,
+    }
+
+
+# PET: its own incineration dataset. Its landfill dataset in BAFU:2026 is marked obsolete,
+# so the landfill uses the plastics mixture, a PROXY. Polyethylene: its own datasets for both.
+_PET_EOL = _plastics_eol("disposal_polyethylene_terephthalate_incineration", "disposal_plastics_mixture_landfill")
+_PE_EOL = _plastics_eol("disposal_polyethylene_incineration", "disposal_polyethylene_landfill")
 
 MATERIALS = {
     "pet": {
@@ -74,21 +81,21 @@ MATERIALS = {
             "ratio": ("uniform", {"low": 0.2, "high": 0.5},
                       "ASSUMPTION: no recycled PET dataset in BAFU:2026; burden of rPET as a share of virgin PET"),
         },
-        "end_of_life": _PLASTICS_EOL,
+        "end_of_life": _PET_EOL,
     },
     "hdpe": {
         "label": "HDPE",
         "datasets": {"HDPE granulate": ("hdpe_granulate", 1.0)},
         "conversion": "injection_moulding",
         "recycled": None,
-        "end_of_life": _PLASTICS_EOL,
+        "end_of_life": _PE_EOL,
     },
     "ldpe": {
         "label": "LDPE",
         "datasets": {"LDPE granulate": ("ldpe_granulate", 1.0)},
         "conversion": "film_extrusion",
         "recycled": None,
-        "end_of_life": _PLASTICS_EOL,
+        "end_of_life": _PE_EOL,
     },
     "glass": {
         "label": "glass",

@@ -124,3 +124,41 @@ def test_only_materials_with_factors_are_offered():
     assert set(webapp.materials(demo)) == set(ready)
     assert "polypropylene" in webapp.materials_waiting(demo)
     assert set(webapp.materials()) == set(load_materials())
+
+
+def test_every_plastic_uses_the_disposal_datasets_of_its_own_polymer():
+    """A plastics mixture dataset is a stand-in. It is allowed only where the database has no
+    current dataset of the polymer (list of BAFU:2026 read on 14 November 2026)."""
+    from branch import catalogue as cat
+    from branch.olca_extract import PROCESSES
+    mats = {**cat.MATERIALS, **cat.load_materials()}
+    polymer = {"pet": "polyethylene terephtalate", "hdpe": "polyethylene, 0.4%", "ldpe": "polyethylene, 0.4%",
+               "pp": "polypropylene", "ps": "polystyrene, 0.2%", "eps": "expanded polystyrene", "pvc": "polyvinylchloride"}
+    stand_in_allowed = {("pet", "landfill"), ("pp", "landfill"), ("pla", "incineration"), ("pla", "landfill")}
+    same_polymer_allowed = {("eps", "landfill"): "polystyrene, 0.2%"}
+    for mid in list(polymer) + ["pla"]:
+        eol = mats[mid]["end_of_life"]
+        for route in ("incineration", "landfill"):
+            name = PROCESSES[eol[route]][0].lower()
+            if (mid, route) in stand_in_allowed:
+                assert "plastics, mixture" in name, (mid, route, name)
+            elif (mid, route) in same_polymer_allowed:
+                assert same_polymer_allowed[(mid, route)] in name, (mid, route, name)
+            else:
+                assert polymer[mid] in name and "mixture" not in name, (mid, route, name)
+            assert not name.startswith("xx "), "obsolete datasets of the database are not used"
+
+
+def test_the_materials_validation_reads_every_example_file():
+    """Examples described only by processes have no component; the validation must skip them, not stop."""
+    import importlib.util
+    import os
+    pytest.importorskip("olca_schema")
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "experiments", "validate_materials.py")
+    spec = importlib.util.spec_from_file_location("validate_materials", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    from branch import catalogue as cat
+    added = {k: v for k, v in cat.load_materials().items() if k not in cat.MATERIALS}
+    found = list(mod.variants(added))
+    assert {mid for _, _, mid, _ in found} == set(added)

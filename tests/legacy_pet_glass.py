@@ -36,7 +36,7 @@ def legacy_pet_vs_refillable_glass(factors, country="PT", category=DEFAULT_CATEG
     lorry = f("lorry_16_32t")                      # per t*km
     heat = f("heat_natural_gas_furnace")           # per MJ
     water = f("tap_water_RER")                     # per kg
-    pet_inc, pet_land = f("disposal_pet_incineration"), f("disposal_pet_landfill")
+    pet_inc, pet_land = f("disposal_polyethylene_terephthalate_incineration"), f("disposal_plastics_mixture_landfill")
     glass_eol = T([0.0, f("disposal_glass_landfill"), f("disposal_glass_incineration")])
 
     choices = [
