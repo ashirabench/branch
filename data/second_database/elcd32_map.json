@@ -1,0 +1,167 @@
+{
+ "about": "Which ELCD 3.2 process replaces which BRANCH factor in the second database test. Fixed on 15 November 2026, before any run (experiments/PLAN_2026-11-15.md, B3).",
+ "mapped": {
+  "pet_granulate_bottle_grade": {
+   "process": "Polyethylene terephthalate (PET) granulate, production mix, at plant, bottle grade",
+   "location": "RER",
+   "ref_id": "84854d79-77da-4794-9d2a-f108f7e91741",
+   "unit": "kg",
+   "note": ""
+  },
+  "pet_granulate_amorphous": {
+   "process": "Polyethylene terephthalate (PET) granulate, production mix, at plant, amorphous",
+   "location": "RER",
+   "ref_id": "028b2915-00a5-4967-b356-34bce19960c3",
+   "unit": "kg",
+   "note": ""
+  },
+  "hdpe_granulate": {
+   "process": "Polyethylene high density granulate (PE-HD), production mix, at plant",
+   "location": "RER",
+   "ref_id": "0704c700-2fb0-43c5-8803-bed8a6f1b968",
+   "unit": "kg",
+   "note": ""
+  },
+  "ldpe_granulate": {
+   "process": "Polyethylene low density granulate (PE-LD), production mix, at plant",
+   "location": "RER",
+   "ref_id": "46c09193-ab51-43ae-957f-e6383b67e73d",
+   "unit": "kg",
+   "note": ""
+  },
+  "liquid_packaging_board": {
+   "process": "Liquid Packaging Board (LPB) production, production mix, at plant, production, mineral coated LPB (n=4), basis weight: 266 g/m2",
+   "location": "EU-27",
+   "ref_id": "7d580a76-d2a4-46fe-a3a3-c6c8ed585382",
+   "unit": "kg",
+   "note": ""
+  },
+  "glass_packaging_white": {
+   "process": "Container glass (delivered to the end user of the contained product, reuse rate: 7%), production mix at plant, technology mix",
+   "location": "RER",
+   "ref_id": "d7bbec20-f8d8-4a8a-9a99-c7cdafaaa77d",
+   "unit": "kg",
+   "note": "one dataset for the three colours; 7% reuse inside the dataset"
+  },
+  "glass_packaging_green": {
+   "process": "Container glass (delivered to the end user of the contained product, reuse rate: 7%), production mix at plant, technology mix",
+   "location": "RER",
+   "ref_id": "d7bbec20-f8d8-4a8a-9a99-c7cdafaaa77d",
+   "unit": "kg",
+   "note": "same dataset"
+  },
+  "glass_packaging_brown": {
+   "process": "Container glass (delivered to the end user of the contained product, reuse rate: 7%), production mix at plant, technology mix",
+   "location": "RER",
+   "ref_id": "d7bbec20-f8d8-4a8a-9a99-c7cdafaaa77d",
+   "unit": "kg",
+   "note": "same dataset"
+  },
+  "electricity_mv_PT": {
+   "process": "Electricity Mix, consumption mix, at consumer, AC, 1kV - 60kV",
+   "location": "PT",
+   "ref_id": "b9562ec9-10cb-410a-a23c-146178662d30",
+   "unit": "kWh",
+   "note": "reference flow 3.6 MJ = 1 kWh"
+  },
+  "electricity_mv_DE": {
+   "process": "Electricity Mix, consumption mix, at consumer, AC, 1kV - 60kV",
+   "location": "DE",
+   "ref_id": "a1388758-0402-40c4-976b-6a805c8e46e0",
+   "unit": "kWh",
+   "note": "reference flow 3.6 MJ = 1 kWh"
+  },
+  "heat_natural_gas_furnace": {
+   "process": "Process steam from natural gas 90%, consumption mix, at power plant, heat plant, MJ, 90 % efficiency",
+   "location": "EU-27",
+   "ref_id": "90fd9728-e56b-4a82-b631-7d32572036f9",
+   "unit": "MJ",
+   "note": "steam at 90% efficiency instead of an industrial furnace"
+  },
+  "lorry_16_32t": {
+   "process": "Lorry transport, Euro 0, 1, 2, 3, 4 mix, 22 t total weight, 17,3t max payload",
+   "location": "RER",
+   "ref_id": "b444f4d3-3393-11dd-bd11-0800200c9a66",
+   "unit": "t*km",
+   "note": "22 t lorry, 17.3 t payload"
+  },
+  "tap_water_RER": {
+   "process": "Drinking water, production mix, at plant, water purification treatment, from surface water",
+   "location": "RER",
+   "ref_id": "db009014-338f-11dd-bd11-0800200c9a66",
+   "unit": "kg",
+   "note": "at plant, not at user"
+  },
+  "disposal_polyethylene_terephthalate_incineration": {
+   "process": "Waste incineration of plastics (PET, PMMA, PC), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment",
+   "location": "EU-27",
+   "ref_id": "9c0cf135-02aa-46a1-ae22-dfa2683c9bd8",
+   "unit": "kg",
+   "note": "version without energy credit"
+  },
+  "disposal_polyethylene_incineration": {
+   "process": "Waste incineration of plastics (PE, PP, PS, PB), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment",
+   "location": "EU-27",
+   "ref_id": "e01167ad-6cf8-47a7-8df9-e89bf35cb704",
+   "unit": "kg",
+   "note": "version without energy credit"
+  },
+  "disposal_board_incineration": {
+   "process": "Waste incineration of paper fraction in municipal solid waste (MSW), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment",
+   "location": "EU-27",
+   "ref_id": "77b31dcd-5acd-47bf-8b6e-d9eadfd8b136",
+   "unit": "kg",
+   "note": "version without energy credit"
+  },
+  "disposal_glass_incineration": {
+   "process": "Waste incineration of glass/inert material, at plant, average European waste-to-energy plant, without collection, transport and pre-treatment",
+   "location": "EU-27",
+   "ref_id": "60815257-bdaa-495a-a8da-163c5ed2439d",
+   "unit": "kg",
+   "note": "version without energy credit"
+  },
+  "disposal_polyethylene_landfill": {
+   "process": "Landfill of plastic waste, at landfill site, landfill including landfill gas utilisation and leachate treatment and without collection, transport and   pre-treatment",
+   "location": "EU-27",
+   "ref_id": "64197300-3307-11dd-bd11-0800200c9a66",
+   "unit": "kg",
+   "note": "all plastics together"
+  },
+  "disposal_plastics_mixture_landfill": {
+   "process": "Landfill of plastic waste, at landfill site, landfill including landfill gas utilisation and leachate treatment and without collection, transport and   pre-treatment",
+   "location": "EU-27",
+   "ref_id": "64197300-3307-11dd-bd11-0800200c9a66",
+   "unit": "kg",
+   "note": ""
+  },
+  "disposal_board_landfill": {
+   "process": "Landfill of paper waste, at landfill site, landfill including landfill gas utilisation and leachate treatment and without collection, transport and   pre-treatment",
+   "location": "EU-27",
+   "ref_id": "89863fce-3306-11dd-bd11-0800200c9a66",
+   "unit": "kg",
+   "note": ""
+  },
+  "disposal_glass_landfill": {
+   "process": "Landfill of glass/inert waste, at landfill site, landfill including leachate treatment and without collection, transport and pre-treatment",
+   "location": "EU-27",
+   "ref_id": "64197304-3307-11dd-bd11-0800200c9a66",
+   "unit": "kg",
+   "note": ""
+  }
+ },
+ "gaps": [
+  "aluminium_wrought_mix",
+  "aluminium_secondary_old_scrap",
+  "sheet_rolling_aluminium",
+  "disposal_aluminium_incineration",
+  "disposal_aluminium_landfill",
+  "stretch_blow_moulding",
+  "injection_moulding",
+  "film_extrusion"
+ ],
+ "why_gaps": {
+  "aluminium_wrought_mix, aluminium_secondary_old_scrap, sheet_rolling_aluminium": "ELCD has aluminium sheet only as one data set that already joins primary production, rolling and recycling, so the recycled content cannot vary",
+  "disposal_aluminium_incineration, disposal_aluminium_landfill": "ELCD has incineration and landfill of ferro metals, not of aluminium",
+  "stretch_blow_moulding, injection_moulding, film_extrusion": "ELCD has no plastic conversion processes"
+ }
+}

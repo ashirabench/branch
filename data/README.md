@@ -1,6 +1,6 @@
 # Data
 
-No LCA data is stored in this repository. The terms of use of the BAFU database allow use in calculators but not redistribution, so every user extracts the unit impact factors locally.
+No BAFU data is stored in this repository. The terms of use of the BAFU database allow use in calculators but not redistribution, so every user extracts the unit impact factors locally. The only LCA values kept here are 21 factors computed from ELCD 3.2, whose licence allows distribution with credit (`data/second_database/`).
 
 | Folder | Content | In git |
 |---|---|---|
@@ -8,6 +8,8 @@ No LCA data is stored in this repository. The terms of use of the BAFU database 
 | `data/catalogue_sources/` | Lists of BAFU process names exported from openLCA while the catalogue was built (names and identifiers, no factors) | No |
 | `data/regions/` | One file per region with its electricity mix, transport legs and priors; every prior carries a `SOURCE:` or `ASSUMPTION:` tag | Yes |
 | `data/eurostat/` | Two Eurostat tables read on 15 November 2026: recycling rates of packaging waste by material (`env_waspacr`) and municipal waste incinerated and landfilled (`env_wasmun`), 2022 to 2024. `experiments/make_eu_regions.py` writes the European region files from them | Yes |
+| `data/second_database/` | Second database test: the table that links 21 BRANCH factors to ELCD 3.2 processes and the factors computed from the ELCD file (its README gives the licence and the limits) | Yes |
+| `data/factors_second/` | Hybrid factor files of that test, written by `experiments/make_hybrid_factors.py`; they carry BAFU values | No |
 | `data/materials/` | Materials added as data files, one JSON per material (see its README) | Yes |
 | `data/examples/` | Example products for the added materials and for products described by processes | Yes |
 | `data/cff/` | Circular Footprint Formula parameters per material, to be copied from PEF Annex C (its README gives the format; no file is filled in yet) | Yes |

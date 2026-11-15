@@ -1,0 +1,335 @@
+{
+ "database": "ELCD 3.2 (openLCA Nexus file elcd_3_2_greendelta_v2_18_correction_20220908)",
+ "method": "EF 3.0 Method (adapted); IPCC 2021 AR6 for the second reading of climate change",
+ "citation": "European Commission, Joint Research Centre, European Reference Life Cycle Database (ELCD), version 3.2; each factor names the owner of its data set",
+ "computed": "2026-11-15",
+ "computed_by": "experiments/second_database/read_elcd.py",
+ "aggregated_processes_in_the_file": 483,
+ "factors": {
+  "pet_granulate_bottle_grade": {
+   "process": "Polyethylene terephthalate (PET) granulate, production mix, at plant, bottle grade",
+   "id": "84854d79-77da-4794-9d2a-f108f7e91741",
+   "location": "RER",
+   "unit": "kg",
+   "reference": "1 kg",
+   "owner": "Plastics Europe Association of Plastics Manufacturers",
+   "valid": "1999 to 2009",
+   "note": "",
+   "impacts": {
+    "Climate change": 3.63063286555839,
+    "Acidification": 0.0189483112799454,
+    "Climate change (IPCC 2021 GWP 100)": 3.450562248244699
+   }
+  },
+  "pet_granulate_amorphous": {
+   "process": "Polyethylene terephthalate (PET) granulate, production mix, at plant, amorphous",
+   "id": "028b2915-00a5-4967-b356-34bce19960c3",
+   "location": "RER",
+   "unit": "kg",
+   "reference": "1 kg",
+   "owner": "Plastics Europe Association of Plastics Manufacturers",
+   "valid": "1999 to 2010",
+   "note": "",
+   "impacts": {
+    "Climate change": 3.4990831271824634,
+    "Acidification": 0.0186388240201644,
+    "Climate change (IPCC 2021 GWP 100)": 3.3235944961376642
+   }
+  },
+  "hdpe_granulate": {
+   "process": "Polyethylene high density granulate (PE-HD), production mix, at plant",
+   "id": "0704c700-2fb0-43c5-8803-bed8a6f1b968",
+   "location": "RER",
+   "unit": "kg",
+   "reference": "1 kg",
+   "owner": "Plastics Europe Association of Plastics Manufacturers",
+   "valid": "1999 to 2009",
+   "note": "",
+   "impacts": {
+    "Climate change": 2.1087366553315188,
+    "Acidification": 0.007730415714062541,
+    "Climate change (IPCC 2021 GWP 100)": 1.96296198765001
+   }
+  },
+  "ldpe_granulate": {
+   "process": "Polyethylene low density granulate (PE-LD), production mix, at plant",
+   "id": "46c09193-ab51-43ae-957f-e6383b67e73d",
+   "location": "RER",
+   "unit": "kg",
+   "reference": "1 kg",
+   "owner": "Plastics Europe Association of Plastics Manufacturers",
+   "valid": "1999 to 2009",
+   "note": "",
+   "impacts": {
+    "Climate change": 2.2918654225165,
+    "Acidification": 0.00939126282938092,
+    "Climate change (IPCC 2021 GWP 100)": 2.1424282143594233
+   }
+  },
+  "liquid_packaging_board": {
+   "process": "Liquid Packaging Board (LPB) production, production mix, at plant, production, mineral coated LPB (n=4), basis weight: 266 g/m2",
+   "id": "7d580a76-d2a4-46fe-a3a3-c6c8ed585382",
+   "location": "EU-27",
+   "unit": "kg",
+   "reference": "1000 kg",
+   "owner": "The Alliance for Beverage Cartons and the Environment (ACE)",
+   "valid": "2009 to 2014",
+   "note": "",
+   "impacts": {
+    "Climate change": 0.46481193349,
+    "Acidification": 0.002149032,
+    "Climate change (IPCC 2021 GWP 100)": 0.45787681538600006
+   }
+  },
+  "glass_packaging_white": {
+   "process": "Container glass (delivered to the end user of the contained product, reuse rate: 7%), production mix at plant, technology mix",
+   "id": "d7bbec20-f8d8-4a8a-9a99-c7cdafaaa77d",
+   "location": "RER",
+   "unit": "kg",
+   "reference": "1 kg",
+   "owner": "European Container Glass Association",
+   "valid": "2007 to 2014",
+   "note": "one dataset for the three colours; 7% reuse inside the dataset",
+   "impacts": {
+    "Climate change": 0.8016742480808305,
+    "Acidification": 0.0046585560183456925,
+    "Climate change (IPCC 2021 GWP 100)": 0.7868475212618532
+   }
+  },
+  "glass_packaging_green": {
+   "process": "Container glass (delivered to the end user of the contained product, reuse rate: 7%), production mix at plant, technology mix",
+   "id": "d7bbec20-f8d8-4a8a-9a99-c7cdafaaa77d",
+   "location": "RER",
+   "unit": "kg",
+   "reference": "1 kg",
+   "owner": "European Container Glass Association",
+   "valid": "2007 to 2014",
+   "note": "same dataset",
+   "impacts": {
+    "Climate change": 0.8016742480808305,
+    "Acidification": 0.0046585560183456925,
+    "Climate change (IPCC 2021 GWP 100)": 0.7868475212618532
+   }
+  },
+  "glass_packaging_brown": {
+   "process": "Container glass (delivered to the end user of the contained product, reuse rate: 7%), production mix at plant, technology mix",
+   "id": "d7bbec20-f8d8-4a8a-9a99-c7cdafaaa77d",
+   "location": "RER",
+   "unit": "kg",
+   "reference": "1 kg",
+   "owner": "European Container Glass Association",
+   "valid": "2007 to 2014",
+   "note": "same dataset",
+   "impacts": {
+    "Climate change": 0.8016742480808305,
+    "Acidification": 0.0046585560183456925,
+    "Climate change (IPCC 2021 GWP 100)": 0.7868475212618532
+   }
+  },
+  "electricity_mv_PT": {
+   "process": "Electricity Mix, consumption mix, at consumer, AC, 1kV - 60kV",
+   "id": "b9562ec9-10cb-410a-a23c-146178662d30",
+   "location": "PT",
+   "unit": "kWh",
+   "reference": "3.6 MJ",
+   "owner": "PE INTERNATIONAL GmbH",
+   "valid": "2002 to 2010",
+   "note": "reference flow 3.6 MJ = 1 kWh",
+   "impacts": {
+    "Climate change": 0.782659672121191,
+    "Acidification": 0.0065338018690529066,
+    "Climate change (IPCC 2021 GWP 100)": 0.7659686146513571
+   }
+  },
+  "electricity_mv_DE": {
+   "process": "Electricity Mix, consumption mix, at consumer, AC, 1kV - 60kV",
+   "id": "a1388758-0402-40c4-976b-6a805c8e46e0",
+   "location": "DE",
+   "unit": "kWh",
+   "reference": "3.6 MJ",
+   "owner": "PE INTERNATIONAL GmbH",
+   "valid": "2002 to 2010",
+   "note": "reference flow 3.6 MJ = 1 kWh",
+   "impacts": {
+    "Climate change": 0.6991980074604487,
+    "Acidification": 0.001404842987731534,
+    "Climate change (IPCC 2021 GWP 100)": 0.6885693937618466
+   }
+  },
+  "heat_natural_gas_furnace": {
+   "process": "Process steam from natural gas 90%, consumption mix, at power plant, heat plant, MJ, 90 % efficiency",
+   "id": "90fd9728-e56b-4a82-b631-7d32572036f9",
+   "location": "EU-27",
+   "unit": "MJ",
+   "reference": "1 MJ",
+   "owner": "PE INTERNATIONAL GmbH",
+   "valid": "2008 to 2015",
+   "note": "steam at 90% efficiency instead of an industrial furnace",
+   "impacts": {
+    "Climate change": 0.08293037395131758,
+    "Acidification": 8.437110039202092e-05,
+    "Climate change (IPCC 2021 GWP 100)": 0.08108873632857402
+   }
+  },
+  "lorry_16_32t": {
+   "process": "Lorry transport, Euro 0, 1, 2, 3, 4 mix, 22 t total weight, 17,3t max payload",
+   "id": "b444f4d3-3393-11dd-bd11-0800200c9a66",
+   "location": "RER",
+   "unit": "t*km",
+   "reference": "1 t*km",
+   "owner": "PE INTERNATIONAL GmbH",
+   "valid": "2005 to 2010",
+   "note": "22 t lorry, 17.3 t payload",
+   "impacts": {
+    "Climate change": 0.06664969411514346,
+    "Acidification": 0.00044453959830325046,
+    "Climate change (IPCC 2021 GWP 100)": 0.06590302400724159
+   }
+  },
+  "tap_water_RER": {
+   "process": "Drinking water, production mix, at plant, water purification treatment, from surface water",
+   "id": "db009014-338f-11dd-bd11-0800200c9a66",
+   "location": "RER",
+   "unit": "kg",
+   "reference": "1 kg",
+   "owner": "PE INTERNATIONAL GmbH",
+   "valid": "2005 to 2010",
+   "note": "at plant, not at user",
+   "impacts": {
+    "Climate change": 0.0006350663822763624,
+    "Acidification": 1.973815938200432e-06,
+    "Climate change (IPCC 2021 GWP 100)": 0.0006277522093171489
+   }
+  },
+  "disposal_polyethylene_terephthalate_incineration": {
+   "process": "Waste incineration of plastics (PET, PMMA, PC), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment",
+   "id": "9c0cf135-02aa-46a1-ae22-dfa2683c9bd8",
+   "location": "EU-27",
+   "unit": "kg",
+   "reference": "-1000 kg",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "valid": "2006 to 2010",
+   "note": "version without energy credit",
+   "impacts": {
+    "Climate change": 2.425131128380538,
+    "Acidification": 0.000334006305160294,
+    "Climate change (IPCC 2021 GWP 100)": 2.4241479045204715
+   }
+  },
+  "disposal_polyethylene_incineration": {
+   "process": "Waste incineration of plastics (PE, PP, PS, PB), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment",
+   "id": "e01167ad-6cf8-47a7-8df9-e89bf35cb704",
+   "location": "EU-27",
+   "unit": "kg",
+   "reference": "-1000 kg",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "valid": "2006 to 2010",
+   "note": "version without energy credit",
+   "impacts": {
+    "Climate change": 3.2266234831490825,
+    "Acidification": 0.00042491529184457465,
+    "Climate change (IPCC 2021 GWP 100)": 3.2253309430475805
+   }
+  },
+  "disposal_board_incineration": {
+   "process": "Waste incineration of paper fraction in municipal solid waste (MSW), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment",
+   "id": "77b31dcd-5acd-47bf-8b6e-d9eadfd8b136",
+   "location": "EU-27",
+   "unit": "kg",
+   "reference": "-1000 kg",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "valid": "2006 to 2010",
+   "note": "version without energy credit",
+   "impacts": {
+    "Climate change": 0.037443761013047666,
+    "Acidification": 0.0002285639340844467,
+    "Climate change (IPCC 2021 GWP 100)": 0.036793721775219015
+   }
+  },
+  "disposal_glass_incineration": {
+   "process": "Waste incineration of glass/inert material, at plant, average European waste-to-energy plant, without collection, transport and pre-treatment",
+   "id": "60815257-bdaa-495a-a8da-163c5ed2439d",
+   "location": "EU-27",
+   "unit": "kg",
+   "reference": "-1000 kg",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "valid": "2006 to 2010",
+   "note": "version without energy credit",
+   "impacts": {
+    "Climate change": 0.05516084661534101,
+    "Acidification": 0.0001999478915185779,
+    "Climate change (IPCC 2021 GWP 100)": 0.0524521986743629
+   }
+  },
+  "disposal_polyethylene_landfill": {
+   "process": "Landfill of plastic waste, at landfill site, landfill including landfill gas utilisation and leachate treatment and without collection, transport and   pre-treatment",
+   "id": "64197300-3307-11dd-bd11-0800200c9a66",
+   "location": "EU-27",
+   "unit": "kg",
+   "reference": "-1 kg",
+   "owner": "PE INTERNATIONAL GmbH",
+   "valid": "2006 to 2012",
+   "note": "all plastics together",
+   "impacts": {
+    "Climate change": 0.07459122051588474,
+    "Acidification": 0.0002844029446038696,
+    "Climate change (IPCC 2021 GWP 100)": 0.071239144441097
+   }
+  },
+  "disposal_plastics_mixture_landfill": {
+   "process": "Landfill of plastic waste, at landfill site, landfill including landfill gas utilisation and leachate treatment and without collection, transport and   pre-treatment",
+   "id": "64197300-3307-11dd-bd11-0800200c9a66",
+   "location": "EU-27",
+   "unit": "kg",
+   "reference": "-1 kg",
+   "owner": "PE INTERNATIONAL GmbH",
+   "valid": "2006 to 2012",
+   "note": "",
+   "impacts": {
+    "Climate change": 0.07459122051588474,
+    "Acidification": 0.0002844029446038696,
+    "Climate change (IPCC 2021 GWP 100)": 0.071239144441097
+   }
+  },
+  "disposal_board_landfill": {
+   "process": "Landfill of paper waste, at landfill site, landfill including landfill gas utilisation and leachate treatment and without collection, transport and   pre-treatment",
+   "id": "89863fce-3306-11dd-bd11-0800200c9a66",
+   "location": "EU-27",
+   "unit": "kg",
+   "reference": "-1 kg",
+   "owner": "PE INTERNATIONAL GmbH",
+   "valid": "2006 to 2012",
+   "note": "",
+   "impacts": {
+    "Climate change": 1.128667346092868,
+    "Acidification": 0.0004901271064753849,
+    "Climate change (IPCC 2021 GWP 100)": 0.9342110170928302
+   }
+  },
+  "disposal_glass_landfill": {
+   "process": "Landfill of glass/inert waste, at landfill site, landfill including leachate treatment and without collection, transport and pre-treatment",
+   "id": "64197304-3307-11dd-bd11-0800200c9a66",
+   "location": "EU-27",
+   "unit": "kg",
+   "reference": "-1 kg",
+   "owner": "PE INTERNATIONAL GmbH",
+   "valid": "2006 to 2012",
+   "note": "",
+   "impacts": {
+    "Climate change": 0.012641867903132813,
+    "Acidification": 0.0001022173565882236,
+    "Climate change (IPCC 2021 GWP 100)": 0.012383723966742945
+   }
+  }
+ },
+ "not_in_elcd": [
+  "aluminium_wrought_mix",
+  "aluminium_secondary_old_scrap",
+  "sheet_rolling_aluminium",
+  "disposal_aluminium_incineration",
+  "disposal_aluminium_landfill",
+  "stretch_blow_moulding",
+  "injection_moulding",
+  "film_extrusion"
+ ]
+}

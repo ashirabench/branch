@@ -7,6 +7,7 @@ outputs/
 .DS_Store
 results/
 data/factors/
+data/factors_second/
 data/catalogue_sources/
 
 # LCA data: never in git (BAFU terms of use, size)
@@ -18,3 +19,4 @@ lca_data/
 *.egg-info/
 build/
 dist/
+derby.log

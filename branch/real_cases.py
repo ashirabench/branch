@@ -27,7 +27,11 @@ CITATION = "Life Cycle Inventory database of the Swiss Federal Administration, B
 
 
 def load_factors(path=None, root=None):
-    """Newest data/factors/*.json unless a path is given."""
+    """The file in BRANCH_FACTORS if that is set, else the newest data/factors/*.json, unless a
+    path is given. BRANCH_FACTORS lets every command run on another factor file, such as the
+    hybrid of the second database test (experiments/make_hybrid_factors.py)."""
+    if path is None and root is None:
+        path = os.environ.get("BRANCH_FACTORS") or None
     if path is None:
         if root:
             roots = [root]
