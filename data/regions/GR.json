@@ -1,0 +1,203 @@
+{
+  "code": "GR",
+  "name": "Greece",
+  "parent": "EU",
+  "electricity": "electricity_mv_GR",
+  "priors": {
+    "pet.recycling_rate": [
+      "beta",
+      {
+        "a": 6.6,
+        "b": 13.4
+      },
+      "SOURCE: plastic packaging recycled in Greece: 32.7% in 2023 and 33.6% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together, no separate figure for PET bottles"
+    ],
+    "hdpe.recycling_rate": [
+      "beta",
+      {
+        "a": 6.6,
+        "b": 13.4
+      },
+      "SOURCE: plastic packaging recycled in Greece: 32.7% in 2023 and 33.6% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "ldpe.recycling_rate": [
+      "beta",
+      {
+        "a": 6.6,
+        "b": 13.4
+      },
+      "SOURCE: plastic packaging recycled in Greece: 32.7% in 2023 and 33.6% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "pp.recycling_rate": [
+      "beta",
+      {
+        "a": 6.6,
+        "b": 13.4
+      },
+      "SOURCE: plastic packaging recycled in Greece: 32.7% in 2023 and 33.6% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "aluminium.recycling_rate": [
+      "beta",
+      {
+        "a": 6.9,
+        "b": 13.1
+      },
+      "SOURCE: aluminium packaging recycled in Greece: 35.7% in 2023 and 33% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all aluminium packaging, not only beverage cans"
+    ],
+    "steel.recycling_rate": [
+      "beta",
+      {
+        "a": 13.7,
+        "b": 6.3
+      },
+      "SOURCE: steel packaging recycled in Greece: 63.9% in 2023 and 73% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026)"
+    ],
+    "corrugated_board.recycling_rate": [
+      "beta",
+      {
+        "a": 15.2,
+        "b": 4.8
+      },
+      "SOURCE: paper and cardboard packaging recycled in Greece: 76.7% in 2023 and 75.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "cartonboard.recycling_rate": [
+      "beta",
+      {
+        "a": 15.2,
+        "b": 4.8
+      },
+      "SOURCE: paper and cardboard packaging recycled in Greece: 76.7% in 2023 and 75.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "kraft_paper.recycling_rate": [
+      "beta",
+      {
+        "a": 15.2,
+        "b": 4.8
+      },
+      "SOURCE: paper and cardboard packaging recycled in Greece: 76.7% in 2023 and 75.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "pet.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "hdpe.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "ldpe.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "pp.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "ps.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "eps.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "pvc.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "pla.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "aluminium.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "steel.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "liquid_packaging_board.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "corrugated_board.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "cartonboard.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "kraft_paper.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Greece in 2024: 90 kt incinerated with or without energy recovery and 4444 kt landfilled, so 2% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "glass.end_of_life": {
+      "weights": {
+        "recycling (cut-off)": 0.24,
+        "landfill": 0.74,
+        "incineration": 0.02
+      },
+      "source": "SOURCE: glass packaging recycled in Greece: 25.9% in 2023 and 21.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the rest follows municipal waste, 2% incinerated in 2024 (Eurostat env_wasmun, table updated 15 October 2026)"
+    }
+  },
+  "sources_needed": [
+    "A recycling rate of PET bottles alone (the figure used covers all plastic packaging)"
+  ]
+}

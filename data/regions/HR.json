@@ -1,0 +1,203 @@
+{
+  "code": "HR",
+  "name": "Croatia",
+  "parent": "EU",
+  "electricity": "electricity_mv_HR",
+  "priors": {
+    "pet.recycling_rate": [
+      "beta",
+      {
+        "a": 5.8,
+        "b": 14.2
+      },
+      "SOURCE: plastic packaging recycled in Croatia: 28.2% in 2023 and 29.9% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together, no separate figure for PET bottles"
+    ],
+    "hdpe.recycling_rate": [
+      "beta",
+      {
+        "a": 5.8,
+        "b": 14.2
+      },
+      "SOURCE: plastic packaging recycled in Croatia: 28.2% in 2023 and 29.9% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "ldpe.recycling_rate": [
+      "beta",
+      {
+        "a": 5.8,
+        "b": 14.2
+      },
+      "SOURCE: plastic packaging recycled in Croatia: 28.2% in 2023 and 29.9% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "pp.recycling_rate": [
+      "beta",
+      {
+        "a": 5.8,
+        "b": 14.2
+      },
+      "SOURCE: plastic packaging recycled in Croatia: 28.2% in 2023 and 29.9% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "aluminium.recycling_rate": [
+      "beta",
+      {
+        "a": 4.5,
+        "b": 7.5
+      },
+      "SOURCE: aluminium packaging recycled in Croatia: 28.3% in 2023 and 46.2% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all aluminium packaging, not only beverage cans; the two years differ by more than 10 points"
+    ],
+    "steel.recycling_rate": [
+      "beta",
+      {
+        "a": 1.2,
+        "b": 18.8
+      },
+      "SOURCE: steel packaging recycled in Croatia: 7.6% in 2023 and 4.8% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026)"
+    ],
+    "corrugated_board.recycling_rate": [
+      "beta",
+      {
+        "a": 15.3,
+        "b": 4.7
+      },
+      "SOURCE: paper and cardboard packaging recycled in Croatia: 77.4% in 2023 and 75.6% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "cartonboard.recycling_rate": [
+      "beta",
+      {
+        "a": 15.3,
+        "b": 4.7
+      },
+      "SOURCE: paper and cardboard packaging recycled in Croatia: 77.4% in 2023 and 75.6% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "kraft_paper.recycling_rate": [
+      "beta",
+      {
+        "a": 15.3,
+        "b": 4.7
+      },
+      "SOURCE: paper and cardboard packaging recycled in Croatia: 77.4% in 2023 and 75.6% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "pet.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "hdpe.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "ldpe.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "pp.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "ps.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "eps.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "pvc.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "pla.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "aluminium.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "steel.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "liquid_packaging_board.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "corrugated_board.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "cartonboard.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "kraft_paper.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Croatia in 2024: 29 kt incinerated with or without energy recovery and 957 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "glass.end_of_life": {
+      "weights": {
+        "recycling (cut-off)": 0.58,
+        "landfill": 0.41,
+        "incineration": 0.01
+      },
+      "source": "SOURCE: glass packaging recycled in Croatia: 53.2% in 2023 and 63.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the rest follows municipal waste, 3% incinerated in 2024 (Eurostat env_wasmun, table updated 15 October 2026); the two years differ by more than 10 points"
+    }
+  },
+  "sources_needed": [
+    "A recycling rate of PET bottles alone (the figure used covers all plastic packaging)"
+  ]
+}

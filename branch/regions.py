@@ -6,6 +6,8 @@ parent, so a new place only states what differs from the place above it:
 
     GLO  (defaults: one lorry leg filler to shops)
      ├── PT, DE
+     ├── EU   (European Union, a group)
+     │    └── AT, BE, ... SK, IS, NO   (written by experiments/make_eu_regions.py from Eurostat)
      └── BR
           └── BR-N   (Northern Brazil)
                └── BR-AM   (Amazonas: Manaus, river supply, isolated grids)
@@ -26,6 +28,8 @@ Fields (all optional except code and name; a child overrides its parent):
                     Keys: <material>.recycling_rate, .incineration_share, .recycled_content,
                     .recycled_ratio, .end_of_life; refillable.trips.
     "sources_needed" what still has to be sourced for this region (shown in reports)
+    "group"         true for a set of countries (EU): its members inherit from it, but it does not
+                    appear in their name ("France", not "European Union > France")
 
 Transport modes map to factor keys in catalogue.TRANSPORT.
 """
@@ -71,7 +75,8 @@ class Region:
 
     @property
     def path(self):
-        return " > ".join(r["name"] for r in reversed(self.chain) if r["code"] != "GLO")
+        return " > ".join(r["name"] for r in reversed(self.chain) if r["code"] != "GLO"
+                          and not (r.get("group") and r is not self.chain[0]))
 
     def sources_needed(self):
         out = []

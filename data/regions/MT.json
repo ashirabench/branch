@@ -1,0 +1,203 @@
+{
+  "code": "MT",
+  "name": "Malta",
+  "parent": "EU",
+  "priors": {
+    "pet.recycling_rate": [
+      "beta",
+      {
+        "a": 6.7,
+        "b": 13.3
+      },
+      "SOURCE: plastic packaging recycled in Malta: 31.9% in 2023 and 35.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together, no separate figure for PET bottles"
+    ],
+    "hdpe.recycling_rate": [
+      "beta",
+      {
+        "a": 6.7,
+        "b": 13.3
+      },
+      "SOURCE: plastic packaging recycled in Malta: 31.9% in 2023 and 35.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "ldpe.recycling_rate": [
+      "beta",
+      {
+        "a": 6.7,
+        "b": 13.3
+      },
+      "SOURCE: plastic packaging recycled in Malta: 31.9% in 2023 and 35.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "pp.recycling_rate": [
+      "beta",
+      {
+        "a": 6.7,
+        "b": 13.3
+      },
+      "SOURCE: plastic packaging recycled in Malta: 31.9% in 2023 and 35.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "aluminium.recycling_rate": [
+      "beta",
+      {
+        "a": 4.6,
+        "b": 7.4
+      },
+      "SOURCE: aluminium packaging recycled in Malta: 22.6% in 2023 and 53.7% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all aluminium packaging, not only beverage cans; the two years differ by more than 10 points"
+    ],
+    "steel.recycling_rate": [
+      "beta",
+      {
+        "a": 3.6,
+        "b": 8.4
+      },
+      "SOURCE: steel packaging recycled in Malta: 6.1% in 2023 and 53.3% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the two years differ by more than 10 points"
+    ],
+    "corrugated_board.recycling_rate": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: paper and cardboard packaging recycled in Malta: 53.6% in 2023 and 57.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "cartonboard.recycling_rate": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: paper and cardboard packaging recycled in Malta: 53.6% in 2023 and 57.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "kraft_paper.recycling_rate": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: paper and cardboard packaging recycled in Malta: 53.6% in 2023 and 57.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "pet.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "hdpe.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "ldpe.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "pp.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "ps.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "eps.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "pvc.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "pla.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "aluminium.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "steel.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "liquid_packaging_board.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "corrugated_board.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "cartonboard.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "kraft_paper.incineration_share": [
+      "beta",
+      {
+        "a": 1.0,
+        "b": 19.0
+      },
+      "SOURCE: municipal waste in Malta in 2024: 8 kt incinerated with or without energy recovery and 255 kt landfilled, so 3% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 5%"
+    ],
+    "glass.end_of_life": {
+      "weights": {
+        "recycling (cut-off)": 0.5,
+        "landfill": 0.48,
+        "incineration": 0.02
+      },
+      "source": "SOURCE: glass packaging recycled in Malta: 65.2% in 2023 and 34.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the rest follows municipal waste, 3% incinerated in 2024 (Eurostat env_wasmun, table updated 15 October 2026); the two years differ by more than 10 points"
+    }
+  },
+  "sources_needed": [
+    "A recycling rate of PET bottles alone (the figure used covers all plastic packaging)",
+    "A national electricity mix for Malta (BAFU:2026 has none; the European grid is used)"
+  ]
+}

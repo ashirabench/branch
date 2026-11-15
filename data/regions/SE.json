@@ -1,0 +1,203 @@
+{
+  "code": "SE",
+  "name": "Sweden",
+  "parent": "EU",
+  "electricity": "electricity_mv_SE",
+  "priors": {
+    "pet.recycling_rate": [
+      "beta",
+      {
+        "a": 5.0,
+        "b": 15.0
+      },
+      "SOURCE: plastic packaging recycled in Sweden: 28.6% in 2023 and 21.8% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together, no separate figure for PET bottles"
+    ],
+    "hdpe.recycling_rate": [
+      "beta",
+      {
+        "a": 5.0,
+        "b": 15.0
+      },
+      "SOURCE: plastic packaging recycled in Sweden: 28.6% in 2023 and 21.8% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "ldpe.recycling_rate": [
+      "beta",
+      {
+        "a": 5.0,
+        "b": 15.0
+      },
+      "SOURCE: plastic packaging recycled in Sweden: 28.6% in 2023 and 21.8% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "pp.recycling_rate": [
+      "beta",
+      {
+        "a": 5.0,
+        "b": 15.0
+      },
+      "SOURCE: plastic packaging recycled in Sweden: 28.6% in 2023 and 21.8% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "aluminium.recycling_rate": [
+      "beta",
+      {
+        "a": 10.0,
+        "b": 2.0
+      },
+      "SOURCE: aluminium packaging recycled in Sweden: 89.1% in 2023 and 77.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all aluminium packaging, not only beverage cans; the two years differ by more than 10 points"
+    ],
+    "steel.recycling_rate": [
+      "beta",
+      {
+        "a": 8.9,
+        "b": 3.1
+      },
+      "SOURCE: steel packaging recycled in Sweden: 83.3% in 2023 and 64.8% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the two years differ by more than 10 points"
+    ],
+    "corrugated_board.recycling_rate": [
+      "beta",
+      {
+        "a": 10.8,
+        "b": 1.2
+      },
+      "SOURCE: paper and cardboard packaging recycled in Sweden: 80.9% in 2023 and 99.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together; the two years differ by more than 10 points"
+    ],
+    "cartonboard.recycling_rate": [
+      "beta",
+      {
+        "a": 10.8,
+        "b": 1.2
+      },
+      "SOURCE: paper and cardboard packaging recycled in Sweden: 80.9% in 2023 and 99.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together; the two years differ by more than 10 points"
+    ],
+    "kraft_paper.recycling_rate": [
+      "beta",
+      {
+        "a": 10.8,
+        "b": 1.2
+      },
+      "SOURCE: paper and cardboard packaging recycled in Sweden: 80.9% in 2023 and 99.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together; the two years differ by more than 10 points"
+    ],
+    "pet.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "hdpe.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "ldpe.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "pp.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "ps.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "eps.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "pvc.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "pla.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "aluminium.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "steel.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "liquid_packaging_board.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "corrugated_board.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "cartonboard.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "kraft_paper.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Sweden in 2024: 2378 kt incinerated with or without energy recovery and 27 kt landfilled, so 99% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "glass.end_of_life": {
+      "weights": {
+        "recycling (cut-off)": 0.92,
+        "landfill": -0.0,
+        "incineration": 0.08
+      },
+      "source": "SOURCE: glass packaging recycled in Sweden: 84.7% in 2023 and 98.7% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the rest follows municipal waste, 99% incinerated in 2024 (Eurostat env_wasmun, table updated 15 October 2026); the two years differ by more than 10 points"
+    }
+  },
+  "sources_needed": [
+    "A recycling rate of PET bottles alone (the figure used covers all plastic packaging)"
+  ]
+}

@@ -160,6 +160,7 @@ A region is a JSON file in [`data/regions/`](data/regions) that states only what
 
 ```
 GLO ── PT, DE
+    ├─ EU ── 25 other countries of the European Union, Iceland and Norway
     └─ BR ── BR-N (Northern Brazil) ── BR-AM (Amazonas, Manaus: river supply, isolated grids)
 ```
 
@@ -168,6 +169,8 @@ compare("aluminium_can_330ml", "beverage_carton_1l", region="BR-AM")
 ```
 
 For Portugal, Germany and Brazil the recycling rates, the split between incineration and landfill, the recycled content and (for Germany) the trips of refillable bottles come from national statistics: Eurostat and the APA packaging reports for Portugal, BMUV, GVM and ZSVR for Germany, ABIPET, ABRALATAS, Tetra Pak and ABREMA for Brazil. Each value names its document and year in the `SOURCE:` tag. Component masses, trips (outside Germany), washing, distribution distance, the recycled content of aluminium, the recycled content of PET in Brazil and the burden of recycled PET are still `ASSUMPTION:` priors, and the subregions BR-N and BR-AM still rest on assumptions.
+
+For the 25 other countries of the European Union, Iceland and Norway, the recycling rates of plastic, aluminium, steel, paper and glass packaging and the split between incineration and landfill come from two Eurostat tables (`env_waspacr` and `env_wasmun`, years 2022 to 2024) kept in [`data/eurostat/`](data/eurostat). `python experiments/make_eu_regions.py` writes those 28 files from the tables and states its rules; nobody edits them by hand. Eurostat gives one rate for all plastic packaging and none for beverage cartons, and each file says so.
 
 To add a place, copy the closest file, set `parent`, and change only what is different. Every prior keeps its `SOURCE:` or `ASSUMPTION:` tag, and `sources_needed` lists the data still to collect; both appear in the reports.
 </details>
@@ -358,7 +361,8 @@ branch/
 ├── packaging/               PyInstaller spec and Windows installer script (see .github/workflows/installers.yml)
 ├── reproduce.sh             master script: install, data, tests, experiments, figures, paper, notebook
 ├── app.py                   web app entry point (see docs/DEPLOY.md)
-├── data/regions/            GLO, PT, DE, BR, BR-N, BR-AM
+├── data/regions/            GLO, PT, DE, BR, BR-N, BR-AM, EU and 27 European countries
+├── data/eurostat/           the two Eurostat tables behind the European region files
 ├── data/materials/          extra materials as JSON, no code needed
 ├── data/examples/           example products for added materials (not part of the benchmark)
 ├── data/benchmark/          product files: PET, refillable glass, aluminium can, beverage carton

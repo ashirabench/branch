@@ -7,6 +7,7 @@ No LCA data is stored in this repository. The terms of use of the BAFU database 
 | `data/factors/` | Unit impact factors extracted from openLCA by `experiments/extract_factors.py` (one JSON per database and LCIA method) | No |
 | `data/catalogue_sources/` | Lists of BAFU process names exported from openLCA while the catalogue was built (names and identifiers, no factors) | No |
 | `data/regions/` | One file per region with its electricity mix, transport legs and priors; every prior carries a `SOURCE:` or `ASSUMPTION:` tag | Yes |
+| `data/eurostat/` | Two Eurostat tables read on 15 November 2026: recycling rates of packaging waste by material (`env_waspacr`) and municipal waste incinerated and landfilled (`env_wasmun`), 2022 to 2024. `experiments/make_eu_regions.py` writes the European region files from them | Yes |
 | `data/materials/` | Materials added as data files, one JSON per material (see its README) | Yes |
 | `data/examples/` | Example products for the added materials and for products described by processes | Yes |
 | `data/cff/` | Circular Footprint Formula parameters per material, to be copied from PEF Annex C (its README gives the format; no file is filled in yet) | Yes |

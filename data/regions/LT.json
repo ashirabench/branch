@@ -1,0 +1,203 @@
+{
+  "code": "LT",
+  "name": "Lithuania",
+  "parent": "EU",
+  "electricity": "electricity_mv_LT",
+  "priors": {
+    "pet.recycling_rate": [
+      "beta",
+      {
+        "a": 8.4,
+        "b": 11.6
+      },
+      "SOURCE: plastic packaging recycled in Lithuania: 42.9% in 2023 and 41.3% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together, no separate figure for PET bottles"
+    ],
+    "hdpe.recycling_rate": [
+      "beta",
+      {
+        "a": 8.4,
+        "b": 11.6
+      },
+      "SOURCE: plastic packaging recycled in Lithuania: 42.9% in 2023 and 41.3% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "ldpe.recycling_rate": [
+      "beta",
+      {
+        "a": 8.4,
+        "b": 11.6
+      },
+      "SOURCE: plastic packaging recycled in Lithuania: 42.9% in 2023 and 41.3% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "pp.recycling_rate": [
+      "beta",
+      {
+        "a": 8.4,
+        "b": 11.6
+      },
+      "SOURCE: plastic packaging recycled in Lithuania: 42.9% in 2023 and 41.3% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "aluminium.recycling_rate": [
+      "beta",
+      {
+        "a": 10.2,
+        "b": 1.8
+      },
+      "SOURCE: aluminium packaging recycled in Lithuania: 80.1% in 2023 and 90.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all aluminium packaging, not only beverage cans; the two years differ by more than 10 points"
+    ],
+    "steel.recycling_rate": [
+      "beta",
+      {
+        "a": 18.0,
+        "b": 2.0
+      },
+      "SOURCE: steel packaging recycled in Lithuania: 88.3% in 2023 and 92.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026)"
+    ],
+    "corrugated_board.recycling_rate": [
+      "beta",
+      {
+        "a": 17.1,
+        "b": 2.9
+      },
+      "SOURCE: paper and cardboard packaging recycled in Lithuania: 83.4% in 2023 and 88% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "cartonboard.recycling_rate": [
+      "beta",
+      {
+        "a": 17.1,
+        "b": 2.9
+      },
+      "SOURCE: paper and cardboard packaging recycled in Lithuania: 83.4% in 2023 and 88% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "kraft_paper.recycling_rate": [
+      "beta",
+      {
+        "a": 17.1,
+        "b": 2.9
+      },
+      "SOURCE: paper and cardboard packaging recycled in Lithuania: 83.4% in 2023 and 88% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "pet.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "hdpe.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "ldpe.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "pp.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "ps.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "eps.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "pvc.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "pla.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "aluminium.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "steel.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "liquid_packaging_board.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "corrugated_board.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "cartonboard.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "kraft_paper.incineration_share": [
+      "beta",
+      {
+        "a": 17.5,
+        "b": 2.5
+      },
+      "SOURCE: municipal waste in Lithuania in 2024: 516 kt incinerated with or without energy recovery and 75 kt landfilled, so 87% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "glass.end_of_life": {
+      "weights": {
+        "recycling (cut-off)": 0.77,
+        "landfill": 0.03,
+        "incineration": 0.2
+      },
+      "source": "SOURCE: glass packaging recycled in Lithuania: 74.8% in 2023 and 78.3% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the rest follows municipal waste, 87% incinerated in 2024 (Eurostat env_wasmun, table updated 15 October 2026)"
+    }
+  },
+  "sources_needed": [
+    "A recycling rate of PET bottles alone (the figure used covers all plastic packaging)"
+  ]
+}

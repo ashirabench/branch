@@ -1,0 +1,203 @@
+{
+  "code": "IT",
+  "name": "Italy",
+  "parent": "EU",
+  "electricity": "electricity_mv_IT",
+  "priors": {
+    "pet.recycling_rate": [
+      "beta",
+      {
+        "a": 9.9,
+        "b": 10.1
+      },
+      "SOURCE: plastic packaging recycled in Italy: 49% in 2023 and 50.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together, no separate figure for PET bottles"
+    ],
+    "hdpe.recycling_rate": [
+      "beta",
+      {
+        "a": 9.9,
+        "b": 10.1
+      },
+      "SOURCE: plastic packaging recycled in Italy: 49% in 2023 and 50.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "ldpe.recycling_rate": [
+      "beta",
+      {
+        "a": 9.9,
+        "b": 10.1
+      },
+      "SOURCE: plastic packaging recycled in Italy: 49% in 2023 and 50.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "pp.recycling_rate": [
+      "beta",
+      {
+        "a": 9.9,
+        "b": 10.1
+      },
+      "SOURCE: plastic packaging recycled in Italy: 49% in 2023 and 50.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "aluminium.recycling_rate": [
+      "beta",
+      {
+        "a": 14.2,
+        "b": 5.8
+      },
+      "SOURCE: aluminium packaging recycled in Italy: 70.3% in 2023 and 71.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all aluminium packaging, not only beverage cans"
+    ],
+    "steel.recycling_rate": [
+      "beta",
+      {
+        "a": 17.8,
+        "b": 2.2
+      },
+      "SOURCE: steel packaging recycled in Italy: 89% in 2023 and 89.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026)"
+    ],
+    "corrugated_board.recycling_rate": [
+      "beta",
+      {
+        "a": 18.5,
+        "b": 1.5
+      },
+      "SOURCE: paper and cardboard packaging recycled in Italy: 92.6% in 2023 and 92.2% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "cartonboard.recycling_rate": [
+      "beta",
+      {
+        "a": 18.5,
+        "b": 1.5
+      },
+      "SOURCE: paper and cardboard packaging recycled in Italy: 92.6% in 2023 and 92.2% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "kraft_paper.recycling_rate": [
+      "beta",
+      {
+        "a": 18.5,
+        "b": 1.5
+      },
+      "SOURCE: paper and cardboard packaging recycled in Italy: 92.6% in 2023 and 92.2% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "pet.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "hdpe.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "ldpe.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "pp.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "ps.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "eps.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "pvc.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "pla.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "aluminium.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "steel.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "liquid_packaging_board.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "corrugated_board.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "cartonboard.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "kraft_paper.incineration_share": [
+      "beta",
+      {
+        "a": 11.1,
+        "b": 8.9
+      },
+      "SOURCE: municipal waste in Italy in 2024: 5484 kt incinerated with or without energy recovery and 4429 kt landfilled, so 55% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "glass.end_of_life": {
+      "weights": {
+        "recycling (cut-off)": 0.79,
+        "landfill": 0.09,
+        "incineration": 0.12
+      },
+      "source": "SOURCE: glass packaging recycled in Italy: 77.4% in 2023 and 80.3% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the rest follows municipal waste, 55% incinerated in 2024 (Eurostat env_wasmun, table updated 15 October 2026)"
+    }
+  },
+  "sources_needed": [
+    "A recycling rate of PET bottles alone (the figure used covers all plastic packaging)"
+  ]
+}

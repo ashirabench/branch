@@ -1,0 +1,203 @@
+{
+  "code": "DK",
+  "name": "Denmark",
+  "parent": "EU",
+  "electricity": "electricity_mv_DK",
+  "priors": {
+    "pet.recycling_rate": [
+      "beta",
+      {
+        "a": 4.5,
+        "b": 15.5
+      },
+      "SOURCE: plastic packaging recycled in Denmark: 22.7% in 2023 and 22.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together, no separate figure for PET bottles"
+    ],
+    "hdpe.recycling_rate": [
+      "beta",
+      {
+        "a": 4.5,
+        "b": 15.5
+      },
+      "SOURCE: plastic packaging recycled in Denmark: 22.7% in 2023 and 22.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "ldpe.recycling_rate": [
+      "beta",
+      {
+        "a": 4.5,
+        "b": 15.5
+      },
+      "SOURCE: plastic packaging recycled in Denmark: 22.7% in 2023 and 22.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "pp.recycling_rate": [
+      "beta",
+      {
+        "a": 4.5,
+        "b": 15.5
+      },
+      "SOURCE: plastic packaging recycled in Denmark: 22.7% in 2023 and 22.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "aluminium.recycling_rate": [
+      "beta",
+      {
+        "a": 16.3,
+        "b": 3.7
+      },
+      "SOURCE: aluminium packaging recycled in Denmark: 78% in 2023 and 85.2% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all aluminium packaging, not only beverage cans"
+    ],
+    "steel.recycling_rate": [
+      "beta",
+      {
+        "a": 8.4,
+        "b": 3.6
+      },
+      "SOURCE: steel packaging recycled in Denmark: 61.7% in 2023 and 78.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the two years differ by more than 10 points"
+    ],
+    "corrugated_board.recycling_rate": [
+      "beta",
+      {
+        "a": 7.8,
+        "b": 4.2
+      },
+      "SOURCE: paper and cardboard packaging recycled in Denmark: 71.8% in 2023 and 58.2% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together; the two years differ by more than 10 points"
+    ],
+    "cartonboard.recycling_rate": [
+      "beta",
+      {
+        "a": 7.8,
+        "b": 4.2
+      },
+      "SOURCE: paper and cardboard packaging recycled in Denmark: 71.8% in 2023 and 58.2% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together; the two years differ by more than 10 points"
+    ],
+    "kraft_paper.recycling_rate": [
+      "beta",
+      {
+        "a": 7.8,
+        "b": 4.2
+      },
+      "SOURCE: paper and cardboard packaging recycled in Denmark: 71.8% in 2023 and 58.2% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together; the two years differ by more than 10 points"
+    ],
+    "pet.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "hdpe.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "ldpe.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "pp.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "ps.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "eps.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "pvc.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "pla.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "aluminium.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "steel.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "liquid_packaging_board.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "corrugated_board.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "cartonboard.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "kraft_paper.incineration_share": [
+      "beta",
+      {
+        "a": 19.0,
+        "b": 1.0
+      },
+      "SOURCE: municipal waste in Denmark in 2024: 2325 kt incinerated with or without energy recovery and 88 kt landfilled, so 96% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026); prior centred at 95%"
+    ],
+    "glass.end_of_life": {
+      "weights": {
+        "recycling (cut-off)": 0.68,
+        "landfill": 0.01,
+        "incineration": 0.31
+      },
+      "source": "SOURCE: glass packaging recycled in Denmark: 68.9% in 2023 and 66.8% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the rest follows municipal waste, 96% incinerated in 2024 (Eurostat env_wasmun, table updated 15 October 2026)"
+    }
+  },
+  "sources_needed": [
+    "A recycling rate of PET bottles alone (the figure used covers all plastic packaging)"
+  ]
+}

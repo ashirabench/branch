@@ -1,0 +1,203 @@
+{
+  "code": "FR",
+  "name": "France",
+  "parent": "EU",
+  "electricity": "electricity_mv_FR",
+  "priors": {
+    "pet.recycling_rate": [
+      "beta",
+      {
+        "a": 5.3,
+        "b": 14.7
+      },
+      "SOURCE: plastic packaging recycled in France: 25.7% in 2023 and 27.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together, no separate figure for PET bottles"
+    ],
+    "hdpe.recycling_rate": [
+      "beta",
+      {
+        "a": 5.3,
+        "b": 14.7
+      },
+      "SOURCE: plastic packaging recycled in France: 25.7% in 2023 and 27.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "ldpe.recycling_rate": [
+      "beta",
+      {
+        "a": 5.3,
+        "b": 14.7
+      },
+      "SOURCE: plastic packaging recycled in France: 25.7% in 2023 and 27.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "pp.recycling_rate": [
+      "beta",
+      {
+        "a": 5.3,
+        "b": 14.7
+      },
+      "SOURCE: plastic packaging recycled in France: 25.7% in 2023 and 27.4% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "aluminium.recycling_rate": [
+      "beta",
+      {
+        "a": 10.2,
+        "b": 9.8
+      },
+      "SOURCE: aluminium packaging recycled in France: 50.1% in 2023 and 52.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all aluminium packaging, not only beverage cans"
+    ],
+    "steel.recycling_rate": [
+      "beta",
+      {
+        "a": 15.0,
+        "b": 5.0
+      },
+      "SOURCE: steel packaging recycled in France: 74.4% in 2023 and 75.3% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026)"
+    ],
+    "corrugated_board.recycling_rate": [
+      "beta",
+      {
+        "a": 18.9,
+        "b": 1.1
+      },
+      "SOURCE: paper and cardboard packaging recycled in France: 94.8% in 2023 and 94.2% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "cartonboard.recycling_rate": [
+      "beta",
+      {
+        "a": 18.9,
+        "b": 1.1
+      },
+      "SOURCE: paper and cardboard packaging recycled in France: 94.8% in 2023 and 94.2% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "kraft_paper.recycling_rate": [
+      "beta",
+      {
+        "a": 18.9,
+        "b": 1.1
+      },
+      "SOURCE: paper and cardboard packaging recycled in France: 94.8% in 2023 and 94.2% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "pet.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "hdpe.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "ldpe.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "pp.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "ps.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "eps.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "pvc.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "pla.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "aluminium.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "steel.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "liquid_packaging_board.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "corrugated_board.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "cartonboard.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "kraft_paper.incineration_share": [
+      "beta",
+      {
+        "a": 13.3,
+        "b": 6.7
+      },
+      "SOURCE: municipal waste in France in 2024: 12612 kt incinerated with or without energy recovery and 6420 kt landfilled, so 66% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "glass.end_of_life": {
+      "weights": {
+        "recycling (cut-off)": 0.84,
+        "landfill": 0.05,
+        "incineration": 0.11
+      },
+      "source": "SOURCE: glass packaging recycled in France: 83.7% in 2023 and 84.7% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the rest follows municipal waste, 66% incinerated in 2024 (Eurostat env_wasmun, table updated 15 October 2026)"
+    }
+  },
+  "sources_needed": [
+    "A recycling rate of PET bottles alone (the figure used covers all plastic packaging)"
+  ]
+}

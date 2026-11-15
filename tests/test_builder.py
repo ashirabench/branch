@@ -27,8 +27,8 @@ LEGACY_NAMES = {
 
 
 # A country without a region file of its own: the catalogue priors apply unchanged there,
-# while PT, DE and BR override them with national statistics (data/regions/*.json).
-PLAIN = "ES"
+# while PT, DE, BR and the European countries override them with statistics (data/regions/*.json).
+PLAIN = "US"
 
 
 def fake_factors(seed=0):
@@ -187,6 +187,8 @@ def test_every_region_needs_only_known_factor_keys():
         if code == "GLO":
             continue
         missing = set(required_factor_keys(BENCH, code)) - known
+        # the extractor finds the electricity mix of every other country in the database by its name
+        missing = {k for k in missing if not re.fullmatch(r"electricity_mv_([A-Z]{2}|ENTSO-E)", k)}
         assert not missing, (code, missing)
 
 

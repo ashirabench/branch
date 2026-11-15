@@ -1,0 +1,203 @@
+{
+  "code": "LU",
+  "name": "Luxembourg",
+  "parent": "EU",
+  "electricity": "electricity_mv_LU",
+  "priors": {
+    "pet.recycling_rate": [
+      "beta",
+      {
+        "a": 8.9,
+        "b": 11.1
+      },
+      "SOURCE: plastic packaging recycled in Luxembourg: 42.9% in 2023 and 46.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together, no separate figure for PET bottles"
+    ],
+    "hdpe.recycling_rate": [
+      "beta",
+      {
+        "a": 8.9,
+        "b": 11.1
+      },
+      "SOURCE: plastic packaging recycled in Luxembourg: 42.9% in 2023 and 46.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "ldpe.recycling_rate": [
+      "beta",
+      {
+        "a": 8.9,
+        "b": 11.1
+      },
+      "SOURCE: plastic packaging recycled in Luxembourg: 42.9% in 2023 and 46.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "pp.recycling_rate": [
+      "beta",
+      {
+        "a": 8.9,
+        "b": 11.1
+      },
+      "SOURCE: plastic packaging recycled in Luxembourg: 42.9% in 2023 and 46.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all plastics together"
+    ],
+    "aluminium.recycling_rate": [
+      "beta",
+      {
+        "a": 8.7,
+        "b": 3.3
+      },
+      "SOURCE: aluminium packaging recycled in Luxembourg: 80.6% in 2023 and 64.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all aluminium packaging, not only beverage cans; the two years differ by more than 10 points"
+    ],
+    "steel.recycling_rate": [
+      "beta",
+      {
+        "a": 8.1,
+        "b": 3.9
+      },
+      "SOURCE: steel packaging recycled in Luxembourg: 78.4% in 2023 and 56.9% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the two years differ by more than 10 points"
+    ],
+    "corrugated_board.recycling_rate": [
+      "beta",
+      {
+        "a": 15.9,
+        "b": 4.1
+      },
+      "SOURCE: paper and cardboard packaging recycled in Luxembourg: 79.4% in 2023 and 79.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "cartonboard.recycling_rate": [
+      "beta",
+      {
+        "a": 15.9,
+        "b": 4.1
+      },
+      "SOURCE: paper and cardboard packaging recycled in Luxembourg: 79.4% in 2023 and 79.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "kraft_paper.recycling_rate": [
+      "beta",
+      {
+        "a": 15.9,
+        "b": 4.1
+      },
+      "SOURCE: paper and cardboard packaging recycled in Luxembourg: 79.4% in 2023 and 79.5% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); all paper and cardboard packaging together"
+    ],
+    "pet.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "hdpe.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "ldpe.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "pp.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "ps.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "eps.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "pvc.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "pla.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "aluminium.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "steel.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "liquid_packaging_board.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "corrugated_board.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "cartonboard.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "kraft_paper.incineration_share": [
+      "beta",
+      {
+        "a": 18.6,
+        "b": 1.4
+      },
+      "SOURCE: municipal waste in Luxembourg in 2024: 201 kt incinerated with or without energy recovery and 15 kt landfilled, so 93% of what is not recycled is incinerated (Eurostat env_wasmun, table updated 15 October 2026)"
+    ],
+    "glass.end_of_life": {
+      "weights": {
+        "recycling (cut-off)": 0.9,
+        "landfill": 0.01,
+        "incineration": 0.09
+      },
+      "source": "SOURCE: glass packaging recycled in Luxembourg: 90.4% in 2023 and 90.1% in 2024 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026); the rest follows municipal waste, 93% incinerated in 2024 (Eurostat env_wasmun, table updated 15 October 2026)"
+    }
+  },
+  "sources_needed": [
+    "A recycling rate of PET bottles alone (the figure used covers all plastic packaging)"
+  ]
+}

@@ -51,19 +51,23 @@ def available_regions(factors=None):
     Sources: the region files in data/regions/ and every electricity mix extracted from openLCA
     (keys electricity_mv_<code>), labelled with the location name openLCA gives it."""
     entries = {}                                   # code -> (country label, path below it)
+    groups = []
     for code in list_regions():
         try:
             r = load_region(code)
         except ValueError:
             continue
-        names = [x["name"] for x in reversed(r.chain) if x["code"] != "GLO"]
+        if r.chain[0].get("group"):                # a set of countries, listed with the grids
+            groups.append((f"Region: {r.name}", code))
+            continue
+        names = [x["name"] for x in reversed(r.chain) if x["code"] != "GLO" and not x.get("group")]
         if names:
             entries[code] = (names[0], names[1:])
     grids = {k[len("electricity_mv_"):]: (f or {}) for k, f in
              ((factors or {}).get("factors") or {}).items() if k.startswith("electricity_mv_")}
     country_name = {c: (f.get("location") or c) for c, f in grids.items() if re.fullmatch(r"[A-Z]{2}", c)}
     country_name.update({c: e[0] for c, e in entries.items() if re.fullmatch(r"[A-Z]{2}", c) and not e[1]})
-    regions = []
+    regions = list(groups)
     for code, f in grids.items():
         if code in entries:
             continue
