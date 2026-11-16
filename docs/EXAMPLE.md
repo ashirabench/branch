@@ -55,6 +55,10 @@ With openLCA open on the same database and its IPC server started, add `--push` 
 - **formulas** as the amounts of the exchanges. The glass of the refillable bottle, for example, is `(glass_bottle_mass_g / 1000) / glass_trips`, so changing the number of trips in openLCA changes the amount of glass;
 - a **product system**, which openLCA calculates. BRANCH compares openLCA's result with its own and shows the difference; over the 36 products of the benchmark the largest relative difference is a few billionths.
 
+![The parameters of the PET process in openLCA](img/openlca_parameters.png)
+
+*The process "BRANCH | PET single use" in openLCA 2.6.2, tab Parameters, sent with every choice left open (`--push --defaults`). The distance, the mass of the bottle and the burden of recycled PET carry their distributions. The three shares show "none" because their priors are beta distributions, which openLCA does not have.*
+
 Because the choices are parameters with uncertainty, openLCA's own Monte Carlo simulation runs on the model. Sending the same comparison again updates these objects; it does not add copies.
 
 Two limits: openLCA has no beta distribution, which BRANCH uses for recycling rates, so those parameters have no uncertainty in openLCA and say so; and a choice between options (which dataset, which disposal route) is not a number, so it is fixed at the option of the model and listed in the description of the process.
