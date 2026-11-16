@@ -46,6 +46,7 @@ def test_summary_gives_both_intervals(tmp_path):
         lo, hi = v02_summary.interval(out.loc["entropy", col])
         assert lo <= out.loc["entropy", "dq_vs_decision_flip"] <= hi
     assert " to " in out.loc["decision_flip", "wrong_ci95_pair"]
+    assert out.loc["entropy", "p_pair"] == 0.5            # two pairs, both above zero: 2 / 2^2, the smallest possible
 
 
 def test_effect_against_a_base_is_read_by_size_and_sign():

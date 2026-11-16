@@ -74,11 +74,13 @@ def reading_questions(block):
     if r is None:
         return None
     lo, hi = interval(r.loc["entropy"].dq_ci95_pair)
-    if lo > 0:
-        return "holds: the interval of entropy minus decision flip lies entirely above zero"
-    if hi < 0:
-        return "FAILS: the interval lies entirely below zero, entropy asks less"
-    return "not shown with these cases: the interval contains zero"
+    p = float(r.loc["entropy"].p_pair)
+    tail = f" (exact test over pairs: p = {p:.3g})"
+    if lo > 0 and p <= 0.05:
+        return "holds: the interval of entropy minus decision flip lies entirely above zero and the exact test agrees" + tail
+    if hi < 0 and p <= 0.05:
+        return "FAILS: the interval lies entirely below zero, entropy asks less" + tail
+    return "not shown with these cases: the interval contains zero, or the exact test over pairs does not agree" + tail
 
 
 def reading_certificate(block):

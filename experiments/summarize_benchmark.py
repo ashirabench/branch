@@ -12,6 +12,8 @@ and by PAIR (all the regions of a pair are resampled together; a file named
 <region>_<a>_vs_<b> belongs to the pair <a>_vs_<b>). With 6 or 10 pairs the pair
 interval is coarse, and it is the one the readings of the plan use. Hence
   wrong_ci95_pair, dq_ci95_pair  the two intervals below, resampling pairs
+  p_pair                       exact two sided sign flip test on the mean difference of each pair
+                               (not adjusted; with n informative pairs it cannot be below 2 / 2^n)
   pairs                        number of pairs
   wrong_ci95                   95% percentile interval of a bootstrap over cases
                                (10,000 resamples; exact binomial over sessions when
@@ -120,6 +122,7 @@ def main(folder):
                 row["dq_ci95"] = "{:.2f} to {:.2f}".format(*np.percentile(bd, [2.5, 97.5]))
                 row["dq_ci95_pair"] = "{:.2f} to {:.2f}".format(
                     *np.percentile(boot_ratio(diff, ones, pidx, members), [2.5, 97.5]))
+                row["p_pair"] = sign_flip_p([diff[m].mean() for m in members])
                 row["p_raw"] = sign_flip_p(diff)
             block.append(row)
         raw = [(i, r["p_raw"]) for i, r in enumerate(block) if "p_raw" in r]
