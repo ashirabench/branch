@@ -140,10 +140,11 @@ def main():
     ap.add_argument("--system-model", dest="system_model", default="cut-off", choices=["cut-off", "cff"],
                     help="--case real: cut-off, or the Circular Footprint Formula (data/cff/)")
     ap.add_argument("--inventory-uncertainty", dest="inventory_uncertainty", default="off",
-                    choices=["on", "off", "correlated"],
+                    choices=["on", "off", "correlated", "consistent"],
                     help="--case real: on lets every factor vary by the uncertainty of its dataset, "
                          "when the factor file has it (experiments/openlca/extract_uncertainty.py); correlated "
-                         "moves all factors with one draw (the bound opposite to independence)")
+                         "moves all factors with one draw (the bound opposite to independence); consistent "
+                         "keeps only the factors whose runs have their median within 10%% of the calculated value")
     ap.add_argument("--cff-heat", dest="cff_heat", default="gas", choices=["gas", "district", "none"],
                     help="--system-model cff: heat that the recovered steam replaces (sensitivity runs)")
     ap.add_argument("--cff-pet-ssp", dest="cff_pet_ssp", action="store_true",
@@ -158,7 +159,7 @@ def main():
                  tau=args.tau, backend=args.backend, a=args.a, b=args.b, country=args.region,
                  truth=args.truth, category=args.category, ablation=args.ablation,
                  system_model=args.system_model,
-                 inventory_uncertainty={"on": True, "off": False}.get(args.inventory_uncertainty, "correlated"),
+                 inventory_uncertainty={"on": True, "off": False}.get(args.inventory_uncertainty, args.inventory_uncertainty),
                  cff_heat=args.cff_heat, cff_pet_ssp=args.cff_pet_ssp, wash_kwh_high=args.wash_kwh_high)
             for cs, s, b, n, sd in itertools.product(args.case_seeds, args.strategies, args.batch,
                                                      args.n, range(args.first_seed, args.first_seed + args.seeds))]

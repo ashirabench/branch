@@ -234,6 +234,8 @@ class _Builder:
         unc = ((self.data.get("factors", {}).get(key) or {}).get("uncertainty") or {}).get(self.category)
         if not unc or not unc.get("gsd") or float(unc["gsd"]) <= 1.0:
             return None
+        if self.inventory_uncertainty == "consistent" and not consistent_uncertainty(unc):
+            return None
         if self.inventory_uncertainty == "correlated":
             # the bound opposite to independence: one standard normal draw moves every factor at once,
             # each by its own geometric standard deviation
@@ -343,6 +345,14 @@ class _Scaled(Param):
 
 
 COMMON_FACTOR_DRAW = "factor.all"
+MEDIAN_TOLERANCE = 0.10
+
+
+def consistent_uncertainty(unc):
+    """True when the median of the Monte Carlo runs of a dataset lies within 10% of the value the
+    database calculates for it. The others are the ones that the wrong signs of the database reach."""
+    ratio = unc.get("median_ratio")
+    return ratio is not None and abs(float(ratio) - 1.0) <= MEDIAN_TOLERANCE
 
 
 def _deps(*params):
@@ -718,8 +728,8 @@ def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=
         raise ValueError("system_model must be 'cut-off' or 'cff'")
     if cff_heat not in cat.CFF_HEAT_OPTIONS:
         raise ValueError(f"cff_heat must be one of {sorted(cat.CFF_HEAT_OPTIONS)}")
-    if inventory_uncertainty not in (False, True, "correlated"):
-        raise ValueError("inventory_uncertainty must be False, True or 'correlated'")
+    if inventory_uncertainty not in (False, True, "correlated", "consistent"):
+        raise ValueError("inventory_uncertainty must be False, True, 'correlated' or 'consistent'")
     region = load_region(country or region)
     if factors is None:
         from .real_cases import load_factors
