@@ -141,3 +141,38 @@ def draw_truth_tails(model, seed, tail=0.1):
             u = u if rng.random() < 0.5 else 1 - u
             out[c.name] = float(c.ppf(np.array([u]))[0])
     return out
+
+
+def draw_truth_adverse(model, seed, n=4000):
+    """An expert world wrong in ONE direction: the one that works against the verdict of the priors.
+
+    Each continuous choice that a person can answer takes a value from the half of its prior
+    (median to extreme) that pushes the difference between the products against the side the
+    priors favour. The side is the sign of the correlation between the choice and the difference
+    in `n` prior draws (fixed seed, so it is a property of the case); a choice with no measurable
+    correlation (below 0.02 in absolute value) takes a side at random. Categorical choices and the
+    draws nobody is asked come from their priors. Second stress test of the certificate, beside
+    draw_truth_tails: there the beliefs are wrong at random on both sides, here all on the bad side.
+    """
+    rng = np.random.default_rng(np.random.SeedSequence([seed, 30_000]))
+    draws = model.sample(n, 12_345)
+    S = to_numpy(draws)
+    delta = np.asarray(to_numpy(sum(model.term_value(i, draws) for i in range(len(model.terms)))), dtype=float)
+    favours_a = float(np.mean(delta < 0)) >= 0.5          # the priors say A is lower
+    out = {}
+    for j, c in enumerate(model.choices):
+        if not c.is_open():
+            out[c.name] = c.encode(c.fixed)
+        elif not c.askable or c.kind == "categorical":
+            out[c.name] = float(S[rng.integers(0, n), j]) if c.kind == "categorical" \
+                else float(c.ppf(np.array([rng.random()]))[0])
+        else:
+            col = S[:, j]
+            r = 0.0 if col.std() == 0 or delta.std() == 0 else float(np.corrcoef(col, delta)[0, 1])
+            if abs(r) < 0.02:
+                up = rng.random() < 0.5
+            else:
+                up = (r > 0) == favours_a                  # raise the difference when A is favoured
+            u = rng.uniform(0.5, 1.0) if up else rng.uniform(0.0, 0.5)
+            out[c.name] = float(c.ppf(np.array([u]))[0])
+    return out

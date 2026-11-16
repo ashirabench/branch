@@ -35,6 +35,9 @@ TAU = 2.5
 READ = ["families", "bafu12", "placebo12", "elcd", "elcd_ipcc2021", "cutoff", "cff", "uncertainty"]
 SENSITIVITY = ["wash_old", "cff_heat_none", "cff_heat_district", "cff_pet_ssp", "uncertainty_correlated"]
 PRIMARY = "families"
+MARGIN = 0.5          # questions; equivalence with the Sobol index of the impact (plan, point 13)
+EQUIVALENCE = [("other product families (the equivalence reading)", "eq_families"), ("the 18 benchmark cases", "eq_bench")]
+STRESS = ["stress_families", "stress_bench"]
 
 
 def rows(block, truth):
@@ -56,7 +59,7 @@ def table(lines, blocks):
               "95% by pair | 95% by case |",
               "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for block in blocks:
-        for truth in ("prior", "tails"):
+        for truth in ("prior", "tails", "adverse"):
             r = rows(block, truth)
             if r is None:
                 continue
@@ -94,6 +97,56 @@ def reading_certificate(block):
     if hi <= TAU:
         return f"the target holds: interval {lo} to {hi}%, entirely at or below {TAU}%"
     return f"undecided: the interval {lo} to {hi}% contains {TAU}%"
+
+
+def reading_equivalence(block):
+    """Sobol of the impact minus decision flip, experts from the priors, interval over pairs inside +-MARGIN."""
+    r = rows(block, "prior")
+    if r is None:
+        return None
+    s = r.loc["sobol"]
+    lo, hi = interval(s.dq_ci95_pair)
+    text = (f"Sobol of the impact {s.q_mean:.2f} questions, decision flip {r.loc['decision_flip'].q_mean:.2f}; "
+            f"difference {s.dq_vs_decision_flip:.2f} (95% over {int(s.pairs)} pairs {lo:.2f} to {hi:.2f})")
+    if -MARGIN < lo and hi < MARGIN:
+        return text + f": equivalent within {MARGIN} question, the interval lies inside the margin"
+    return text + f": equivalence within {MARGIN} question NOT shown, the interval leaves the margin"
+
+
+def reading_adverse(block):
+    r = rows(block, "adverse")
+    if r is None:
+        return None
+    d = r.loc["decision_flip"]
+    lo, hi = interval(d.wrong_ci95_pair)
+    verdict = ("the certificate errs above its nominal level" if lo > TAU else
+               "not shown to exceed the nominal level" + (" (the interval contains it)" if hi > TAU else ""))
+    return (f"{d.wrong_when_certified_pct:.1f}% of the certified verdicts are wrong (95% over pairs {lo} to {hi}%), "
+            f"{d.q_mean:.2f} questions: {verdict}")
+
+
+def synthetic_lines():
+    """Point 15: decision flip against the Sobol index of the impact on synthetic models. Illustration only."""
+    path = os.path.join(OUT, "synthetic_runs.csv")
+    if not os.path.exists(path):
+        return []
+    df = pd.read_csv(path)
+    out = ["## Illustration on synthetic models (not evidence about real products)", "",
+           f"{df.case_seed.nunique()} synthetic models of 40 choices, {df.seed.nunique()} sessions each, experts from the "
+           "priors, tau 2.5%. Intervals: bootstrap over models.", "",
+           "| Questions per round | Decision flip | Sobol of the impact | entropy | Sobol minus decision flip | 95% over models | "
+           "Models where the two differ | Wrong certified: decision flip | Sobol |", "|---|---|---|---|---|---|---|---|---|"]
+    rng = np.random.default_rng(0)
+    for b, g in df.groupby("batch_size"):
+        q = g.pivot_table(index="case_seed", columns="strategy", values="questions", aggfunc="mean")
+        d = (q["sobol"] - q["decision_flip"]).to_numpy()
+        boot = d[rng.integers(0, len(d), size=(10_000, len(d)))].mean(1)
+        lo, hi = np.percentile(boot, [2.5, 97.5])
+        wrong = {s: 100 * (1 - x[x.certified].correct.mean()) for s, x in g.groupby("strategy")}
+        out.append(f"| {b} | {q['decision_flip'].mean():.2f} | {q['sobol'].mean():.2f} | {q['entropy'].mean():.2f} | "
+                   f"{d.mean():.2f} | {lo:.2f} to {hi:.2f} | {int((np.abs(d) > 1e-9).sum())} of {len(d)} | "
+                   f"{wrong['decision_flip']:.1f}% | {wrong['sobol']:.1f}% |")
+    return out + [""]
 
 
 def per_case_gap(block, truth="prior"):
@@ -190,6 +243,15 @@ def main():
                       f"{e[3]:.2f} to {e[4]:.2f}): {e[5]}. Compatible means that no difference was detected, "
                       f"not that the two are equal. Certificate with tail experts, for description: "
                       f"{reading_certificate(block)}.", ""]
+    eq = [(t, reading_equivalence(b)) for t, b in EQUIVALENCE]
+    if any(r for _, r in eq):
+        lines += ["## Equivalence with the Sobol index of the impact (new seeds 300 to 329)", ""]
+        lines += [f"- {t.capitalize()}: {r}." for t, r in eq if r] + [""]
+    if any(rows(b, "adverse") is not None for b in STRESS):
+        lines += ["## A second wrong expert: beliefs wrong on the side against the verdict (description)", ""]
+        lines += [f"- {b}: {reading_adverse(b)}." for b in STRESS if reading_adverse(b)] + [""]
+        table(lines, STRESS)
+    lines += synthetic_lines()
     if any(rows(b, "prior") is not None for b in SENSITIVITY):
         lines += ["## Sensitivity runs (reported, not read as statements)", ""]
         table(lines, SENSITIVITY)

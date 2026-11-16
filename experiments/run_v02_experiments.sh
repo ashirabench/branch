@@ -4,6 +4,7 @@
 #
 #   bash experiments/run_v02_experiments.sh                # everything that the factor file allows
 #   bash experiments/run_v02_experiments.sh families       # one block: families | elcd | cff | wash | uncertainty
+#   bash experiments/run_v02_experiments.sh review         # equivalence | adverse | synthetic (plan, points 13 to 15)
 #   QUICK=1 bash experiments/run_v02_experiments.sh        # 3 seeds, N = 5,000: checks that it runs, not a result
 #
 # Setting of the paper: tau 2.5%, three questions per round, N = 20,000, four strategies, experts
@@ -50,7 +51,7 @@ bench_pairs() { local i j; for ((i = 0; i < ${#BENCH[@]}; i++)); do for ((j = i 
 
 run() {  # block name, factor file, regions (quoted list), pairs (function or "families"), extra run_grid options...
   local block=$1 factors=$2 regions=$3 pairs=$4; shift 4
-  for truth in prior tails; do
+  for truth in ${TRUTHS:-prior tails}; do
     local out="v02/${block}_${truth}"
     rm -rf "results/$out"; mkdir -p "results/$out"
     for region in $regions; do
@@ -130,5 +131,30 @@ PY
   else
     echo "== A3 skipped: $BAFU has no uncertainty yet (python experiments/extract_uncertainty.py, with openLCA open)"
   fi
+fi
+
+# Second review of 16 November 2026 (plan, points 13 to 15). Seeds 300 to 329, used nowhere before.
+# "review" runs the three blocks; with no argument they run with everything else.
+if [[ "${QUICK:-0}" == "1" ]]; then FIRST=950; else FIRST="${REVIEW_FIRST_SEED:-300}"; fi
+want2() { [[ "$WHAT" == "all" || "$WHAT" == "$1" || "$WHAT" == "review" ]]; }
+
+if want2 equivalence; then
+  echo "== 13. Equivalence with the Sobol index of the impact: new seeds, experts from the priors"
+  TRUTHS="prior" run eq_families "$BAFU" "PT DE BR" families
+  TRUTHS="prior" run eq_bench "$BAFU" "PT DE BR" bench
+fi
+
+if want2 adverse; then
+  echo "== 14. A second wrong expert: every continuous belief wrong on the side against the verdict"
+  TRUTHS="adverse" run stress_families "$BAFU" "PT DE BR" families
+  TRUTHS="adverse" run stress_bench "$BAFU" "PT DE BR" bench
+fi
+
+if want2 synthetic; then
+  echo "== 15. Illustration: where decision flip and the Sobol index of the impact part (synthetic models)"
+  if [[ "${QUICK:-0}" == "1" ]]; then MODELS=$(seq 5900 5904); else MODELS=$(seq 5000 5099); fi
+  python experiments/run_grid.py --case lca --J 40 --case_seeds $MODELS --strategies decision_flip sobol entropy \
+    --batch 1 3 --seeds 5 --first-seed "$FIRST" --n "$N" --tau 0.025 --truth prior --tag v02/synthetic >/dev/null
+  echo "done: results/v02/synthetic_runs.csv"
 fi
 python experiments/v02_summary.py

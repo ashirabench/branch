@@ -69,3 +69,41 @@ def test_a_source_for_the_centre_is_not_a_source_for_the_spread():
     assert prior_sources.group(c("continuous", u, "SOURCE: 4.9 g and 5.8 g (X); both bounds come from the source")) == "whole"
     assert prior_sources.group(c("categorical", {"a": 1, "b": 2}, "SOURCE: shares of 2023 (Eurostat)")) == "whole"
     assert prior_sources.group(c("categorical", {"a": 1, "b": 1}, "SOURCE: BAFU datasets; ASSUMPTION on the weights")) == "centre only"
+
+
+def test_adverse_expert_is_wrong_on_the_side_against_the_verdict():
+    """Every continuous belief sits in the half of its prior that pushes against the verdict of the priors."""
+    from branch.builder import build_model
+    from branch.cases import draw_truth_adverse
+    from branch.demo_factors import demo_factors
+    m = build_model("pet_bottle_1l", "glass_refillable_1l", "PT", "Climate change", demo_factors())
+    S = m.sample(4000, 12_345)
+    delta = np.asarray(sum(m.term_value(i, S) for i in range(len(m.terms))))
+    favours_a = (delta < 0).mean() >= 0.5
+    central = {c.name: (float(np.argmax(c.probs)) if c.kind == "categorical" else float(c.ppf(np.array([0.5]))[0]))
+               for c in m.choices}
+    shifts = []
+    for seed in range(20):
+        t = draw_truth_adverse(m, seed)
+        assert set(t) == {c.name for c in m.choices}
+        for c in m.choices:
+            if c.kind == "continuous":
+                lo, hi = float(c.ppf(np.array([0.0005]))[0]), float(c.ppf(np.array([0.9995]))[0])
+                assert lo - 1e-9 <= t[c.name] <= hi + 1e-9          # a value the prior allows
+        shifts.append(m.delta_at(t) - m.delta_at(central))
+    assert draw_truth_adverse(m, 3) == draw_truth_adverse(m, 3)
+    assert (np.mean(shifts) > 0) == favours_a                         # on average it moves against the favoured side
+
+
+def test_equivalence_reading_needs_the_interval_inside_the_margin(tmp_path, monkeypatch):
+    monkeypatch.setattr(v02_summary, "OUT", str(tmp_path))
+    def write(lo, hi):
+        os.makedirs(tmp_path / "eq_prior", exist_ok=True)
+        pd.DataFrame([dict(strategy="decision_flip", batch_size=3, q_mean=2.0, pairs=10),
+                      dict(strategy="sobol", batch_size=3, q_mean=2.1, pairs=10, dq_vs_decision_flip=0.1,
+                           dq_ci95_pair=f"{lo:.2f} to {hi:.2f}")]).to_csv(tmp_path / "eq_prior" / "ALL_summary.csv", index=False)
+    write(-0.2, 0.3)
+    assert "equivalent within 0.5" in v02_summary.reading_equivalence("eq")
+    write(-0.2, 0.6)
+    assert "NOT shown" in v02_summary.reading_equivalence("eq")
+    assert v02_summary.reading_equivalence("missing") is None

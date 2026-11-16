@@ -24,7 +24,7 @@ from concurrent.futures import ProcessPoolExecutor
 
 from branch.agent import run_agent
 from branch.backend import get_xp
-from branch.cases import draw_truth, draw_truth_tails, synthetic, synthetic_lca, toy_packaging
+from branch.cases import draw_truth, draw_truth_adverse, draw_truth_tails, synthetic, synthetic_lca, toy_packaging
 from branch.query import STRATEGIES
 
 
@@ -93,8 +93,7 @@ def one_run(cfg):
                wash_kwh_high=cfg.get("wash_kwh_high"))
     model = build(*args, cfg.get("country", "PT"), category, **how)
     # The expert and the reference verdict always come from this model (the national one).
-    truth = (draw_truth_tails(model, cfg["seed"]) if cfg.get("truth") == "tails"
-             else draw_truth(model, cfg["seed"]))
+    truth = {"tails": draw_truth_tails, "adverse": draw_truth_adverse}.get(cfg.get("truth"), draw_truth)(model, cfg["seed"])
     reference = None
     if ablation != "none":
         if cfg["case"] != "real":
@@ -132,7 +131,7 @@ def main():
     ap.add_argument("--workers", type=int, default=os.cpu_count())
     ap.add_argument("--backend", default=os.environ.get("BRANCH_BACKEND", "numpy"))
     ap.add_argument("--tag", default=None)
-    ap.add_argument("--truth", default="prior", choices=["prior", "tails"],
+    ap.add_argument("--truth", default="prior", choices=["prior", "tails", "adverse"],
                     help="simulated expert drawn from the agent's priors, or from their tails (wrong priors)")
     ap.add_argument("--category", default="Climate change",
                     help="--case real: the impact category whose verdict the agent settles")
