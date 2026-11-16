@@ -20,3 +20,4 @@ lca_data/
 build/
 dist/
 derby.log
+results_*/

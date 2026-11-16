@@ -7,8 +7,9 @@
 #   QUICK=1 bash experiments/run_v02_experiments.sh        # 3 seeds, N = 5,000: checks that it runs, not a result
 #
 # Setting of the paper: tau 2.5%, three questions per round, N = 20,000, four strategies, experts
-# from the priors and from their tails. Seeds 100 to 129: new seeds, because 0 to 29 chose the
-# setting of the paper (FIRST_SEED=0 repeats the old ones). Writes results/v02/<block>_<expert>/.
+# from the priors and from their tails. Seeds 200 to 229: new seeds, because 0 to 29 chose the
+# setting of the paper (FIRST_SEED=0 repeats the old ones); QUICK uses 900 to 902, so that a check
+# of the code never shows a seed of the results. Writes results/v02/<block>_<expert>/.
 # Sensitivity runs (not readings): wash_old, cff_heat_none, cff_heat_district, cff_pet_ssp,
 # uncertainty_correlated.
 # The block "uncertainty" runs only when the factor file carries the uncertainty of the datasets
@@ -32,7 +33,7 @@ FAMILIES=(   # B2, fixed on 16 November 2026: "A B" per line
 )
 STRATS=(decision_flip sobol entropy random)
 if [[ "${QUICK:-0}" == "1" ]]; then SEEDS=3; N=5000; else SEEDS=30; N=20000; fi
-FIRST="${FIRST_SEED:-100}"
+if [[ "${QUICK:-0}" == "1" ]]; then FIRST="${FIRST_SEED:-900}"; else FIRST="${FIRST_SEED:-200}"; fi
 has_factor() { python - "$BAFU" "$1" <<'PY'
 import json, sys
 sys.exit(0 if sys.argv[2] in json.load(open(sys.argv[1]))["factors"] else 1)
