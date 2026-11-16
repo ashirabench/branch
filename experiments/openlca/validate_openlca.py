@@ -94,7 +94,7 @@ def main():
                 print(f"{region}  {label:28s} openLCA {chk['openLCA']:.6g}  BRANCH {chk['BRANCH']:.6g}  "
                       f"rel {rel:.2g}  {cause}")
             if not args.keep:
-                for ref in out["systems"] + out["processes"]:
+                for ref in out["systems"] + out["processes"] + out.get("flows", []):
                     try:
                         c.delete(ref)
                     except Exception:

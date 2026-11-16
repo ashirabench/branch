@@ -34,6 +34,7 @@ To repeat everything, use [`reproduce.sh`](../reproduce.sh) at the top of the re
 | `list_datasets.py`, `audit_factors.py` | Lists what the database offers; checks the reference unit of every factor |
 | `validate_openlca.py` | Sends every benchmark case to openLCA and compares its result with BRANCH's |
 | `validate_materials.py`, `check_any_product.py`, `check_app_with_openlca.py` | The same check for the added materials, for products described by processes, and through the web application |
+| `clean_branch_objects.py` | Lists, and with `--delete` removes, the product systems, processes and flows that BRANCH wrote into the open database |
 | `extract_uncertainty.py` | Monte Carlo runs of each dataset in openLCA (not used in the results; see the paper) |
 | `openlca_lognormal/` | A minimal check of how openLCA draws a lognormal value |
 

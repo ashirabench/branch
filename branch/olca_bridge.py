@@ -228,21 +228,22 @@ def push_comparison(c, model, result, verify=True, jsonld_path=None):
     """Write both alternatives to the open openLCA database (see module doc).
 
     Sending the same comparison again updates its flow, process and product system; it does not add
-    copies. Returns {"processes": [Ref], "systems": [Ref], "check": {...} or None,
+    copies. Returns {"processes": [Ref], "systems": [Ref], "flows": [Ref], "check": {...} or None,
     "created": [names of the unit group and flow property BRANCH had to add], "replaced": int}.
     """
     objs = build_objects(c, model, result)
     linking = build_objects.linking
-    procs, systems, replaced = [], [], 0
+    procs, systems, flows, replaced = [], [], [], 0
     for flow, process in objs:
         replaced += _drop_old_systems(c, process)
         c.put(flow)
+        flows.append(o.Ref(ref_type=o.RefType.Flow, id=flow.id, name=flow.name))
         procs.append(c.put(process))
         systems.append(c.create_product_system(procs[-1], linking))
     if jsonld_path:
         write_jsonld(jsonld_path, objs)
     check = verify_in_openlca(c, model, result, systems) if verify else None
-    return {"processes": procs, "systems": systems, "check": check,
+    return {"processes": procs, "systems": systems, "flows": flows, "check": check,
             "created": [x.name for x in _CREATED], "replaced": replaced}
 
 
