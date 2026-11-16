@@ -729,7 +729,7 @@ ranges, the agent asks about one question more (\pqUnif{} against \pqClim{}) and
 (\pwUnif{} and \pwTailsUnif{}). In these cases the location therefore buys correct certificates, and the
 shape of the priors buys about one question. The first ablation removes the electricity mix and the national
 priors together, so it cannot say which of the two matters more, and neither comparison was tested. The third ablation of the proposal, the pedigree spreads,
-cannot be run because BRANCH does not implement them. The global electricity mix used here is the one
+uses the uncertainty that the database states for its datasets and is reported with it below. The global electricity mix used here is the one
 grid that the validation against openLCA does not cover in a product system; only its unit was audited.
 
 \paragraph{A second database.}
@@ -759,11 +759,11 @@ the input, so the credit may be overestimated. And the packaging glass of the da
 cullet and its converter steel about a fifth scrap, so their ``virgin'' impact in the formula is
 not virgin.
 
-\paragraph{Sensitivity to the washing prior, and the uncertainty of the datasets.}
+\paragraph{The washing prior, the uncertainty of the datasets and the third ablation.}
 With the upper bound of the washing electricity at its former 0.03~kWh, no central verdict changes and the
 mean number of questions moves from 2.03 to 2.04. I also let every unit factor vary by the uncertainty that
 the database states for its exchanges, from 200 Monte Carlo runs per dataset in openLCA (six hours for
-30 datasets). I do not draw conclusions from that run. In 11 of the 30 datasets the median of the runs
+30 datasets). In 11 of the 30 datasets the median of the runs
 lies more than 10\% from the value openLCA calculates, down to 0.41 for secondary aluminium. The cause is
 a known kind of error in a converted database, not something new: in the copy of BAFU:2026 that I use,
 14,167 waste outputs carry a lognormal distribution whose geometric mean has the opposite sign of the
@@ -771,9 +771,18 @@ amount, and openLCA draws negative values from it, so the treatment of waste sub
 simulation and adds it in a calculation. GreenDelta confirmed the same pattern as an error of the
 database for ecoinvent 3.9.1 \citep{askopenlca2023}. I checked the behaviour with the generator of the
 library that ships in openLCA~2.6.2 (\texttt{experiments/openlca/openlca\_lognormal}); the same check shows that
-the value entered as geometric mean is the mean of the draws, so their median lies below it. The
-uncertainty of the datasets therefore stays out of the results until the simulation runs on a corrected
-copy of the database.
+the value entered as geometric mean is the mean of the draws, so their median lies below it. These
+spreads are the pedigree spreads of the proposal: 227,083 of the 420,087 exchanges of the database carry a
+pedigree entry, and the one I checked by hand has the geometric standard deviation that its scores give.
+The third ablation therefore compares BRANCH as delivered, where no factor varies, with the spreads in, as
+multipliers with median 1 that the agent cannot ask about. Since I do not trust the spread of those 11
+datasets, I give two runs, the second fixed in the plan before it ran: the spread on the 19 other datasets,
+and on all 30. With experts from the priors the agent certifies 8 and 3 of the \nCases{} cases from the
+priors alone instead of 10, asks 1.26 (0.37--2.36) and 4.59 (1.88--7.59) questions more, and ends 10\% and
+29\% of the sessions without a certificate, because no answer removes that uncertainty. With experts from
+the tails, 4.7\% (1.9--8.8\%) and 0.5\% (0.0--1.1\%) of the certificates are wrong, against 3.1\% as
+delivered, so the effect on wrong certificates has no clear direction. The delivered model is thus more
+confident than the database's own statement of its uncertainty allows, by an amount between the two runs.
 
 \subsection{Validation of the product}\label{sec:validation}
 
@@ -920,9 +929,7 @@ baseline. Fifth, the proposal planned reference models built by hand in openLCA.
 model into openLCA and openLCA recalculates it. This checks the computation, and it found the unit error
 described in Section~\ref{sec:validation}, but it does not check the modelling, which the comparison
 with published studies covers only in part. Sixth, the priors for recycling and disposal now come from national
-statistics, and a check against ten published values widened two ranges. Spreads from the pedigree matrix
-are not implemented. Seventh, two planned parts are missing: the study with five to seven participants and the ablation of the
-pedigree spreads. The other impact categories and the other two knowledge ablations were run late, on a plan
+statistics, and a check against ten published values widened two ranges. The priors take no spread from the pedigree matrix. Seventh, one planned part is missing: the study with five to seven participants. The other impact categories and the knowledge ablations were run late, on a plan
 fixed beforehand (Section~\ref{sec:robust}). Eighth, the title of the proposal kept the human in command. The
 course's terms fit the system better: the human in the loop is the base, and the human is in command at
 three points (Section~\ref{sec:roles}). Ninth, the proposal named packaging as the benchmark, not as the scope. After the benchmark I added the second way of
@@ -945,8 +952,8 @@ score over the impact score, for choices that move the result without moving the
 synthetic models with one question per round. The comparisons were built by me, the entropy baseline
 gives every continuous choice the same score, and the two wrong experts are two kinds of error among many.
 I do not know in which direction the independence of the priors moves the probability of a wrong verdict.
-The uncertainty that the database states for its datasets is not in the results, for the reason given in
-Section~\ref{sec:robust}.
+The uncertainty that the database states for its datasets is not in the delivered model;
+Section~\ref{sec:robust} gives the reason and bounds its effect.
 
 %% ------------------------------------------------------------------
 \section{Conclusions and Future Work}\label{sec:conclusions}

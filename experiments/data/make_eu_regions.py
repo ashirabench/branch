@@ -8,7 +8,7 @@ Input (kept in the repository, read on 15 November 2026 from the Eurostat data i
     data/eurostat/env_waspacr_2022_2024.csv   recycling rates of packaging waste by material
     data/eurostat/env_wasmun_2022_2024.csv    municipal waste incinerated and landfilled, thousand tonnes
 
-Rules, fixed in claude/BRANCH_priors_com_fonte_2026-11-15.md before this script existed:
+Rules, fixed on 15 November 2026 before this script existed:
 
 1. Centre of each prior: the mean of the last two years with a value (rates for the 2025 target).
 2. Width: a beta distribution with weight 20, the weight already used for one official national

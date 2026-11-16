@@ -38,6 +38,8 @@ All `Repeat` commands run from the top of the repository and need the unit facto
 | 11 | Under the Circular Footprint Formula three central verdicts of the 18 change, all with the can; the heat credit and the quality of recycled PET change at most one more | `paper/data/v02_2026-11-16/cff_prior.csv`, `cff_heat_*`, `cff_pet_ssp_*`, `verdicts.csv` | `V cff` |
 | 12 | Widening the washing electricity to include the one published measurement changes no central verdict | `paper/data/v02_2026-11-16/wash_old_prior.csv`, `verdicts.csv` | `V wash` |
 
+| 17 | The third ablation of the proposal. With the spread that the database states for its datasets in the model (the pedigree spreads), the agent certifies 8 of the 18 cases from the priors alone instead of 10 and asks 1.26 questions more (0.37 to 2.36) when the spread goes to the 19 datasets whose runs are consistent, and 3 cases and 4.59 questions more (1.88 to 7.59) when it goes to all 30. 10% and 29% of the sessions then end without a certificate. The effect on wrong certificates has no clear direction (4.7% and 0.5% against 3.1%) | `paper/data/v02_2026-11-16/uncertainty_consistent_*.csv`, `uncertainty_*.csv`, `cutoff_*.csv` | `V uncertainty` (needs the uncertainty in the factor file) |
+
 ## Correctness of the computation and of the data
 
 | # | Statement | Evidence | Repeat |
@@ -52,4 +54,4 @@ All `Repeat` commands run from the top of the repository and need the unit facto
 - That BRANCH helps a real person. No one outside the project has used it.
 - That BRANCH asks fewer questions than an LCA expert's ranking on real comparisons. It asks as many (row 3).
 - That the certificate holds its target when the beliefs are wrong (rows 8 and 9).
-- Anything about the uncertainty that the database states for its datasets. The runs exist (`uncertainty_*.csv`) and are not interpreted, for the reason of row 16.
+- A single number for the uncertainty that the database states for its datasets. Row 17 gives two runs that bound its effect, because 11 of the 30 datasets are reached by the wrong signs of row 16.

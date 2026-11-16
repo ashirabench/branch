@@ -65,6 +65,14 @@ python app.py                                                       # the same p
 
 [`docs/EXAMPLE.md`](docs/EXAMPLE.md) walks through one comparison from the bill of materials to the parametrised model in openLCA. [`docs/USAGE.md`](docs/USAGE.md) has every other way of using BRANCH: the terminal, product files, regions, products that are not containers, the PDF report, hosting. Installers of the desktop connector for macOS and Windows are on the [releases page](https://github.com/ashirabench/branch/releases/latest).
 
+## What it covers
+
+- **Products.** Any package described by a bill of materials from 15 materials (PET, glass, aluminium, beverage carton board, HDPE, LDPE, polypropylene, polystyrene, expanded polystyrene, PVC, PLA, steel, kraft paper, cartonboard and corrugated board), and, for other products, any process of the open database chosen by name.
+- **Places.** Portugal, Germany and Brazil have priors from national statistics. The 25 other countries of the European Union, Iceland and Norway have recycling and disposal rates from two Eurostat tables. The North of Brazil and Amazonas have their own files. Any other electricity grid of the database runs with its own electricity and default priors, so the agent asks more there.
+- **Impacts.** The verdict follows the indicator the person chooses, and the report gives all 16 categories of EF 3.1.
+
+The experiments of the paper use a part of this: 18 comparisons of four beverage packages and 30 of ten other pairs, in Portugal, Germany and Brazil.
+
 ## Results
 
 Simulated experts, comparisons that I built on real inventory data (BAFU:2026 with EF 3.1), three questions per round and a certificate of 2.5%. [`docs/CLAIMS.md`](docs/CLAIMS.md) lists each statement with the file that supports it and the command that repeats it; the [paper](paper/main.pdf) has the details.
@@ -82,7 +90,7 @@ Simulated experts, comparisons that I built on real inventory data (BAFU:2026 wi
 - No person outside the project has used BRANCH yet. Every expert in the experiments is simulated.
 - The certificate is a statement under the agent's beliefs. Cases that it certifies without asking anything carry most of its errors.
 - Versions 0.1.1 and 0.1.2 counted secondary aluminium twice. Version 0.2.0 corrects it; the [changelog](CHANGELOG.md) and the paper say what changed.
-- The uncertainty that the database states for its datasets is not in the results: the copy of BAFU:2026 used here has waste outputs whose lognormal geometric mean has the opposite sign of the amount, a known kind of database error, and a Monte Carlo simulation in openLCA then subtracts the treatment of waste ([`experiments/openlca/openlca_lognormal/`](experiments/openlca/openlca_lognormal/)).
+- The uncertainty that the database states for its datasets is not in the results: the copy of BAFU:2026 used here has waste outputs whose lognormal geometric mean has the opposite sign of the amount, a known kind of database error, and a Monte Carlo simulation in openLCA then subtracts the treatment of waste ([`experiments/openlca/openlca_lognormal/`](experiments/openlca/openlca_lognormal/)). Two runs bound what that uncertainty would cost: between 1.3 and 4.6 more questions per comparison.
 - BRANCH covers attributional studies (ILCD Situation A). It does not replace the critical review that ISO 14044 requires for comparative assertions disclosed to the public.
 
 ## Where things are
@@ -93,7 +101,7 @@ Simulated experts, comparisons that I built on real inventory data (BAFU:2026 wi
 | [`data/`](data/) | Product files, materials, regions and their sources. Inventory factors are never committed |
 | [`experiments/`](experiments/) | The experiments of the paper, the checks against openLCA, the scripts that build data files, and the plans written before each run ([guide](experiments/README.md)) |
 | [`examples/`](examples/) | A terminal demonstration |
-| [`tests/`](tests/) | 225 tests, run on every push |
+| [`tests/`](tests/) | 226 tests, run on every push |
 | [`paper/`](paper/) | The paper and the summaries its numbers come from |
 | [`docs/`](docs/) | The claims and their evidence, the example, the usage guide, the proof of the identity behind the score, the deployment guide |
 | [`packaging/`](packaging/) | The desktop connector for macOS and Windows |

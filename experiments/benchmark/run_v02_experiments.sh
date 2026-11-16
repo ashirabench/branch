@@ -128,6 +128,8 @@ PY
     run uncertainty "$BAFU" "PT DE BR" bench --inventory-uncertainty on
     echo "== A3, sensitivity: all factors moving together (the bound opposite to independence)"
     run uncertainty_correlated "$BAFU" "PT DE BR" bench --inventory-uncertainty correlated
+    echo "== Third ablation of the proposal: the spread only for the factors whose runs are consistent"
+    run uncertainty_consistent "$BAFU" "PT DE BR" bench --inventory-uncertainty consistent
   else
     echo "== A3 skipped: $BAFU has no uncertainty yet (python experiments/openlca/extract_uncertainty.py, with openLCA open)"
   fi
