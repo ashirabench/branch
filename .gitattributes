@@ -1,0 +1,3 @@
+# Data files keep their exact bytes on every system: two tests compare their checksums with the sources
+*.csv -text
+*.json -text

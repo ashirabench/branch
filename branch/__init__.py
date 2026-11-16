@@ -1,5 +1,5 @@
 """BRANCH: Belief Revising Agent for Non-expert Certified Human-in-the-loop LCA."""
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 from .agent import ask_human_cli, run_agent
 from .beliefs import BeliefBase, Choice
