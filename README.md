@@ -376,6 +376,10 @@ branch/
 
 BRANCH initially covers attributional studies in ILCD Situation A; its priors are only as good as the regional statistics behind them; and it does not replace the critical review that ISO 14044 requires for comparative assertions disclosed to the public.
 
+## Independence
+
+BRANCH is an independent project. It is not affiliated with, sponsored by or endorsed by GreenDelta GmbH, the developer of openLCA; "for openLCA" says only which software BRANCH works with. openLCA and the other product names mentioned here belong to their owners.
+
 ## Acknowledgements
 
 BRANCH builds on [openLCA](https://www.openlca.org), [olca-ipc](https://github.com/GreenDelta/olca-ipc.py) and [olca-schema](https://github.com/GreenDelta/olca-schema) by GreenDelta, and on the Life Cycle Inventory database of the Swiss Federal Administration (BAFU:2026). I thank the Human-Centered AI course at the University of Coimbra.

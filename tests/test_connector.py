@@ -97,7 +97,17 @@ class FakeClient:
 
     def create_product_system(self, ref, config=None):
         self.systems.append(ref.id)
-        return o.Ref(id=f"ps-{ref.id}")
+        self.linking = config
+        ps = o.ProductSystem(id=f"ps-{ref.id}-{len(self.systems)}", name=ref.name,
+                             ref_process=o.Ref(id=ref.id, name=ref.name))
+        self.store[ps.id] = ps
+        return o.Ref(id=ps.id, name=ps.name)
+
+    def get_descriptors(self, t):
+        return [o.Ref(id=x.id, name=x.name) for x in self.store.values() if isinstance(x, t)]
+
+    def delete(self, ref):
+        self.store.pop(ref.id, None)
 
 
 def test_push_writes_linked_processes_with_choice_parameters(tmp_path):
@@ -124,6 +134,119 @@ def test_push_writes_linked_processes_with_choice_parameters(tmp_path):
         assert "distribution_km" in names
         assert all(re_ok(n) for n in names)
     assert (tmp_path / "branch.zip").stat().st_size > 0
+
+
+def _session(pair=("pet_bottle_1l", "glass_refillable_1l"), questions=1, **kw):
+    data = fake_factors()
+    m = build_model(*pair, "PT", CAT, data, **kw)
+    t = draw_truth(m, 0)
+    r = run_agent(m, lambda n: t[n], n_samples=3000, truth=t, max_questions=questions)
+    return data, m, r
+
+
+def test_amounts_in_openlca_are_formulas_of_the_choices():
+    """Editing a parameter in openLCA has to move the exchanges exactly as BRANCH would."""
+    from branch.olca_bridge import push_comparison
+    for kw in ({}, {"system_model": "cff"}):
+        data, m, r = _session(**kw)
+        c = FakeClient(data, waste_keys={"disposal_glass_landfill"})
+        out = push_comparison(c, m, r, verify=False)
+        world = point_world(m, r)
+        other = dict(world)
+        for ch in m.choices:                       # another value for every continuous choice, same options
+            if ch.kind == "continuous" and ch.askable:
+                other[ch.name] = float(ch.ppf(np.array([0.31]))[0]) if ch.is_open() else world[ch.name] * 1.1
+        inv = m.inventory(other)
+        seen = 0
+        for ref, label in zip(out["processes"], inv):
+            proc = c.store[ref.id]
+            env = {p.name: other[n] for p in proc.parameters for n in other if _name(n) == p.name}
+            assert len(env) == len(proc.parameters) > 0
+            for e in proc.exchanges:
+                if e.is_quantitative_reference:
+                    continue
+                key = e.description.split(": ")[1]
+                assert e.amount_formula, key        # every amount of these products depends on a choice
+                assert np.isclose(eval(e.amount_formula, {"__builtins__": {}}, env), inv[label][key], rtol=1e-9)
+                seen += 1
+        assert seen >= 8
+
+
+def _name(n):
+    import re
+    return re.sub(r"\W", "_", n)
+
+
+def test_formula_numbers_have_no_exponent():
+    from branch.formulas import number
+    assert number(1e-7) == "0.0000001" and number(2.5e-5) == "0.000025" and number(3.0) == "3"
+    assert "e" not in number(1.2345678e-11).lower() and float(number(1.2345678e-11)) == 1.2345678e-11
+
+
+def test_open_choices_carry_their_prior_and_answered_ones_do_not():
+    from branch.olca_bridge import push_comparison, uncertainty_of
+    data, m, r = _session(questions=3)
+    c = FakeClient(data)
+    out = push_comparison(c, m, r, verify=False)
+    by_name = {ch.name: ch for ch in m.choices}
+    kinds = set()
+    for ref in out["processes"]:
+        for p in c.store[ref.id].parameters:
+            ch = next(x for n, x in by_name.items() if _name(n) == p.name)
+            assert ch.kind == "continuous"                         # options are not parameters
+            if not ch.is_open():
+                assert p.uncertainty is None and "human" in p.description
+            elif ch.prior[0] == "beta":
+                assert p.uncertainty is None and "openLCA does not have" in p.description
+            else:
+                assert p.uncertainty is not None
+                kinds.add(p.uncertainty.distribution_type)
+        assert "Options fixed in this model" in c.store[ref.id].description
+    assert o.UncertaintyType.UNIFORM_DISTRIBUTION in kinds
+    from branch.beliefs import Choice
+    u, why = uncertainty_of(Choice("x", "continuous", ("lognormal", {"median": 2.0, "sigma": 0.5}), "s", question="?"))
+    assert why is None and np.isclose(u.geom_mean, 2.0 * np.exp(0.125)) and np.isclose(u.geom_sd, np.exp(0.5))
+    u, _ = uncertainty_of(Choice("x", "continuous", ("triangular", {"low": 1, "mode": 2, "high": 4}), "s", question="?"))
+    assert (u.minimum, u.mode, u.maximum) == (1.0, 2.0, 4.0)
+
+
+def test_sending_twice_updates_and_does_not_pile_up():
+    from branch.olca_bridge import push_comparison
+    data, m, r = _session()
+    c = FakeClient(data)
+    first = push_comparison(c, m, r, verify=False)
+    n_objects = len(c.store)
+    second = push_comparison(c, m, r, verify=False)
+    assert [p.id for p in first["processes"]] == [p.id for p in second["processes"]]
+    assert first["replaced"] == 0 and second["replaced"] == 2
+    assert len(c.store) == n_objects                       # same flows, processes and two product systems
+    assert len([x for x in c.store.values() if isinstance(x, o.ProductSystem)]) == 2
+    data2, m2, r2 = _session(pair=("pet_bottle_1l", "aluminium_can_330ml"))
+    c.store.update(FakeClient(data2).store)
+    third = push_comparison(c, m2, r2, verify=False)       # another comparison keeps the first one
+    assert not set(p.id for p in third["processes"]) & set(p.id for p in first["processes"])
+    assert len([x for x in c.store.values() if isinstance(x, o.ProductSystem)]) == 4
+
+
+def test_linking_follows_the_kind_of_the_providers():
+    from branch.olca_bridge import push_comparison
+    data, m, r = _session()
+    c = FakeClient(data)
+    push_comparison(c, m, r, verify=False)
+    assert c.linking.provider_linking == o.ProviderLinking.PREFER_DEFAULTS       # unit processes
+    for p in c.store.values():
+        if isinstance(p, o.Process) and p.name.startswith("BAFU "):
+            p.process_type = o.ProcessType.LCI_RESULT
+    push_comparison(c, m, r, verify=False)
+    assert c.linking.provider_linking == o.ProviderLinking.ONLY_DEFAULTS         # aggregated, as in ELCD
+
+
+def test_nothing_is_sent_before_the_backup_is_confirmed(monkeypatch):
+    from branch import connector
+    called = []
+    monkeypatch.setattr(connector, "client", lambda port=8080: called.append(port))
+    msg = connector.send(None, None)
+    assert "backup" in msg.lower() and not called
 
 
 def re_ok(name):
@@ -156,7 +279,7 @@ class NoReferenceDataClient(FakeClient):
         return None
 
     def get_descriptors(self, t):
-        return []
+        return [] if t is o.FlowProperty else super().get_descriptors(t)
 
 
 def test_push_adds_number_of_items_when_the_database_has_none(tmp_path):

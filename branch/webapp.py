@@ -419,7 +419,8 @@ def build_ui():
         gr.Markdown("# BRANCH for openLCA\nCompare two products from their bill of materials, or from processes "
                     "of the openLCA database. BRANCH fills in what you do not know, asks only the questions that "
                     "can change the answer, and gives you a report you can share. Free and open source. "
-                    f"Version {__version__}.")
+                    f"Version {__version__}. An independent project, not affiliated with or endorsed by GreenDelta, "
+                    "the developer of openLCA.")
         if demo:
             gr.Markdown("**ILLUSTRATIVE NUMBERS.** This server runs on demo values, not real inventory "
                         "data. Do not use the results for decisions or claims.")
@@ -514,6 +515,7 @@ def build_ui():
             with gr.Row():
                 send_btn = gr.Button("Send to openLCA")
                 again = gr.Button("New comparison")
+            backup_ok = gr.Checkbox(label="The database open in openLCA is a copy, or I have a backup of it", value=False)
             send_msg = gr.Markdown()
 
         def show(s):
@@ -643,7 +645,7 @@ def build_ui():
                     gr.Dropdown(choices=[(describe(c)[0], c) for c in cats_now], value="Climate change"
                                 if "Climate change" in cats_now else cats_now[0]))
 
-        def on_send(s):
+        def on_send(s, backup_ok=False):
             if s is None:
                 return "Run a comparison first."
             if getattr(s, "demo", False):
@@ -652,11 +654,11 @@ def build_ui():
             if not ready:
                 return msg
             try:
-                return connector.send(s.model, s.result())
+                return connector.send(s.model, s.result(), backup_confirmed=bool(backup_ok))
             except Exception as exc:
                 return f"**openLCA did not accept it:** {exc}"
 
         check_btn.click(on_check, None, olca_msg)
         read_btn.click(on_read, None, [olca_msg, read_msg, region, main_cat])
-        send_btn.click(on_send, state, send_msg)
+        send_btn.click(on_send, [state, backup_ok], send_msg)
     return ui

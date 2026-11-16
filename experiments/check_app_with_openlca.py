@@ -189,7 +189,10 @@ def main():
         if args.offline:
             print("5. Send to openLCA: skipped (offline)")
         else:
-            sent = app.predict(api_name="/on_send")
+            first = app.predict(False, api_name="/on_send")
+            if "backup" not in first.lower():
+                fail(5, f"the app sent without the backup confirmed:\n{first}")
+            sent = app.predict(True, api_name="/on_send")       # this check runs on a database kept for it
             rels = [float(x) for x in re.findall(r"\| ([0-9.eE+-]+)% \|", sent)]
             if "**Sent to openLCA**" not in sent or len(rels) != 2:
                 fail(5, f"openLCA did not confirm the two products:\n{sent}")

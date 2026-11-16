@@ -189,12 +189,24 @@ def read_factors(port=PORT, method="EF 3.1", progress=print):
     return path, summary
 
 
-def send(model, result, port=PORT):
-    """Push the comparison to openLCA and check it there. Returns a Markdown summary."""
+BACKUP_FIRST = ("BRANCH writes two processes, two flows and two product systems into the database that is open "
+                "in openLCA. Work on a copy or make a backup first (in openLCA: right click the database, "
+                "**Backup database**), then tick the box and send again.")
+
+
+def send(model, result, port=PORT, backup_confirmed=False):
+    """Push the comparison to openLCA and check it there. Returns a Markdown summary.
+
+    Nothing is written until the person confirms that the database is a copy or has a backup."""
+    if not backup_confirmed:
+        return BACKUP_FIRST
     from .olca_bridge import push_comparison
     out = push_comparison(client(port), model, result)
-    lines = ["**Sent to openLCA**, folder **BRANCH**: " + ", ".join(p.name for p in out["processes"]) + ".", "",
-             "| Product | openLCA | BRANCH | Difference |", "|---|---|---|---|"]
+    lines = ["**Sent to openLCA**, folder **BRANCH**: " + ", ".join(p.name for p in out["processes"]) + "."
+             + (f" It replaced {out['replaced']} product system(s) of an earlier send of this comparison."
+                if out.get("replaced") else "")
+             + (" BRANCH also added to the database: " + ", ".join(out["created"]) + "." if out.get("created") else ""),
+             "", "| Product | openLCA | BRANCH | Difference |", "|---|---|---|---|"]
     check = out["check"] or {}
     if "error" in check:
         return lines[0] + f"\n\nopenLCA could not check it: {check['error']}"
@@ -202,5 +214,7 @@ def send(model, result, port=PORT):
         rel = chk.get("relative_difference")
         lines.append(f"| {label} | {chk['openLCA']:.4g} | {chk['BRANCH']:.4g} | "
                      f"{'n/a' if rel is None else f'{100 * rel:.3g}%'} |")
-    lines += ["", "In openLCA: refresh the Navigation panel (F5) and open **Product systems > BRANCH**."]
+    lines += ["", "In openLCA: refresh the Navigation panel (F5) and open **Product systems > BRANCH**. Each "
+              "process has one input parameter per choice, and the amounts are formulas of those parameters: "
+              "change a parameter there, or run openLCA's Monte Carlo simulation on the product system."]
     return "\n".join(lines)

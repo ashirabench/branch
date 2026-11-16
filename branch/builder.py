@@ -320,6 +320,11 @@ class _Builder:
         return Param(name), values
 
 
+def _scalar(x):
+    """A plain number, or the symbol itself when the inventory is being traced into formulas (formulas.py)."""
+    return x if hasattr(x, "text") else float(x)
+
+
 def _i(p, v):
     """Option index of a categorical Param in a world of scalars."""
     return int(round(float(p(v))))
@@ -570,7 +575,7 @@ def _product_terms(b, spec, sign, n_units):
 
             def cff_eol_inv(v, mass=mass, ds=ds, ds_keys=ds_keys, r2=r2, trips=trips, A=A, q_out=q_out,
                             erec_eol=erec_eol):
-                w = n_units * mass(v) / 1000 * (1 - A) * float(r2(v)) / trips(v)
+                w = n_units * mass(v) / 1000 * (1 - A) * _scalar(r2(v)) / trips(v)
                 vk = ds_keys[_i(ds, v)]
                 if erec_eol[0] == "key":
                     out = {vk: -w * q_out}
@@ -608,7 +613,7 @@ def _product_terms(b, spec, sign, n_units):
 
                 def cff_energy_inv(v, mass=mass, r3=r3, trips=trips, grid=grid, elec_keys=elec_keys, kwh=kwh,
                                    steam=steam, heat_key=heat_key):
-                    w = n_units * mass(v) / 1000 * float(r3(v)) / trips(v)
+                    w = n_units * mass(v) / 1000 * _scalar(r3(v)) / trips(v)
                     out = {elec_keys[_i(grid, v)]: -w * kwh}
                     if heat_key:
                         out[heat_key] = -w * steam

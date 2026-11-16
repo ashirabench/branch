@@ -778,11 +778,16 @@ With the upper bound of the washing electricity at its former 0.03~kWh, no centr
 mean number of questions moves from 2.03 to 2.04. I also let every unit factor vary by the uncertainty that
 the database states for its exchanges, from 200 Monte Carlo runs per dataset in openLCA (six hours for
 30 datasets). I do not draw conclusions from that run. In 11 of the 30 datasets the median of the runs
-lies more than 10\% from the value openLCA calculates, down to 0.41 for secondary aluminium. I traced the
-cause in the database and in openLCA: 14,167 waste outputs carry a lognormal distribution whose geometric
-mean has the opposite sign of the amount, and openLCA~2.6.2 keeps that sign when it draws, so the treatment
-of waste subtracts impact in a simulation and adds it in a calculation. This is a property of the
-converted database, not of BRANCH, and it affects any Monte Carlo simulation of these datasets.
+lies more than 10\% from the value openLCA calculates, down to 0.41 for secondary aluminium. The cause is
+a known kind of error in a converted database, not something new: in the copy of BAFU:2026 that I use,
+14,167 waste outputs carry a lognormal distribution whose geometric mean has the opposite sign of the
+amount, and openLCA draws negative values from it, so the treatment of waste subtracts impact in a
+simulation and adds it in a calculation. GreenDelta confirmed the same pattern as an error of the
+database for ecoinvent 3.9.1 \citep{askopenlca2023}. I checked the behaviour with the generator of the
+library that ships in openLCA~2.6.2 (\texttt{experiments/openlca\_lognormal}); the same check shows that
+the value entered as geometric mean is the mean of the draws, so their median lies below it. The
+uncertainty of the datasets therefore stays out of the results until the simulation runs on a corrected
+copy of the database.
 
 \subsection{Validation of the product}\label{sec:validation}
 

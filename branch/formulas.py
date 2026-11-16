@@ -1,0 +1,111 @@
+"""Amounts of the inventory as formulas of the modelling choices, for openLCA.
+
+The builder writes each amount as ordinary Python arithmetic on the values of the choices.
+Running that same arithmetic on symbols instead of numbers gives the formula of every amount,
+so the model that goes to openLCA can keep the choices as parameters that drive the exchanges:
+a person can change a parameter in openLCA, or let openLCA's Monte Carlo simulation draw it.
+
+Only continuous choices become symbols. A categorical choice selects a dataset or a route; it
+stays fixed at the option of the world that is sent, because an openLCA parameter is a number.
+Only + - * / are traced: an amount that needs anything else keeps its number, and `trace`
+reports it.
+"""
+from decimal import Decimal
+
+
+def number(x):
+    """A number as openLCA's formula parser reads it: plain decimals, no exponent."""
+    x = float(x)
+    if x == int(x) and abs(x) < 1e15:
+        return str(int(x))
+    return format(Decimal(repr(x)), "f")
+
+
+class Sym:
+    """A value that remembers how it was computed."""
+
+    __slots__ = ("text", "value", "atom")
+
+    def __init__(self, text, value, atom=True):
+        self.text, self.value, self.atom = text, float(value), atom
+
+    @staticmethod
+    def _of(x):
+        if isinstance(x, Sym):
+            return x
+        v = float(x)
+        return Sym(number(v) if v >= 0 else f"({number(v)})", v)
+
+    def _wrap(self):
+        return self.text if self.atom else f"({self.text})"
+
+    def _op(self, other, op, value, swap=False):
+        a, b = (Sym._of(other), self) if swap else (self, Sym._of(other))
+        return Sym(f"{a._wrap()} {op} {b._wrap()}", value, atom=False)
+
+    def __add__(self, o): return self._op(o, "+", self.value + float(o))
+    def __radd__(self, o): return self._op(o, "+", float(o) + self.value, swap=True)
+    def __sub__(self, o): return self._op(o, "-", self.value - float(o))
+    def __rsub__(self, o): return self._op(o, "-", float(o) - self.value, swap=True)
+    def __mul__(self, o): return self._op(o, "*", self.value * float(o))
+    def __rmul__(self, o): return self._op(o, "*", float(o) * self.value, swap=True)
+    def __truediv__(self, o): return self._op(o, "/", self.value / float(o))
+    def __rtruediv__(self, o): return self._op(o, "/", float(o) / self.value, swap=True)
+    def __neg__(self): return Sym(f"-{self._wrap()}", -self.value, atom=False)
+    def __pos__(self): return self
+    def __float__(self): return self.value
+
+
+def _agree(traced, numbers):
+    return set(traced) == set(numbers) and all(
+        abs(float(traced[k]) - float(numbers[k])) <= 1e-9 * max(1e-12, abs(float(numbers[k]))) for k in numbers)
+
+
+def _holds_elsewhere(term, traced, plain, names):
+    """The formulas must give the amounts of the term at another world too: an amount that turned a
+    choice into a constant on the way agrees at the traced world and nowhere else."""
+    moved = {d: (v * 1.07 if d in names else v) for d, v in plain.items()}
+    try:
+        numbers = term.inventory(moved)
+    except Exception:
+        return True                      # the moved world is not valid for this term: nothing to compare
+    env = {names[d]: moved[d] for d in moved if d in names}
+    values = {k: (eval(a.text, {"__builtins__": {}}, env) if isinstance(a, Sym) else float(a)) for k, a in traced.items()}
+    return _agree(values, numbers)
+
+
+def trace(model, world, names):
+    """Inventory of one world with formulas.
+
+    names   {choice name: parameter name} for the continuous choices to keep as parameters
+    Returns ({label: {factor key: (amount, formula or None)}}, [choices that could not be traced]).
+    The formula of a key is the sum over the terms that use it; None when no parameter enters it.
+    """
+    out = {model.label_a: {}, model.label_b: {}}
+    failed = set()
+    for t in model.terms:
+        if t.inventory is None:
+            raise ValueError(f"Term {t.name} has no inventory; build the model with builder.py")
+        side = out[model.label_a if t.sign > 0 else model.label_b]
+        plain = {d: float(world[d]) for d in t.deps}
+        numbers = t.inventory(plain)
+        symbolic = {d: (Sym(names[d], world[d]) if d in names else float(world[d])) for d in t.deps}
+        try:
+            traced = t.inventory(symbolic)
+            ok = _agree(traced, numbers) and _holds_elsewhere(t, traced, plain, names)
+        except Exception:
+            ok = False
+        if not ok:
+            failed.update(d for d in t.deps if d in names)
+            traced = numbers
+        for key, amount in traced.items():
+            value, text = side.get(key, (0.0, None))
+            part = amount.text if isinstance(amount, Sym) else None
+            if isinstance(amount, Sym) and not amount.atom:
+                part = f"({part})"
+            if part is None and text is not None:
+                part = Sym._of(float(amount)).text
+            elif part is not None and text is None and value != 0.0:
+                text = Sym._of(value).text
+            side[key] = (value + float(amount), part if text is None else f"{text} + {part}")
+    return out, sorted(failed)

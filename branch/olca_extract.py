@@ -179,6 +179,18 @@ def linking(proc):
                                              else o.ProviderLinking.PREFER_DEFAULTS))
 
 
+def linking_for(process_types):
+    """Linking for a process BRANCH builds on several providers: only the default providers when every
+    provider is an aggregated process, as in `linking`; otherwise the linking of unit processes. A
+    database that mixes the two kinds gets the linking of unit processes, and the check that openLCA
+    runs after a send (olca_bridge.verify_in_openlca) shows whether that was right."""
+    types = [t for t in process_types if t is not None]
+    aggregated = bool(types) and all(t == o.ProcessType.LCI_RESULT for t in types)
+    return o.LinkingConfig(prefer_unit_processes=False,
+                           provider_linking=(o.ProviderLinking.ONLY_DEFAULTS if aggregated
+                                             else o.ProviderLinking.PREFER_DEFAULTS))
+
+
 def unit_impacts(client, proc_ref, method_ref):
     """Impacts per unit of the reference flow of one process."""
     proc = client.get(o.Process, proc_ref.id)
@@ -272,7 +284,7 @@ def extract(client, path, method="EF 3.1", database="bafu2026", all_grids=True, 
 
     descs = all_processes(client)
     m = find_method(client, method)
-    out = {"database": database, "method": m.name, "citation": citation_for(database),
+    out = {"database": database, "method": m.name, "method_id": m.id, "citation": citation_for(database),
            "extracted": time.strftime("%Y-%m-%d"), "factors": {}, "unresolved": {}}
     chosen = []                      # processes people chose by name stay in the file across extractions
     if os.path.exists(path):
