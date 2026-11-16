@@ -24,8 +24,10 @@ https://nexus.openlca.org/database/ELCD.
 
 ## Limits
 
-- The factors are computed outside openLCA. The comparison with openLCA on three processes is in the plan
-  and has not been made yet.
+- The factors are computed outside openLCA. On 16 November 2026 the 21 of them were compared with
+  openLCA 2.6.2 on the same file, linking only the default providers: largest relative difference
+  3.7e-16 (record in `experiments/PLAN_2026-11-15.md`, section B3). With openLCA's automatic linking the
+  numbers differ, because leftover waste flows get attached to unrelated data sets.
 - ELCD was discontinued in 2018; the data sets used state validity periods that end between 2009 and 2015.
 - The method in the file is EF 3.0, while the BAFU factors of BRANCH use EF 3.1.
 - No BAFU value is stored in this folder. The hybrid factor file carries BAFU values and stays out of git
