@@ -21,3 +21,5 @@ build/
 dist/
 derby.log
 results_*/
+# summaries of runs are results, not database files
+!paper/data/**/elcd_*.csv
