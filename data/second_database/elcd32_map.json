@@ -1,5 +1,5 @@
 {
- "about": "Which ELCD 3.2 process replaces which BRANCH factor in the second database test. Fixed on 15 November 2026, before any run (experiments/PLAN_2026-11-15.md, B3).",
+ "about": "Which ELCD 3.2 process replaces which BRANCH factor in the second database test. Fixed on 15 November 2026, before any run (experiments/record/PLAN_2026-11-15.md, B3).",
  "mapped": {
   "pet_granulate_bottle_grade": {
    "process": "Polyethylene terephthalate (PET) granulate, production mix, at plant, bottle grade",

@@ -1,6 +1,6 @@
 """Benchmark cases built from unit impact factors extracted from openLCA.
 
-The factors come from experiments/extract_factors.py (data/factors/*.json,
+The factors come from experiments/openlca/extract_factors.py (data/factors/*.json,
 kept out of git: the BAFU terms of use do not allow redistributing the
 data). Every result must cite: "Life Cycle Inventory database of the Swiss
 Federal Administration, BAFU:2026".
@@ -29,7 +29,7 @@ CITATION = "Life Cycle Inventory database of the Swiss Federal Administration, B
 def load_factors(path=None, root=None):
     """The file in BRANCH_FACTORS if that is set, else the newest data/factors/*.json, unless a
     path is given. BRANCH_FACTORS lets every command run on another factor file, such as the
-    hybrid of the second database test (experiments/make_hybrid_factors.py)."""
+    hybrid of the second database test (experiments/data/make_hybrid_factors.py)."""
     if path is None and root is None:
         path = os.environ.get("BRANCH_FACTORS") or None
     if path is None:
@@ -42,7 +42,7 @@ def load_factors(path=None, root=None):
         files = sorted((f for r in roots for f in glob.glob(os.path.join(r, "*.json"))), key=os.path.getmtime)
         if not files:
             raise FileNotFoundError(
-                "No extracted factors found. Run experiments/extract_factors.py with openLCA open first.")
+                "No extracted factors found. Run experiments/openlca/extract_factors.py with openLCA open first.")
         path = files[-1]
     with open(path) as fh:
         data = json.load(fh)

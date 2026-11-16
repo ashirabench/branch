@@ -563,7 +563,7 @@ five. More questions per round help, and on these sessions no batch size reaches
 sessions give lower shares. On the new seeds, three questions per round give \wFlipHoldThree{}
 (\ciFlipHoldThree{}), 13 wrong certificates in 540, and two give \wFlipHoldTwo{} (\ciFlipHoldTwo{}).
 Because 540 sessions leave that interval wide, I had fixed a larger run
-(\texttt{experiments/PLAN\_2026-11-15.md}): 300 further seeds (2000 to 2299) per case, 5,400 sessions, in
+(\texttt{experiments/record/PLAN\_2026-11-15.md}): 300 further seeds (2000 to 2299) per case, 5,400 sessions, in
 the same setting. It gives 3.3\% wrong certificates (179 of 5,400; interval over cases 1.4--5.6\%). I
 report the three figures together: \wFlipChosenTails{} on the seeds used to choose the setting,
 \wFlipHoldThree{} on the first new seeds and 3.3\% on the larger run. Before the correction of aluminium
@@ -616,7 +616,7 @@ decision flip.}
 \subsection{Other impact categories and knowledge ablations}\label{sec:proposal}
 
 The proposal also promised results beyond climate change and ablations of the agent's knowledge. I fixed
-both runs in a file of the repository before any of them existed (\texttt{experiments/PLAN\_2026-11-13.md}):
+both runs in a file of the repository before any of them existed (\texttt{experiments/record/PLAN\_2026-11-13.md}):
 the chosen setting, seeds 0 to 29, both expert models and four strategies. I report them as descriptive,
 without new tests, because the cases are the same \nCases{} and so the runs are not independent evidence.
 Before the runs, the new code path reproduced the climate change summaries of Table~\ref{tab:main} exactly.
@@ -671,7 +671,7 @@ grid that the validation against openLCA does not cover in a product system; onl
 \subsection{Experiments after the audit}\label{sec:v02}
 
 The runs of this subsection were fixed in a file of the repository before they existed
-(\texttt{experiments/PLAN\_2026-11-15.md}, with the changes of 16 November dated in it). They use the
+(\texttt{experiments/record/PLAN\_2026-11-15.md}, with the changes of 16 November dated in it). They use the
 chosen setting, four strategies, both expert models and seeds 200 to 229, which nothing before had used.
 A statistical review of the plan changed three things before any run. The unit of inference is the pair of
 products, since the regions of one pair share most of their choices, so every interval resamples whole
@@ -784,7 +784,7 @@ a known kind of error in a converted database, not something new: in the copy of
 amount, and openLCA draws negative values from it, so the treatment of waste subtracts impact in a
 simulation and adds it in a calculation. GreenDelta confirmed the same pattern as an error of the
 database for ecoinvent 3.9.1 \citep{askopenlca2023}. I checked the behaviour with the generator of the
-library that ships in openLCA~2.6.2 (\texttt{experiments/openlca\_lognormal}); the same check shows that
+library that ships in openLCA~2.6.2 (\texttt{experiments/openlca/openlca\_lognormal}); the same check shows that
 the value entered as geometric mean is the mean of the draws, so their median lies below it. The
 uncertainty of the datasets therefore stays out of the results until the simulation runs on a corrected
 copy of the database.
@@ -805,14 +805,14 @@ precision for these products. The check was not a formality. Its first run found
 Checking each exchange alone in openLCA traced the gap to electricity. The extraction had computed that
 factor per MJ, the unit of the flow, while BRANCH multiplied it by kWh, the unit of the exchange. Since the
 fix, the extraction computes every factor per unit of the reference exchange, and the validation script runs with
-the experiments (\texttt{experiments/validate\_openlca.py}). Because that error lived in a single dataset, I then
+the experiments (\texttt{experiments/openlca/validate\_openlca.py}). Because that error lived in a single dataset, I then
 audited the reference unit of all the factors (151 in the file of 16 November 2026), which found no problem, and validated one comparison
 (refillable glass against aluminium can) in each of the \nGrids{} national and regional grids and in two
 Brazilian regions. Over these \nGridProducts{} products the largest relative difference was
 \maxDiffGrids{}. No region uses the global grid, so I could not check it this way. On 14 November 2026 I added nine
 materials and extracted the factors they need (26 after the correction of the disposal datasets), all per kg. For each of their 14 dataset options I pushed an example
 product to openLCA in Portugal, Germany and Brazil. Over these 42 products the largest relative difference was
-$4.2\times10^{-9}$ in the run of 15 November 2026 (\texttt{experiments/validate\_materials.py}). The same day I checked the second way of describing
+$4.2\times10^{-9}$ in the run of 15 November 2026 (\texttt{experiments/openlca/validate\_materials.py}). The same day I checked the second way of describing
 a product with two shopping bags that are not containers, a cotton bag and a polypropylene bag, each described by
 processes named in the database (fabric or granulate, forming, sea freight and disposal). openLCA and BRANCH
 differ by at most $4.7\times10^{-10}$ for the two products, and three processes read by name gave exactly the factors
@@ -843,7 +843,7 @@ outside the possible range is refused in plain words, and that every question ca
 explanation. They also check the connection panel, which lists the four steps before the first comparison
 (openLCA open with its IPC server, a database open, the BAFU:2026 database with EF~3.1, the factors read)
 and names the next one to do. A further check uses the whole application with a real openLCA, through the same web
-interface as the browser (\texttt{experiments/check\_app\_with\_openlca.py}). On 14 November 2026 it searched the database, filled
+interface as the browser (\texttt{experiments/openlca/check\_app\_with\_openlca.py}). On 14 November 2026 it searched the database, filled
 the form with the two shopping bags, pressed Compare, after which the application read the factors of six processes
 from openLCA by itself, answered one of seven questions and skipped the others, opened both reports and sent the comparison to openLCA,
 where the two products differed from BRANCH by at most $3.8\times10^{-8}$\%. GitHub Actions builds the installers for macOS and Windows and checks that each built

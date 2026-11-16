@@ -1,5 +1,5 @@
 {
- "about": "Electricity and steam delivered per kg of material burnt, copied from data/second_database/elcd32_energy_recovery.json (written by experiments/second_database/read_elcd.py). Aluminium and PLA have no ELCD incineration data set and get no credit.",
+ "about": "Electricity and steam delivered per kg of material burnt, copied from data/second_database/elcd32_energy_recovery.json (written by experiments/data/second_database/read_elcd.py). Aluminium and PLA have no ELCD incineration data set and get no credit.",
  "materials": {
   "pet": {
    "electricity_mj_per_kg": 3.115905,

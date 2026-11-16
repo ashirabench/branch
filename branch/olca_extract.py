@@ -1,5 +1,5 @@
 """Unit impact factors from the open openLCA database (used by the connector and
-experiments/extract_factors.py).
+experiments/openlca/extract_factors.py).
 
 For every process BRANCH needs, builds a product system in openLCA, calculates it with
 the chosen LCIA method and stores the impact per unit of the reference exchange (per kg,

@@ -7,7 +7,7 @@ parent, so a new place only states what differs from the place above it:
     GLO  (defaults: one lorry leg filler to shops)
      ├── PT, DE
      ├── EU   (European Union, a group)
-     │    └── AT, BE, ... SK, IS, NO   (written by experiments/make_eu_regions.py from Eurostat)
+     │    └── AT, BE, ... SK, IS, NO   (written by experiments/data/make_eu_regions.py from Eurostat)
      └── BR
           └── BR-N   (Northern Brazil)
                └── BR-AM   (Amazonas: Manaus, river supply, isolated grids)

@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(os.path.dirname(HERE), "experiments"))
+sys.path.insert(0, os.path.join(os.path.dirname(HERE), "experiments", "benchmark"))
 
 import prior_sources  # noqa: E402
 import summarize_benchmark as sb  # noqa: E402

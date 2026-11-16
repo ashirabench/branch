@@ -16,7 +16,7 @@ The builder picks the country entry when it exists, else "default". This is
 where Eurostat, ENTSO-E and Brazilian National Energy Balance statistics go
 (data/priors/, Step 4).
 
-Factor keys are the names used by experiments/extract_factors.py (PROCESSES).
+Factor keys are the names used by experiments/openlca/extract_factors.py (PROCESSES).
 Every factor is an impact per unit of the dataset's reference flow: per kg
 for materials, conversion and disposal; per kWh, MJ, kg of water, t*km.
 

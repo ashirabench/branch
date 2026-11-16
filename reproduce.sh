@@ -14,7 +14,7 @@
 #   4. experiments  the full benchmark: 18 cases x 30 seeds x batch 1 to 5, priors and tails,
 #                   certificate 5% and 2.5%, the run with new seeds, then three other impact categories and
 #                   two knowledge ablations in the chosen setting (minutes to hours, by the number of cores)
-#   5. figures      every figure and table of the paper (experiments/paper_assets.py)
+#   5. figures      every figure and table of the paper (experiments/benchmark/paper_assets.py)
 #   6. paper        paper/main.pdf (latexmk)
 #   notebook        (on request) executes notebooks/branch_walkthrough.ipynb
 #
@@ -48,7 +48,7 @@ if want data; then
   if have_factors; then
     echo "factors found: $(ls -t data/factors/*.json | head -1)"
   elif olca_up; then
-    $PY experiments/extract_factors.py --method "${BRANCH_METHOD:-EF 3.1}" --all-grids --port "${OLCA_PORT:-8080}"
+    $PY experiments/openlca/extract_factors.py --method "${BRANCH_METHOD:-EF 3.1}" --all-grids --port "${OLCA_PORT:-8080}"
   else
     cat <<'MSG'
 No factors and no openLCA on port 8080. To extract them (once, about 10 minutes):
@@ -70,10 +70,10 @@ if want experiments; then
   if have_factors; then
     for cfg in "prior 0.05" "tails 0.05" "prior 0.025" "tails 0.025"; do
       set -- $cfg
-      TRUTH=$1 TAU=$2 bash experiments/run_benchmark.sh
+      TRUTH=$1 TAU=$2 bash experiments/benchmark/run_benchmark.sh
     done
-    CONFIRM=1 bash experiments/run_benchmark.sh   # new seeds 1000 to 1029 for the chosen setting
-    bash experiments/run_proposal_experiments.sh  # other impact categories and knowledge ablations
+    CONFIRM=1 bash experiments/benchmark/run_benchmark.sh   # new seeds 1000 to 1029 for the chosen setting
+    bash experiments/benchmark/run_proposal_experiments.sh  # other impact categories and knowledge ablations
   else
     echo "skipped: no factors (see stage 2); the paper uses paper/data/*.csv"
   fi
@@ -81,8 +81,8 @@ fi
 
 if want figures; then
   say "5. figures and tables"
-  $PY experiments/paper_assets.py
-  $PY experiments/proposal_assets.py
+  $PY experiments/benchmark/paper_assets.py
+  $PY experiments/benchmark/proposal_assets.py
 fi
 
 if want paper; then
@@ -93,7 +93,7 @@ fi
 if want notebook; then
   say "notebook"
   $PY -c "import nbformat, nbconvert, ipykernel" 2>/dev/null || $PY -m pip install --quiet nbformat nbconvert ipykernel
-  $PY experiments/make_notebook.py
+  $PY experiments/benchmark/make_notebook.py
   $PY -m jupyter nbconvert --to notebook --execute --inplace notebooks/branch_walkthrough.ipynb
 fi
 say "done"

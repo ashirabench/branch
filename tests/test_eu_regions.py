@@ -12,7 +12,7 @@ from branch.builder import build_model, required_factor_keys
 from branch.regions import list_regions, load_region
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "experiments"))
+sys.path.insert(0, os.path.join(ROOT, "experiments", "data"))
 import make_eu_regions as eu  # noqa: E402
 
 CAT = "Climate change"
@@ -36,7 +36,7 @@ def test_the_tables_are_the_ones_read_from_eurostat():
 
 
 def test_the_files_on_disk_are_what_the_tables_give():
-    out = subprocess.run([sys.executable, os.path.join(ROOT, "experiments", "make_eu_regions.py"), "--check"],
+    out = subprocess.run([sys.executable, os.path.join(ROOT, "experiments", "data", "make_eu_regions.py"), "--check"],
                          capture_output=True, text=True)
     assert out.returncode == 0, out.stdout + out.stderr
     assert len(CODES) == 27 and set(CODES) | {"EU"} <= set(list_regions())

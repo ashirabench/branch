@@ -157,7 +157,7 @@ def factor(data, key, category):
         return float(data["factors"][key]["impacts"][category])
     except KeyError as exc:
         raise KeyError(f"Factor {key!r} / category {category!r} missing in "
-                       f"{data.get('path', 'factors')}. Run experiments/extract_factors.py "
+                       f"{data.get('path', 'factors')}. Run experiments/openlca/extract_factors.py "
                        f'--update --only "{key}"') from exc
 
 
@@ -702,9 +702,9 @@ def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=
     shared   values the user already knows for shared choices, e.g.
              {"distribution_km": 120} or {"electricity": "national grid (SIN)"}.
     inventory_uncertainty  True: when the factor file carries the uncertainty of its datasets
-             (written by experiments/extract_uncertainty.py), every factor varies in the Monte Carlo
+             (written by experiments/openlca/extract_uncertainty.py), every factor varies in the Monte Carlo
              draws as a choice that nobody is asked. Off by default: the results of the paper and
-             the app do not use it until it has been run and read (experiments/PLAN_2026-11-15.md, A3).
+             the app do not use it until it has been run and read (experiments/record/PLAN_2026-11-15.md, A3).
              "correlated": a sensitivity run in which one draw moves every factor together, the bound
              opposite to treating the factors as independent.
     cff_heat  heat that the steam of a waste-to-energy plant replaces in the Circular Footprint Formula:

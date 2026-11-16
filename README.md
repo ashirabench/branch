@@ -33,15 +33,15 @@ Human-Centered Artificial Intelligence, 2026/2027
 ## Updates
 
 - [Nov 16, 2026] Release v0.2.0, which corrects an error of the model. Versions 0.1.1 and 0.1.2 took a production mix of aluminium as the virgin metal beside a recycled content, and that mix already contains secondary aluminium, so the secondary metal was counted twice and the can and the foil of the carton looked better than they are. The virgin metal is now primary aluminium. One of the 18 central verdicts changes (refillable glass against the can in Brazil), and the paper gives the comparison before and after. I found the error by opening in the database each of the 70 datasets BRANCH uses; no other dataset is counted twice.
-- [Nov 16, 2026] Experiments after a statistical review, on plans fixed before running ([`experiments/PLAN_2026-11-15.md`](experiments/PLAN_2026-11-15.md)): 30 cases of ten other pairs of packages (the one confirmatory test: fewer questions than uncertainty sampling, p = 0.016 over pairs), an equivalence test with the Sobol index of the impact (within a tenth of a question), a second kind of wrong expert, a second database (21 factors from ELCD 3.2), the Circular Footprint Formula, and an illustration on 100 synthetic models. With experts whose answers contradict the beliefs, 2.4% to 5.2% of the certificates of the 18 cases are wrong against a target of 2.5%: near the target and sometimes above it.
+- [Nov 16, 2026] Experiments after a statistical review, on plans fixed before running ([`experiments/record/PLAN_2026-11-15.md`](experiments/record/PLAN_2026-11-15.md)): 30 cases of ten other pairs of packages (the one confirmatory test: fewer questions than uncertainty sampling, p = 0.016 over pairs), an equivalence test with the Sobol index of the impact (within a tenth of a question), a second kind of wrong expert, a second database (21 factors from ELCD 3.2), the Circular Footprint Formula, and an illustration on 100 synthetic models. With experts whose answers contradict the beliefs, 2.4% to 5.2% of the certificates of the 18 cases are wrong against a target of 2.5%: near the target and sometimes above it.
 - [Nov 16, 2026] openLCA connector: the model BRANCH sends is now a native parametrised model. Every continuous choice is an input parameter, the amounts of the exchanges are formulas of those parameters, and an open choice carries its prior as uncertainty, so openLCA's own Monte Carlo simulation runs on it. Sending again updates the objects in place, aggregated datasets are linked by their default providers only, and nothing is written before you confirm a backup.
 - [Nov 16, 2026] 27 European countries as regions with recycling rates from Eurostat, priors with their sources and a count of how much of each prior a source supports, and washing electricity widened to include the one published measurement.
-- [Nov 16, 2026] The uncertainty that the database states for its datasets is not in the results: in the copy of BAFU:2026 I use, waste outputs carry a lognormal geometric mean of the opposite sign of the amount, the pattern GreenDelta confirmed as a database error for ecoinvent 3.9.1 in 2023, and a Monte Carlo simulation in openLCA then subtracts the treatment of waste. [`experiments/openlca_lognormal/`](experiments/openlca_lognormal/) has the check.
-- [Nov 15, 2026] Release v0.1.2: PET and polyethylene now use the disposal datasets of their own polymer in BAFU:2026 (they had been using a plastics mixture), and expanded polystyrene uses its own incineration dataset. The whole benchmark and every validation against openLCA ran again; no verdict changed at the central values, and the mean number of questions in the chosen setting went from 2.75 to 2.87. The paper now names the stand-ins that remain (landfill of PET, the obsolete packaging glass datasets, the oil-fired plant in Brazil) and reports a larger run of 5,400 sessions for the certificate. A factor file extracted before this release needs the six new disposal factors: with openLCA open, `python experiments/extract_factors.py --method "EF 3.1" --update` reads only what is missing.
+- [Nov 16, 2026] The uncertainty that the database states for its datasets is not in the results: in the copy of BAFU:2026 I use, waste outputs carry a lognormal geometric mean of the opposite sign of the amount, the pattern GreenDelta confirmed as a database error for ecoinvent 3.9.1 in 2023, and a Monte Carlo simulation in openLCA then subtracts the treatment of waste. [`experiments/openlca/openlca_lognormal/`](experiments/openlca/openlca_lognormal/) has the check.
+- [Nov 15, 2026] Release v0.1.2: PET and polyethylene now use the disposal datasets of their own polymer in BAFU:2026 (they had been using a plastics mixture), and expanded polystyrene uses its own incineration dataset. The whole benchmark and every validation against openLCA ran again; no verdict changed at the central values, and the mean number of questions in the chosen setting went from 2.75 to 2.87. The paper now names the stand-ins that remain (landfill of PET, the obsolete packaging glass datasets, the oil-fired plant in Brazil) and reports a larger run of 5,400 sessions for the certificate. A factor file extracted before this release needs the six new disposal factors: with openLCA open, `python experiments/openlca/extract_factors.py --method "EF 3.1" --update` reads only what is missing.
 - [Nov 14, 2026] Release v0.1.1: installers for macOS (Apple silicon and Intel) and Windows with everything in this list: any product described by processes of the openLCA database, 15 materials, the search of the database and the automatic reading of missing factors. The page shows the version, and GitHub Actions now runs one whole comparison in each built app (version, questions, manager report) before it publishes the installer.
-- [Nov 14, 2026] Any product, not only containers. A product can now be described by processes chosen from the openLCA database by name, one per life cycle stage, with an amount or the smallest and the largest amount when it is not known; BRANCH asks for the exact amount only if it can change the answer. The app searches the database, shows the unit of each process and reads its factor from openLCA on its own. Two example products that are not containers agree with openLCA to 4.7e-10 ([`paper/data/validation_any_product.csv`](paper/data/validation_any_product.csv)). The reports now name the split toxicity indicators (organics, inorganics) instead of repeating one name. One command uses the whole app against a real openLCA, from the search to "Send to openLCA": `python experiments/check_app_with_openlca.py` (all steps passed on 14 November 2026).
-- [Nov 14, 2026] Eight more packaging materials as data files: polypropylene, polystyrene, expanded polystyrene, PVC, PLA, steel sheet (tinplate proxy), kraft paper and cartonboard, each with an example product in [`data/examples/`](data/examples). With corrugated board, the nine added materials were checked against openLCA for every dataset option in PT, DE and BR (42 products, largest relative difference 6.7e-9, [`paper/data/validation_new_materials.csv`](paper/data/validation_new_materials.csv)). Their recycling rates are assumptions, except for polypropylene (the national rate of all plastics) and, in Germany, for paper, board and steel. The app offers a material only when its factors are in the factor file; one command extracts and checks them: `bash experiments/new_materials_session.sh`.
-- [Nov 13, 2026] Experiments promised in the proposal, on a plan fixed before running ([`experiments/PLAN_2026-11-13.md`](experiments/PLAN_2026-11-13.md)): the chosen setting in three other impact categories (acidification, water use, fossil resource use) and two knowledge ablations (no location, uniform priors). Descriptive results in the paper, summaries in `paper/data/proposal_2026-11-13/`, one command to repeat them: `bash experiments/run_proposal_experiments.sh`.
+- [Nov 14, 2026] Any product, not only containers. A product can now be described by processes chosen from the openLCA database by name, one per life cycle stage, with an amount or the smallest and the largest amount when it is not known; BRANCH asks for the exact amount only if it can change the answer. The app searches the database, shows the unit of each process and reads its factor from openLCA on its own. Two example products that are not containers agree with openLCA to 4.7e-10 ([`paper/data/validation_any_product.csv`](paper/data/validation_any_product.csv)). The reports now name the split toxicity indicators (organics, inorganics) instead of repeating one name. One command uses the whole app against a real openLCA, from the search to "Send to openLCA": `python experiments/openlca/check_app_with_openlca.py` (all steps passed on 14 November 2026).
+- [Nov 14, 2026] Eight more packaging materials as data files: polypropylene, polystyrene, expanded polystyrene, PVC, PLA, steel sheet (tinplate proxy), kraft paper and cartonboard, each with an example product in [`data/examples/`](data/examples). With corrugated board, the nine added materials were checked against openLCA for every dataset option in PT, DE and BR (42 products, largest relative difference 6.7e-9, [`paper/data/validation_new_materials.csv`](paper/data/validation_new_materials.csv)). Their recycling rates are assumptions, except for polypropylene (the national rate of all plastics) and, in Germany, for paper, board and steel. The app offers a material only when its factors are in the factor file; one command extracts and checks them: `bash experiments/record/new_materials_session.sh`.
+- [Nov 13, 2026] Experiments promised in the proposal, on a plan fixed before running ([`experiments/record/PLAN_2026-11-13.md`](experiments/record/PLAN_2026-11-13.md)): the chosen setting in three other impact categories (acidification, water use, fossil resource use) and two knowledge ablations (no location, uniform priors). Descriptive results in the paper, summaries in `paper/data/proposal_2026-11-13/`, one command to repeat them: `bash experiments/benchmark/run_proposal_experiments.sh`.
 - [Nov 13, 2026] Corrugated board added as a material (`data/materials/corrugated_board.json`, example product in `data/examples/`); its German recycling rate is sourced, the default is an assumption, and its check against openLCA in a product system ran on 14 November (entry above). The connection panel of the app now lists the four steps before the first comparison and names the next one.
 - [Nov 13, 2026] Paper: the discussion now states what BRANCH offers a small company (about three answers instead of 16 open choices and 10 to 21 linked exchanges per comparison, with every default visible) and what it cannot claim yet (no person outside the project has used it), and it lists the departures from the proposal. It also states that only Portugal, Germany and Brazil have national priors, and that the other electricity grids of the database run on default priors. `CONTRIBUTING.md` and `docs/lemma.md` point to the current files.
 - [Nov 13, 2026] Priors checked against published values (`data/prior_checks.csv`, with a test). Two priors widened to include a published value: heat for washing, and the mass of the refillable glass bottle in Brazil. The aluminium foil of the carton has its own prior of recycled content.
@@ -117,8 +117,8 @@ print(result["verdict"], result["p_flip"], result["certified"], result["question
 <summary>Talk to the agent in the terminal</summary>
 
 ```bash
-python experiments/demo_cli.py --toy                  # placeholder toy case, no openLCA needed
-python experiments/demo_cli.py --region PT           # real BAFU:2026 factors (any code in data/regions)
+python examples/demo_cli.py --toy                  # placeholder toy case, no openLCA needed
+python examples/demo_cli.py --region PT           # real BAFU:2026 factors (any code in data/regions)
 ```
 
 The agent asks whether the comparison will be disclosed to the public (if so, it states that ISO 14044 requires a critical review panel, which BRANCH prepares for but does not replace) and writes `outputs/report.md`.
@@ -148,13 +148,13 @@ model = compare("my_product.json", "pet_bottle_1l", region="PT")           # or 
 ```
 
 ```bash
-python experiments/demo_cli.py --a aluminium_can_330ml --b beverage_carton_1l --region DE
+python examples/demo_cli.py --a aluminium_can_330ml --b beverage_carton_1l --region DE
 ```
 
 Materials in the catalogue: PET, HDPE, LDPE, glass, aluminium and liquid packaging board (the six of the benchmark), and nine added as data files that no benchmark case uses: corrugated board, cartonboard, kraft paper, polypropylene, polystyrene, expanded polystyrene, PVC, PLA and steel sheet (a proxy for tinplate, without the tin coating). These materials come with codified rules for containers (forming, distribution, refill, end of life). Any other product is described by processes chosen from the database: see [Any product](#any-product). The benchmark products are in [`data/benchmark/`](data/benchmark). Before comparing new products, extract only the factors they need:
 
 ```bash
-python experiments/extract_factors.py --update --specs aluminium_can_330ml beverage_carton_1l --region DE
+python experiments/openlca/extract_factors.py --update --specs aluminium_can_330ml beverage_carton_1l --region DE
 ```
 </details>
 
@@ -175,7 +175,7 @@ compare("aluminium_can_330ml", "beverage_carton_1l", region="BR-AM")
 
 For Portugal, Germany and Brazil the recycling rates, the split between incineration and landfill, the recycled content and (for Germany) the trips of refillable bottles come from national statistics: Eurostat and the APA packaging reports for Portugal, BMUV, GVM and ZSVR for Germany, ABIPET, ABRALATAS, Tetra Pak and ABREMA for Brazil. Each value names its document and year in the `SOURCE:` tag. Component masses, trips (outside Germany), washing, distribution distance, the recycled content of aluminium, the recycled content of PET in Brazil and the burden of recycled PET are still `ASSUMPTION:` priors, and the subregions BR-N and BR-AM still rest on assumptions.
 
-For the 25 other countries of the European Union, Iceland and Norway, the recycling rates of plastic, aluminium, steel, paper and glass packaging and the split between incineration and landfill come from two Eurostat tables (`env_waspacr` and `env_wasmun`, years 2022 to 2024) kept in [`data/eurostat/`](data/eurostat). `python experiments/make_eu_regions.py` writes those 28 files from the tables and states its rules; nobody edits them by hand. Eurostat gives one rate for all plastic packaging and none for beverage cartons, and each file says so.
+For the 25 other countries of the European Union, Iceland and Norway, the recycling rates of plastic, aluminium, steel, paper and glass packaging and the split between incineration and landfill come from two Eurostat tables (`env_waspacr` and `env_wasmun`, years 2022 to 2024) kept in [`data/eurostat/`](data/eurostat). `python experiments/data/make_eu_regions.py` writes those 28 files from the tables and states its rules; nobody edits them by hand. Eurostat gives one rate for all plastic packaging and none for beverage cartons, and each file says so.
 
 To add a place, copy the closest file, set `parent`, and change only what is different. Every prior keeps its `SOURCE:` or `ASSUMPTION:` tag, and `sources_needed` lists the data still to collect; both appear in the reports.
 </details>
@@ -211,8 +211,8 @@ What this way does not give: sourced starting values (the ranges are yours) and 
 openLCA has no fixed list of materials: it can assess anything whose processes are in the database you load. To see what BAFU:2026 (or any database) offers:
 
 ```bash
-python experiments/list_datasets.py                       # every process, grouped, to outputs/datasets_*.csv
-python experiments/list_datasets.py --grep tinplate --full  # with reference flow, unit and waste flag
+python experiments/openlca/list_datasets.py                       # every process, grouped, to outputs/datasets_*.csv
+python experiments/openlca/list_datasets.py --grep tinplate --full  # with reference flow, unit and waste flag
 ```
 
 Then add a material as a data file, without code: [`data/materials/README.md`](data/materials/README.md).
@@ -235,7 +235,7 @@ The answer in one sentence and how sure BRANCH is, where the impact comes from (
 With openLCA open on the database the factors came from and the IPC server running, BRANCH writes the resolved comparison back into it: one process per alternative, every exchange linked to the BAFU process it came from, one parameter per modelling choice with its value, question, source and who decided it, and a product system ready to calculate. It then calculates both systems in openLCA and compares them with its own numbers.
 
 ```bash
-python experiments/demo_cli.py --a aluminium_can_330ml --b beverage_carton_1l --region DE --push --jsonld outputs/branch.zip
+python examples/demo_cli.py --a aluminium_can_330ml --b beverage_carton_1l --region DE --push --jsonld outputs/branch.zip
 ```
 
 ```python
@@ -253,7 +253,7 @@ The amounts are those of one world: the human's answers and the most probable va
 The real case needs unit impact factors extracted once from openLCA 2.x with the IPC server running on port 8080. See [`data/README.md`](data/README.md).
 
 ```bash
-python experiments/extract_factors.py --method "EF 3.1"
+python experiments/openlca/extract_factors.py --method "EF 3.1"
 ```
 
 ```python
@@ -288,7 +288,7 @@ run_agent(model, oracle, strategy="margin", batch_size=3, n_samples=20_000, tau=
 The same code runs on NumPy or CuPy. Install `pip install cupy-cuda12x` and set `BRANCH_BACKEND=cupy`.
 
 ```bash
-BRANCH_BACKEND=cupy python experiments/bench_latency.py
+BRANCH_BACKEND=cupy python experiments/benchmark/bench_latency.py
 ```
 </details>
 
@@ -297,15 +297,15 @@ BRANCH_BACKEND=cupy python experiments/bench_latency.py
 The grid mirrors Faria et al. (2022): every configuration of strategy, batch size and sample size runs over many seeds, and each seed draws a different simulated expert world.
 
 ```bash
-python experiments/run_grid.py --case lca --J 40 --case_seeds 4 --batch 1 3 --seeds 30 --n 10000 --tag lca_J40
-python experiments/analyze.py results/lca_J40      # boxplots, P(flip) curves, Wilcoxon table
-python experiments/bench_latency.py                # time to choose one question
+python experiments/benchmark/run_grid.py --case lca --J 40 --case_seeds 4 --batch 1 3 --seeds 30 --n 10000 --tag lca_J40
+python experiments/benchmark/analyze.py results/lca_J40      # boxplots, P(flip) curves, Wilcoxon table
+python experiments/benchmark/bench_latency.py                # time to choose one question
 ```
 
 `--case` is `toy` (placeholder packaging case), `lca` (synthetic linear LCA with J choices), `sym` (synthetic symmetric case) or `real` (any two product files with extracted factors):
 
 ```bash
-python experiments/run_grid.py --case real --a pet_bottle_1l --b glass_refillable_1l --region PT --seeds 30
+python experiments/benchmark/run_grid.py --case real --a pet_bottle_1l --b glass_refillable_1l --region PT --seeds 30
 ```
 
 ### Results
@@ -334,7 +334,7 @@ QUICK=1 bash reproduce.sh    # 3 seeds and batch 1, to check the pipeline in min
 bash reproduce.sh notebook   # executes notebooks/branch_walkthrough.ipynb
 ```
 
-The paper sources are in [`paper/`](paper/) (IJCAI format, `main.tex`); every number quoted in the text is generated into `paper/tables/numbers.tex` by `experiments/paper_assets.py`, so prose and tables cannot disagree. [`notebooks/branch_walkthrough.ipynb`](notebooks/branch_walkthrough.ipynb) reproduces the lemma, one session of the agent, a small benchmark and the figures in a few minutes.
+The paper sources are in [`paper/`](paper/) (IJCAI format, `main.tex`); every number quoted in the text is generated into `paper/tables/numbers.tex` by `experiments/benchmark/paper_assets.py`, so prose and tables cannot disagree. [`notebooks/branch_walkthrough.ipynb`](notebooks/branch_walkthrough.ipynb) reproduces the lemma, one session of the agent, a small benchmark and the figures in a few minutes.
 
 ## Repository Layout
 
@@ -365,7 +365,7 @@ branch/
 │   └── real_cases.py        load extracted BAFU:2026 factors; compare(a, b, region)
 ├── experiments/             grid, analysis, latency benchmark, factor extraction, terminal demo
 ├── tests/                   pytest suite
-├── paper/                   IJCAI paper: main.tex, tables and figures generated by experiments/paper_assets.py
+├── paper/                   IJCAI paper: main.tex, tables and figures generated by experiments/benchmark/paper_assets.py
 ├── notebooks/               walkthrough notebook
 ├── packaging/               PyInstaller spec and Windows installer script (see .github/workflows/installers.yml)
 ├── reproduce.sh             master script: install, data, tests, experiments, figures, paper, notebook

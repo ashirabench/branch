@@ -8,7 +8,7 @@ import pytest
 from branch.builder import required_factor_keys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "experiments"))
+sys.path.insert(0, os.path.join(ROOT, "experiments", "data"))
 from make_hybrid_factors import CATEGORIES, IPCC, hybrid  # noqa: E402
 
 BENCH = ["pet_bottle_1l", "glass_refillable_1l", "aluminium_can_330ml", "beverage_carton_1l"]

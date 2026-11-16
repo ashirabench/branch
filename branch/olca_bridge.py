@@ -1,6 +1,6 @@
 """The openLCA connector (Steps 2 and 7).
 
-Reading:  experiments/extract_factors.py takes unit impact factors from the
+Reading:  experiments/openlca/extract_factors.py takes unit impact factors from the
           open openLCA database, once.
 Writing:  push_comparison sends the resolved comparison back to the same
           database, so the user opens, inspects and edits it in openLCA
@@ -108,7 +108,7 @@ def uncertainty_of(choice):
     openLCA has uniform, triangular, normal and lognormal distributions. A beta prior (the recycling
     rates) has no counterpart there, so it gets none and the parameter says so: openLCA's simulation
     then keeps that parameter at its value. For a lognormal, openLCA takes the value entered as
-    geometric mean as the mean of its draws (experiments/openlca_lognormal), so the field receives
+    geometric mean as the mean of its draws (experiments/openlca/openlca_lognormal), so the field receives
     median x exp(sigma^2 / 2), which gives draws with the median of the prior."""
     import math
     dist, p = choice.prior

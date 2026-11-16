@@ -2,7 +2,7 @@
 
 Product files that show how to describe a product with a material added in `data/materials/`.
 They are not part of the benchmark of the paper, and every mass is an illustrative assumption,
-labelled as such. `experiments/new_materials_session.sh` uses them to check each added material
+labelled as such. `experiments/record/new_materials_session.sh` uses them to check each added material
 against openLCA.
 
 | File | Material shown |
@@ -18,7 +18,7 @@ against openLCA.
 | `carton_box_1l.json` | cartonboard (with an LDPE liner) |
 
 Compare one with a benchmark product, for example
-`python experiments/demo_cli.py --a data/examples/pp_bottle_1l.json --b pet_bottle_1l --region PT`.
+`python examples/demo_cli.py --a data/examples/pp_bottle_1l.json --b pet_bottle_1l --region PT`.
 
 ## Products that are not containers
 
@@ -34,6 +34,6 @@ exact amount only if it can change which product is better.
 The amounts in these two files are illustrative assumptions, labelled as such. With openLCA open:
 
 ```bash
-python experiments/extract_factors.py --update --specs data/examples/cotton_bag.json data/examples/pp_bag.json
-python experiments/demo_cli.py --a data/examples/cotton_bag.json --b data/examples/pp_bag.json --region PT
+python experiments/openlca/extract_factors.py --update --specs data/examples/cotton_bag.json data/examples/pp_bag.json
+python examples/demo_cli.py --a data/examples/cotton_bag.json --b data/examples/pp_bag.json --region PT
 ```

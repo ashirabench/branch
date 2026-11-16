@@ -7,8 +7,8 @@ Companies only need a browser. openLCA runs once, on your side, to extract the f
 With openLCA 2.6 open on BAFU:2026 and the IPC server running:
 
 ```bash
-python experiments/extract_factors.py --method "EF 3.1"
-python experiments/extract_factors.py --update --specs pet_bottle_1l glass_refillable_1l aluminium_can_330ml beverage_carton_1l --region BR-AM
+python experiments/openlca/extract_factors.py --method "EF 3.1"
+python experiments/openlca/extract_factors.py --update --specs pet_bottle_1l glass_refillable_1l aluminium_can_330ml beverage_carton_1l --region BR-AM
 ```
 
 This writes `data/factors/<database>_<method>.json`. It is git ignored and must stay that way.

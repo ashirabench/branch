@@ -1,4 +1,4 @@
-# Runs fixed in experiments/PLAN_2026-11-13.md
+# Runs fixed in experiments/record/PLAN_2026-11-13.md
 
 Summaries of the runs of 13 November 2026 in the chosen setting (tau 2.5%, three questions per round,
 seeds 0 to 29, 18 cases, 540 sessions per row): `<run>_prior.csv` with experts from the priors and
@@ -10,4 +10,4 @@ seeds 0 to 29, 18 cases, 540 sessions per row): `<run>_prior.csv` with experts f
 - `no_location`, `uniform`: knowledge removed from the agent, verdict for climate change.
 
 The plan reports these runs as descriptive, so the files carry no p values.
-Made by `bash experiments/run_proposal_experiments.sh` and `python experiments/proposal_assets.py`.
+Made by `bash experiments/benchmark/run_proposal_experiments.sh` and `python experiments/benchmark/proposal_assets.py`.

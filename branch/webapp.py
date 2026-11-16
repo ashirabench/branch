@@ -4,7 +4,7 @@ The logic functions below have no Gradio dependency (and are tested); build_ui
 wires them to a Gradio page. Run with `python app.py`.
 
 Factors: the server reads them from the path in BRANCH_FACTORS (a file made
-by experiments/extract_factors.py). They stay on the server: the page never
+by experiments/openlca/extract_factors.py). They stay on the server: the page never
 offers them for download, it only shows results. Without that file the app
 refuses to start a comparison, unless BRANCH_DEMO=1, which uses illustrative
 numbers and says so on every screen and report.
@@ -41,7 +41,7 @@ def load_server_factors():
     except FileNotFoundError:
         pass
     raise RuntimeError("No impact factors configured on this server. Set BRANCH_FACTORS to the file made "
-                       "by experiments/extract_factors.py (or BRANCH_DEMO=1 for illustrative numbers).")
+                       "by experiments/openlca/extract_factors.py (or BRANCH_DEMO=1 for illustrative numbers).")
 
 
 def available_regions(factors=None):

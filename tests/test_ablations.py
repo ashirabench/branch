@@ -1,10 +1,10 @@
-"""Knowledge ablations of experiments/PLAN_2026-11-13.md: the code path, not the results."""
+"""Knowledge ablations of experiments/record/PLAN_2026-11-13.md: the code path, not the results."""
 import os
 import sys
 
 import numpy as np
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "experiments"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "experiments", "benchmark"))
 
 from branch.agent import run_agent  # noqa: E402
 from branch.builder import required_factor_keys  # noqa: E402

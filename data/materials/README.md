@@ -2,8 +2,8 @@
 
 Every file here adds a material to the catalogue without touching the code (`branch/catalogue.py` loads them). A file named after a built in material (`pet`, `hdpe`, `ldpe`, `glass`, `aluminium`, `liquid_packaging_board`) replaces it.
 
-1. Find the datasets in your database: `python experiments/list_datasets.py --grep "tinplate" --full`.
-2. Add their name patterns to `PROCESSES` in `branch/olca_extract.py` and extract: `python experiments/extract_factors.py --update --only tinplate`.
+1. Find the datasets in your database: `python experiments/openlca/list_datasets.py --grep "tinplate" --full`.
+2. Add their name patterns to `PROCESSES` in `branch/olca_extract.py` and extract: `python experiments/openlca/extract_factors.py --update --only tinplate`.
 3. Write `data/materials/<id>.json`:
 
 ```json
@@ -40,5 +40,5 @@ Every prior starts with `SOURCE:` (cited) or `ASSUMPTION:` (placeholder). Region
 | `steel.json` | steel sheet | proxy for tinplate, the tin coating is not modelled |
 
 Every dataset option of these materials was checked against openLCA on 14 November 2026
-(`paper/data/validation_new_materials.csv`, made by `experiments/validate_materials.py`).
+(`paper/data/validation_new_materials.csv`, made by `experiments/openlca/validate_materials.py`).
 The recycling rates are assumptions except where `data/regions/` gives a sourced national value.
