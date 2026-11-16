@@ -114,7 +114,7 @@ def build_objects(c, model, result):
                                  description=f"BRANCH factor key: {key}"))
         params = []
         for ch in model.choices:
-            if label not in side_of.get(ch.name, ()):
+            if not ch.askable or label not in side_of.get(ch.name, ()):
                 continue
             value = world[ch.name]
             shown = ch.decode(value)

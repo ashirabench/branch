@@ -162,13 +162,25 @@ def find_method(client, name):
     return sorted(hits, key=lambda d: len(d.name))[0]
 
 
+def linking(proc):
+    """How openLCA may connect the process to the rest of the database.
+
+    A unit process (BAFU) needs its inputs linked to their providers. An aggregated process (an
+    "LCI result", as in ELCD) already holds its whole inventory: letting openLCA link what is left
+    over attaches it to unrelated data sets (on 16 November 2026 it sent the spoil of the Portuguese
+    electricity of ELCD to container glass and almost doubled the result). There only the default
+    providers are linked."""
+    aggregated = getattr(proc, "process_type", None) == o.ProcessType.LCI_RESULT
+    return o.LinkingConfig(prefer_unit_processes=False,
+                           provider_linking=(o.ProviderLinking.ONLY_DEFAULTS if aggregated
+                                             else o.ProviderLinking.PREFER_DEFAULTS))
+
+
 def unit_impacts(client, proc_ref, method_ref):
     """Impacts per unit of the reference flow of one process."""
     proc = client.get(o.Process, proc_ref.id)
     ref_ex = next(e for e in proc.exchanges if e.is_quantitative_reference)
-    system = client.create_product_system(
-        proc_ref, o.LinkingConfig(prefer_unit_processes=False,
-                                  provider_linking=o.ProviderLinking.PREFER_DEFAULTS))
+    system = client.create_product_system(proc_ref, linking(proc))
     # amount 1 in the unit of the reference EXCHANGE (e.g. kWh), not of the flow's
     # reference unit (e.g. MJ): BRANCH multiplies these factors by amounts in that unit.
     setup = o.CalculationSetup(target=system, impact_method=method_ref, amount=1.0,
@@ -185,6 +197,56 @@ def unit_impacts(client, proc_ref, method_ref):
             "unit": ref_ex.unit.name if ref_ex.unit else None,
             "flow": ref_ex.flow.name if ref_ex.flow else None,
             "impacts": impacts}
+
+
+def simulate_impacts(client, proc_ref, method_ref, runs, tick=None):
+    """Monte Carlo of one process in openLCA: {category: [impact of one unit in each run]}.
+
+    Every run draws the exchanges of the whole product system from the distributions that the
+    database states for them, and calculates again. tick(i, runs) is called after each run."""
+    proc = client.get(o.Process, proc_ref.id)
+    ref_ex = next(e for e in proc.exchanges if e.is_quantitative_reference)
+    system = client.create_product_system(proc_ref, linking(proc))
+    setup = o.CalculationSetup(target=system, impact_method=method_ref, amount=1.0,
+                               unit=ref_ex.unit, flow_property=ref_ex.flow_property)
+    result = client.simulate(setup)
+    out = {}
+    try:
+        result.wait_until_ready()
+        if getattr(result, "error", None) is not None:
+            raise RuntimeError(result.error.error)
+        for i in range(runs):
+            state = result.simulate_next()
+            if getattr(state, "error", None):
+                raise RuntimeError(state.error)
+            result.wait_until_ready()
+            for imp in result.get_total_impacts():
+                out.setdefault(imp.impact_category.name, []).append(float(imp.amount))
+            if tick:
+                tick(i + 1, runs)
+    finally:
+        result.dispose()
+        client.delete(system)
+    return out
+
+
+def spread(values, central):
+    """Summary of the runs of one category: geometric standard deviation and how the runs sit
+    around the value BRANCH uses. No geometric standard deviation when more than 5% of the runs
+    have the other sign or are zero: a lognormal multiplier cannot describe such a factor."""
+    import math
+    n = len(values)
+    if n < 2 or not central:
+        return {"gsd": None, "n": n, "note": "too few runs or a factor of zero"}
+    same = [v / central for v in values if v / central > 0]
+    out = {"n": n, "other_sign": n - len(same)}
+    if len(same) < 0.95 * n:
+        return dict(out, gsd=None, note="more than 5% of the runs have the other sign")
+    logs = [math.log(v) for v in same]
+    mean = sum(logs) / len(logs)
+    sd = math.sqrt(sum((x - mean) ** 2 for x in logs) / (len(logs) - 1))
+    ordered = sorted(same)
+    return dict(out, gsd=math.exp(sd), median_ratio=ordered[len(ordered) // 2], mean_ratio=sum(same) / len(same))
 
 
 def citation_for(database):

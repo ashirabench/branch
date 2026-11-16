@@ -51,10 +51,12 @@ def make_uniform(model):
     return model
 
 
-def build(case, J, case_seed, xp, a=None, b=None, country="PT", category="Climate change"):
+def build(case, J, case_seed, xp, a=None, b=None, country="PT", category="Climate change",
+          system_model="cut-off", inventory_uncertainty=False):
     if case == "real":
         from branch.real_cases import compare
-        return compare(a, b, country, category=category, xp=xp)
+        return compare(a, b, country, category=category, xp=xp, system_model=system_model,
+                       inventory_uncertainty=inventory_uncertainty)
     if case == "toy":
         return toy_packaging(xp)
     if case == "lca":
@@ -68,7 +70,9 @@ def one_run(cfg):
     xp = get_xp(cfg["backend"])
     category, ablation = cfg.get("category", "Climate change"), cfg.get("ablation", "none")
     args = (cfg["case"], cfg["J"], cfg["case_seed"], xp, cfg.get("a"), cfg.get("b"))
-    model = build(*args, cfg.get("country", "PT"), category)
+    how = dict(system_model=cfg.get("system_model", "cut-off"),
+               inventory_uncertainty=cfg.get("inventory_uncertainty", False))
+    model = build(*args, cfg.get("country", "PT"), category, **how)
     # The expert and the reference verdict always come from this model (the national one).
     truth = (draw_truth_tails(model, cfg["seed"]) if cfg.get("truth") == "tails"
              else draw_truth(model, cfg["seed"]))
@@ -77,8 +81,8 @@ def one_run(cfg):
         if cfg["case"] != "real":
             raise ValueError("ablations need --case real")
         reference = bool(model.delta_at(truth) < 0)
-        agent = (build(*args, no_location_region(), category) if ablation == "no_location"
-                 else make_uniform(build(*args, cfg.get("country", "PT"), category)))
+        agent = (build(*args, no_location_region(), category, **how) if ablation == "no_location"
+                 else make_uniform(build(*args, cfg.get("country", "PT"), category, **how)))
         if [c.name for c in agent.choices] != [c.name for c in model.choices]:
             raise ValueError("the ablated model must have the choices of the national model")
         model = agent
@@ -115,13 +119,19 @@ def main():
                     help="--case real: the impact category whose verdict the agent settles")
     ap.add_argument("--ablation", default="none", choices=ABLATIONS,
                     help="--case real: knowledge removed from the agent (experiments/PLAN_2026-11-13.md)")
+    ap.add_argument("--system-model", dest="system_model", default="cut-off", choices=["cut-off", "cff"],
+                    help="--case real: cut-off, or the Circular Footprint Formula (data/cff/)")
+    ap.add_argument("--inventory-uncertainty", dest="inventory_uncertainty", default="off", choices=["on", "off"],
+                    help="--case real: on lets every factor vary by the uncertainty of its dataset, "
+                         "when the factor file has it (experiments/extract_uncertainty.py)")
     args = ap.parse_args()
 
     tag = args.tag or (f"real_{args.a}_vs_{args.b}_{args.region}" if args.case == "real"
                        else f"{args.case}_J{args.J}")
     cfgs = [dict(case=args.case, J=args.J, case_seed=cs, strategy=s, batch=b, n=n, seed=sd,
                  tau=args.tau, backend=args.backend, a=args.a, b=args.b, country=args.region,
-                 truth=args.truth, category=args.category, ablation=args.ablation)
+                 truth=args.truth, category=args.category, ablation=args.ablation,
+                 system_model=args.system_model, inventory_uncertainty=args.inventory_uncertainty == "on")
             for cs, s, b, n, sd in itertools.product(args.case_seeds, args.strategies, args.batch,
                                                      args.n, range(args.first_seed, args.first_seed + args.seeds))]
     print(f"{len(cfgs)} runs on {args.workers} workers")

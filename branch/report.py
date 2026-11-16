@@ -4,6 +4,8 @@ on its own), and the smallest single change that reverses the verdict.
 Structured after the ISO 14044 reporting items that the agent can fill; the
 model itself goes back to openLCA through olca_bridge.push_comparison.
 """
+import math
+
 from .help import fmt_pct
 from .whatif import indicators, reversals, stages
 
@@ -67,16 +69,26 @@ def markdown_report(result, model, title="BRANCH comparative LCA", analysis=True
         lines += [f"> {note}", ""]
     lines += ["## Modelling choices", "", "| Choice | Value | Decided by |", "|---|---|---|"]
     for c in model.choices:
+        if not c.askable:
+            continue
         if c.name in result["fixed"]:
             val = c.decode(result["fixed"][c.name])
             val = f"{val:.4g}" if isinstance(val, float) else val
         else:
             val = "distribution kept"
         lines.append(f"| {c.name} | {val} | {result['decided_by'][c.name]} |")
-    sourced = [c for c in model.choices if c.source.startswith("SOURCE") and c.name not in result["fixed"]]
+    sourced = [c for c in model.choices if c.source.startswith("SOURCE") and c.name not in result["fixed"]
+               and c.askable]
     if sourced:
         lines += ["", "## Priors from published sources (kept as distributions)", ""]
         lines += [f"- {c.name}: {c.source}" for c in sourced]
+    noise = [c for c in model.choices if not c.askable]
+    if noise:
+        lines += ["", "## Uncertainty of the database (in every result, never asked)", "",
+                  "Each dataset varies in the Monte Carlo draws by the uncertainty that the database states for it. "
+                  "Two products that use the same dataset share its draw.", ""]
+        lines += [f"- {c.name[len('factor.'):] if c.name.startswith('factor.') else c.name}: "
+                  f"geometric standard deviation {math.exp(c.prior[1]['sigma']):.3g}" for c in noise]
     pending = [c.name for c in model.choices if c.source.startswith("ASSUMPTION")]
     if pending:
         lines += ["", "## Placeholder priors (to be replaced by sourced data)", ""]

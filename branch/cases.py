@@ -126,6 +126,8 @@ def draw_truth_tails(model, seed, tail=0.1):
     for c in model.choices:
         if not c.is_open():
             out[c.name] = c.encode(c.fixed)
+        elif not c.askable:                 # the database's own uncertainty: not something an expert gets wrong
+            out[c.name] = float(c.ppf(np.array([rng.random()]))[0])
         elif c.kind == "categorical":
             probs = c.probs
             others = [i for i in range(len(probs)) if i != int(np.argmax(probs))]

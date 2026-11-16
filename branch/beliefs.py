@@ -26,6 +26,7 @@ class Choice:
     question: str = ""             # the question shown to the human
     fixed: object = None           # set when the human answers
     n_answers: int = 5             # continuous: answers represented by this many quantile points
+    askable: bool = True           # False: uncertainty nobody can answer (the database's own), never asked
 
     def __post_init__(self):
         if self.kind not in ("categorical", "continuous"):

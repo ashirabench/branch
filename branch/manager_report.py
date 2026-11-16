@@ -231,6 +231,8 @@ def manager_pdf(result, model, path, public=None, company=None):
     story.append(Paragraph("What you told BRANCH, and what it assumed", H2))
     rows = [["Item", "Value", "Decided by"]]
     for c in model.choices:
+        if not c.askable:                          # the database's own uncertainty is not an item anyone decided
+            continue
         rows.append([Paragraph(_plain_question(c), SMALL), Paragraph(_value(c, result), SMALL),
                      Paragraph(_who(result["decided_by"][c.name], c.source), SMALL)])
     story.append(_table(rows, [10.2 * cm, 3.6 * cm, 3.2 * cm]))

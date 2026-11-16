@@ -363,6 +363,8 @@ branch/
 ├── app.py                   web app entry point (see docs/DEPLOY.md)
 ├── data/regions/            GLO, PT, DE, BR, BR-N, BR-AM, EU and 27 European countries
 ├── data/eurostat/           the two Eurostat tables behind the European region files
+├── data/cff/                Circular Footprint Formula: parameters of Part C of Annex II, recovered energy
+├── data/second_database/    second database test: ELCD 3.2 factors and their link to BRANCH factors
 ├── data/materials/          extra materials as JSON, no code needed
 ├── data/examples/           example products for added materials (not part of the benchmark)
 ├── data/benchmark/          product files: PET, refillable glass, aluminium can, beverage carton

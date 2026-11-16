@@ -53,7 +53,7 @@ class Session:
         self.score_fn = STRATEGIES[strategy]
         self.rng = np.random.default_rng(np.random.SeedSequence([seed, 7]))
         self.state = State(model, model.sample(n_samples, seed))
-        self.max_q = max_questions if max_questions is not None else len(model.choices)
+        self.max_q = max_questions if max_questions is not None else sum(c.askable for c in model.choices)
         self.expert_a_lower = None if truth is None else model.delta_at(truth) < 0
         if reference_a_lower is not None:      # verdict of another model at the expert's world (ablations)
             self.expert_a_lower = bool(reference_a_lower)
@@ -129,7 +129,9 @@ class Session:
                    model.label_b: (float(ib.mean()), *map(float, np.percentile(ib, [5, 95])))}
         decided_by = {}
         for c in model.choices:
-            if c.name in state.unknown:
+            if not c.askable:
+                decided_by[c.name] = f"nobody: uncertainty of the database ({c.source})"
+            elif c.name in state.unknown:
                 decided_by[c.name] = "human: don't know (prior kept)"
             elif c.name in asked:
                 decided_by[c.name] = "human"

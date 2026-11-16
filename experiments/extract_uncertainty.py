@@ -1,0 +1,110 @@
+"""Uncertainty of the unit factors, from the uncertainty that the database states for its exchanges.
+
+For every factor it runs a Monte Carlo simulation of the dataset in openLCA and stores, per impact
+category, the geometric standard deviation of the result under the factor in the factor file:
+
+    "uncertainty": {"Climate change": {"gsd": 1.08, "n": 200, "median_ratio": 1.01, ...}, ...}
+
+BRANCH then lets every factor vary in its own Monte Carlo draws (branch/builder.py), as a choice
+that nobody is asked. Requirements as for extract_factors.py: openLCA open with the database, IPC
+server on port 8080, and the factors already extracted.
+
+    python experiments/extract_uncertainty.py --time-only        # three runs of one dataset, to see how long it takes
+    python experiments/extract_uncertainty.py --runs 200         # the factors of the benchmark
+    python experiments/extract_uncertainty.py --runs 200 --only pet_granulate_bottle_grade lorry_16_32t
+
+It can be stopped and started again: factors already done with at least --runs runs are skipped,
+and the file is saved after every factor (a copy of the file as it was is kept in outputs/).
+
+What this does not capture: two factors simulated one at a time do not share the draws of the
+processes they have in common (the same electricity inside PET and inside glass, say), so BRANCH
+treats the uncertainties of different factors as independent.
+"""
+import argparse
+import json
+import os
+import shutil
+import sys
+import time
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import olca_ipc as ipc  # noqa: E402
+import olca_schema as o  # noqa: E402
+
+from branch.builder import required_factor_keys  # noqa: E402
+from branch.olca_extract import find_method, simulate_impacts, spread  # noqa: E402
+from branch.real_cases import load_factors  # noqa: E402
+
+BENCH = ["pet_bottle_1l", "glass_refillable_1l", "aluminium_can_330ml", "beverage_carton_1l"]
+
+
+def benchmark_keys(regions):
+    keys = []
+    for r in regions:
+        keys += required_factor_keys(BENCH, r)
+    return list(dict.fromkeys(keys))
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--port", type=int, default=8080)
+    ap.add_argument("--runs", type=int, default=200)
+    ap.add_argument("--regions", nargs="+", default=["PT", "DE", "BR"])
+    ap.add_argument("--only", nargs="*", help="only these factor keys")
+    ap.add_argument("--time-only", action="store_true", help="three runs of the first factor, print the time, save nothing")
+    args = ap.parse_args()
+
+    data = load_factors()
+    path = data.pop("path")
+    keys = args.only or benchmark_keys(args.regions)
+    missing = [k for k in keys if k not in data["factors"]]
+    if missing:
+        sys.exit(f"not in {path}: {missing}. Extract them first with experiments/extract_factors.py")
+    client = ipc.Client(args.port)
+    descs = {d.id: d for d in client.get_descriptors(o.Process)}
+    method = find_method(client, data["method"])
+    print(f"{len(descs)} processes in the open database, method {method.name}, {len(keys)} factors")
+    gone = [k for k in keys if data["factors"][k]["id"] not in descs]
+    if gone:
+        sys.exit(f"the open database is not the one of {os.path.basename(path)}: {gone[:3]} not found")
+
+    if args.time_only:
+        t0 = time.time()
+        simulate_impacts(client, descs[data["factors"][keys[0]]["id"]], method, 3)
+        per = (time.time() - t0) / 3
+        print(f"{per:.1f} s per run for {keys[0]}; {args.runs} runs of {len(keys)} factors: about "
+              f"{per * args.runs * len(keys) / 3600:.1f} hours (other datasets can be faster or slower)")
+        return
+
+    os.makedirs("outputs", exist_ok=True)
+    backup = os.path.join("outputs", "factors_before_uncertainty_" + time.strftime("%Y-%m-%d") + ".json")
+    if not os.path.exists(backup):
+        shutil.copy(path, backup)
+    todo = [k for k in keys if min((u.get("n", 0) for u in (data["factors"][k].get("uncertainty") or {}).values()),
+                                   default=0) < args.runs]
+    print(f"{len(keys) - len(todo)} already done, {len(todo)} to do")
+    start = time.time()
+    for i, key in enumerate(todo, 1):
+        f = data["factors"][key]
+        t0 = time.time()
+        try:
+            runs = simulate_impacts(client, descs[f["id"]], method, args.runs)
+        except Exception as exc:  # keep going; the factor stays without uncertainty and is listed at the end
+            print(f"!! {key}: {exc}")
+            continue
+        f["uncertainty"] = {c: spread(v, f["impacts"].get(c)) for c, v in runs.items() if c in f["impacts"]}
+        f["uncertainty_runs"] = time.strftime("%Y-%m-%d")
+        with open(path + ".tmp", "w") as fh:
+            json.dump(data, fh, indent=2)
+        os.replace(path + ".tmp", path)
+        cc = f["uncertainty"].get("Climate change", {})
+        left = (time.time() - start) / i * (len(todo) - i)
+        print(f"ok {i}/{len(todo)} {key}: climate change gsd {cc.get('gsd')}, median/central {cc.get('median_ratio')} "
+              f"({time.time() - t0:.0f} s; about {left / 60:.0f} min left)")
+    without = [k for k in keys if not (data["factors"][k].get("uncertainty") or {}).get("Climate change", {}).get("gsd")]
+    print(f"done. Factors without a usable uncertainty for Climate change: {without or 'none'}")
+
+
+if __name__ == "__main__":
+    main()

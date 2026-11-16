@@ -204,9 +204,11 @@ class Param:
 
 
 class _Builder:
-    def __init__(self, region, category, data, xp, shared=None, system_model="cut-off"):
+    def __init__(self, region, category, data, xp, shared=None, system_model="cut-off",
+                 inventory_uncertainty=False):
         self.region, self.category, self.data, self.xp = region, category, data, xp
         self.system_model = system_model
+        self.inventory_uncertainty = inventory_uncertainty
         self.materials = cat.load_materials()
         self.cff = cat.load_cff() if system_model == "cff" else {}
         self.energy = cat.load_energy_recovery() if system_model == "cff" else {}
@@ -216,6 +218,27 @@ class _Builder:
 
     def f(self, key):
         return factor(self.data, key, self.category)
+
+    def u(self, key):
+        """Uncertainty of a unit factor as stated by the database: a multiplier with median 1, or
+        None when the factor file carries none for this factor and category (or it is switched off).
+
+        It is a Choice that nobody can answer (askable=False): it stays in every Monte Carlo draw,
+        the same draw for both products when they share the dataset, and the agent never asks it."""
+        if not self.inventory_uncertainty or key is None:
+            return None
+        unc = ((self.data.get("factors", {}).get(key) or {}).get("uncertainty") or {}).get(self.category)
+        if not unc or not unc.get("gsd") or float(unc["gsd"]) <= 1.0:
+            return None
+        name = f"factor.{key}"
+        if name not in self.choices:
+            gsd = float(unc["gsd"])
+            self.choices[name] = Choice(
+                name, "continuous", ("lognormal", {"median": 1.0, "sigma": float(np.log(gsd))}),
+                f"SOURCE: uncertainty that the database states for the exchanges of this dataset, propagated by "
+                f"{int(unc.get('n', 0))} Monte Carlo runs in openLCA: geometric standard deviation {gsd:.3g} "
+                f"for {self.category}", question="", askable=False)
+        return Param(name)
 
     def continuous(self, name, entry, question, fixed=None, prior_key=None):
         """prior_key: catalogue key a region may override, e.g. "pet.recycling_rate"."""
@@ -237,7 +260,8 @@ class _Builder:
             else:
                 p, keys = self.categorical("electricity", e["options"], e["source"], e["question"],
                                            self.shared.get("electricity"))
-            self._elec = (p, self.xp.asarray([self.f(k) for k in keys], dtype=self.xp.float64), keys)
+            self._elec = (p, self.xp.asarray([self.f(k) for k in keys], dtype=self.xp.float64), keys,
+                          [self.u(k) for k in keys])
         return self._elec
 
     def legs(self, kind):
@@ -250,7 +274,7 @@ class _Builder:
                 name = "distribution_km" if kind == "distribution" and len(legs) == 1 else f"{kind}.{mode}_km"
                 q = cat.TRANSPORT_QUESTIONS[kind].format(mode=cat.MODE_WORDS.get(mode, mode))
                 km = self.continuous(name, leg["km"], q, self.shared.get(name))
-                out.append((km, self.f(cat.TRANSPORT[mode]), cat.TRANSPORT[mode]))
+                out.append((km, self.f(cat.TRANSPORT[mode]), cat.TRANSPORT[mode], self.u(cat.TRANSPORT[mode])))
             self._legs[kind] = out
         return self._legs[kind]
 
@@ -288,7 +312,24 @@ def _i(p, v):
 
 
 def _deps(*params):
-    return [p.name for p in params if p is not None and p.name is not None]
+    return list(dict.fromkeys(p.name for p in params if p is not None and p.name is not None))
+
+
+def _u(p, v):
+    """Multiplier of a factor in a world: its uncertainty draw, or exactly 1."""
+    return 1.0 if p is None else p(v)
+
+
+def _table(xp, values, us, i, v):
+    """values[i], each option multiplied by the uncertainty of its own factor."""
+    out = values[i]
+    if any(u is not None for u in us):
+        mult = xp.ones_like(out)
+        for j, u in enumerate(us):
+            if u is not None:
+                mult = xp.where(i == j, u(v), mult)
+        out = out * mult
+    return out
 
 
 def _product_terms(b, spec, sign, n_units):
@@ -324,15 +365,15 @@ def _product_terms(b, spec, sign, n_units):
                                   f'How much "{proc_name}" does one "{pname}" need for {what} ({unit})?')
         else:
             amount = Param(const=float(e["amount"]))
-        fac = b.f(key)
+        fac, fac_u = b.f(key), b.u(key)
 
-        def exchange(xp_, v, amount=amount, fac=fac):
-            return n_units * amount(v) * fac
+        def exchange(xp_, v, amount=amount, fac=fac, fac_u=fac_u):
+            return n_units * amount(v) * fac * _u(fac_u, v)
 
         def exchange_inv(v, amount=amount, key=key):
             return {key: n_units * amount(v)}
 
-        terms.append(Term(f"{pid}.{e['id']}.{e['stage']}", _deps(amount), exchange, sign, exchange_inv))
+        terms.append(Term(f"{pid}.{e['id']}.{e['stage']}", _deps(amount, fac_u), exchange, sign, exchange_inv))
 
     total_mass = []
     for c in spec["components"]:
@@ -357,11 +398,14 @@ def _product_terms(b, spec, sign, n_units):
                                     m.get("dataset_question", "Which {c} dataset applies?").format(c=where),
                                     known.get("dataset"))
         virgin = xp.asarray([b.f(k) for k in ds_keys], dtype=xp.float64)
+        virgin_u = [b.u(k) for k in ds_keys]
         conv_key = c.get("conversion", m["conversion"])
         conv = b.f(conv_key) if conv_key else 0.0
+        conv_u = b.u(conv_key) if conv_key else None
 
         # recycled content
         rec = m["recycled"]
+        rec_u = None
         if rec is None:
             r_share, ratio, rec_f = Param(const=0.0), None, 0.0
         else:
@@ -376,14 +420,14 @@ def _product_terms(b, spec, sign, n_units):
                                      known.get("recycled_ratio"), f"{mid}.recycled_ratio")
                 rec_f = None
             else:
-                ratio, rec_f = None, b.f(rec["key"])
+                ratio, rec_f, rec_u = None, b.f(rec["key"]), b.u(rec["key"])
 
         def material(xp_, v, mass=mass, ds=ds, virgin=virgin, conv=conv, r=r_share,
-                     ratio=ratio, rec_f=rec_f, trips=trips):
+                     ratio=ratio, rec_f=rec_f, trips=trips, virgin_u=virgin_u, conv_u=conv_u, rec_u=rec_u):
             kg = mass(v) / 1000
-            vf = virgin[idx(ds, v)]
-            recycled = ratio(v) * vf if ratio is not None else rec_f
-            return n_units * kg * ((1 - r(v)) * vf + r(v) * recycled + conv) / trips(v)
+            vf = _table(xp, virgin, virgin_u, idx(ds, v), v)
+            recycled = ratio(v) * vf if ratio is not None else rec_f * _u(rec_u, v)
+            return n_units * kg * ((1 - r(v)) * vf + r(v) * recycled + conv * _u(conv_u, v)) / trips(v)
 
         def material_inv(v, mass=mass, ds=ds, ds_keys=ds_keys, conv_key=conv_key, r=r_share,
                          ratio=ratio, rec=rec, trips=trips):
@@ -397,7 +441,8 @@ def _product_terms(b, spec, sign, n_units):
                 out[conv_key] = out.get(conv_key, 0.0) + kg
             return out
 
-        terms.append(Term(f"{pid}.{c['id']}.material", _deps(mass, ds, r_share, ratio, trips),
+        terms.append(Term(f"{pid}.{c['id']}.material",
+                          _deps(mass, ds, r_share, ratio, trips, *virgin_u, conv_u, rec_u),
                           material, sign, material_inv))
 
         # Circular Footprint Formula: what cut-off leaves out (PEF, Annex C parameters)
@@ -406,9 +451,9 @@ def _product_terms(b, spec, sign, n_units):
             A, q_in, q_out = float(p["A"]), float(p["Qsin_Qp"]), float(p["Qsout_Qp"])
             eol_key = p.get("recycling_eol_key")
             if eol_key:
-                erec_eol = ("key", eol_key, b.f(eol_key))
+                erec_eol = ("key", eol_key, b.f(eol_key), b.u(eol_key))
             elif rec is not None and rec["model"] == "dataset":
-                erec_eol = ("key", rec["key"], rec_f)
+                erec_eol = ("key", rec["key"], rec_f, rec_u)
             elif ratio is not None:
                 erec_eol = ("ratio", ratio, None)
             else:
@@ -421,9 +466,9 @@ def _product_terms(b, spec, sign, n_units):
             # recycled content: R1 (A Erec + (1-A) Ev Qsin/Qp) instead of R1 Erec
             if rec is not None:
                 def cff_content(xp_, v, mass=mass, ds=ds, virgin=virgin, r=r_share, ratio=ratio,
-                                rec_f=rec_f, trips=trips, A=A, q_in=q_in):
-                    vf = virgin[idx(ds, v)]
-                    erec = ratio(v) * vf if ratio is not None else rec_f
+                                rec_f=rec_f, trips=trips, A=A, q_in=q_in, virgin_u=virgin_u, rec_u=rec_u):
+                    vf = _table(xp, virgin, virgin_u, idx(ds, v), v)
+                    erec = ratio(v) * vf if ratio is not None else rec_f * _u(rec_u, v)
                     return n_units * mass(v) / 1000 * r(v) * (1 - A) * (vf * q_in - erec) / trips(v)
 
                 def cff_content_inv(v, mass=mass, ds=ds, ds_keys=ds_keys, r=r_share, ratio=ratio, rec=rec,
@@ -434,7 +479,8 @@ def _product_terms(b, spec, sign, n_units):
                         return {vk: w * (q_in - ratio(v))}
                     return {vk: w * q_in, rec["key"]: -w}
 
-                terms.append(Term(f"{pid}.{c['id']}.cff.material", _deps(mass, ds, r_share, ratio, trips),
+                terms.append(Term(f"{pid}.{c['id']}.cff.material",
+                                  _deps(mass, ds, r_share, ratio, trips, *virgin_u, rec_u),
                                   cff_content, sign, cff_content_inv))
 
         # end of life
@@ -447,32 +493,35 @@ def _product_terms(b, spec, sign, n_units):
                                  f'Of the {label} from "{pname}" not recycled, what share is incinerated (0 to 1)?',
                                  known.get("incineration_share"), f"{mid}.incineration_share")
             inc, land = b.f(eol["incineration"]), b.f(eol["landfill"])
+            inc_u, land_u = b.u(eol["incineration"]), b.u(eol["landfill"])
 
-            def end_of_life(xp_, v, mass=mass, rate=rate, share=share, inc=inc, land=land, trips=trips):
+            def end_of_life(xp_, v, mass=mass, rate=rate, share=share, inc=inc, land=land, trips=trips,
+                            inc_u=inc_u, land_u=land_u):
                 s = share(v)
-                return (n_units * mass(v) / 1000 * (1 - rate(v)) * (s * inc + (1 - s) * land)
-                        / trips(v))
+                return (n_units * mass(v) / 1000 * (1 - rate(v))
+                        * (s * inc * _u(inc_u, v) + (1 - s) * land * _u(land_u, v)) / trips(v))
 
             def eol_inv(v, mass=mass, rate=rate, share=share, keys=(eol["incineration"], eol["landfill"]),
                         trips=trips):
                 kg = n_units * mass(v) / 1000 * (1 - rate(v)) / trips(v)
                 return {keys[0]: kg * share(v), keys[1]: kg * (1 - share(v))}
 
-            deps = _deps(mass, rate, share, trips)
+            deps = _deps(mass, rate, share, trips, inc_u, land_u)
         else:
             fate, keys = b.categorical(f"{pid}.{mid}.end_of_life", eol["options"], eol["source"],
                                        eol["question"].format(c=where), known.get("end_of_life"),
                                        f"{mid}.end_of_life")
             table = xp.asarray([b.f(k) if k else 0.0 for k in keys], dtype=xp.float64)
+            table_u = [b.u(k) for k in keys]
 
-            def end_of_life(xp_, v, mass=mass, fate=fate, table=table, trips=trips):
-                return n_units * mass(v) / 1000 * table[idx(fate, v)] / trips(v)
+            def end_of_life(xp_, v, mass=mass, fate=fate, table=table, trips=trips, table_u=table_u):
+                return n_units * mass(v) / 1000 * _table(xp, table, table_u, idx(fate, v), v) / trips(v)
 
             def eol_inv(v, mass=mass, fate=fate, keys=keys, trips=trips):
                 key = keys[_i(fate, v)]
                 return {key: n_units * mass(v) / 1000 / trips(v)} if key else {}
 
-            deps = _deps(mass, fate, trips)
+            deps = _deps(mass, fate, trips, *table_u)
         terms.append(Term(f"{pid}.{c['id']}.end_of_life", deps, end_of_life, sign, eol_inv))
 
         if b.system_model == "cff":
@@ -485,9 +534,9 @@ def _product_terms(b, spec, sign, n_units):
                 r2 = (lambda v, fate=fate, rec_opts=rec_opts: rec_opts[idx(fate, v)])
 
             def cff_eol(xp_, v, mass=mass, ds=ds, virgin=virgin, r2=r2, trips=trips, A=A, q_out=q_out,
-                        erec_eol=erec_eol):
-                vf = virgin[idx(ds, v)]
-                e_eol = erec_eol[2] if erec_eol[0] == "key" else erec_eol[1](v) * vf
+                        erec_eol=erec_eol, virgin_u=virgin_u):
+                vf = _table(xp, virgin, virgin_u, idx(ds, v), v)
+                e_eol = erec_eol[2] * _u(erec_eol[3], v) if erec_eol[0] == "key" else erec_eol[1](v) * vf
                 return n_units * mass(v) / 1000 * (1 - A) * r2(v) * (e_eol - vf * q_out) / trips(v)
 
             def cff_eol_inv(v, mass=mass, ds=ds, ds_keys=ds_keys, r2=r2, trips=trips, A=A, q_out=q_out,
@@ -500,7 +549,8 @@ def _product_terms(b, spec, sign, n_units):
                     return out
                 return {vk: w * (erec_eol[1](v) - q_out)}
 
-            deps_cff = _deps(mass, ds, r2_param, trips, erec_eol[1] if erec_eol[0] == "ratio" else None)
+            deps_cff = _deps(mass, ds, r2_param, trips, erec_eol[1] if erec_eol[0] == "ratio" else erec_eol[3],
+                             *virgin_u)
             terms.append(Term(f"{pid}.{c['id']}.cff.end_of_life", deps_cff, cff_eol, sign, cff_eol_inv))
 
             # energy recovery, with B = 0 (the PEF default): R3 x (E_ER - LHV X_elec E_SE,elec - LHV X_heat E_SE,heat).
@@ -509,9 +559,9 @@ def _product_terms(b, spec, sign, n_units):
             rec_energy = b.energy.get(mid)
             if rec_energy:
                 kwh, steam = float(rec_energy["electricity_mj_per_kg"]) / 3.6, float(rec_energy["steam_mj_per_kg"])
-                grid, elec, elec_keys = b.electricity()
+                grid, elec, elec_keys, elec_u = b.electricity()
                 heat_key = cat.UTILITIES[cat.CFF_SUBSTITUTED_HEAT]
-                heat_f = b.f(heat_key)
+                heat_f, heat_u = b.f(heat_key), b.u(heat_key)
                 if eol["model"] == "split":
                     r3, r3_params = (lambda v, rate=rate, share=share: (1 - rate(v)) * share(v)), (rate, share)
                 else:
@@ -519,15 +569,18 @@ def _product_terms(b, spec, sign, n_units):
                     r3, r3_params = (lambda v, fate=fate, burnt=burnt: burnt[idx(fate, v)]), (fate,)
 
                 def cff_energy(xp_, v, mass=mass, r3=r3, trips=trips, grid=grid, elec=elec, kwh=kwh, steam=steam,
-                               heat_f=heat_f):
-                    return -n_units * mass(v) / 1000 * r3(v) * (kwh * elec[idx(grid, v)] + steam * heat_f) / trips(v)
+                               heat_f=heat_f, elec_u=elec_u, heat_u=heat_u):
+                    return (-n_units * mass(v) / 1000 * r3(v)
+                            * (kwh * _table(xp, elec, elec_u, idx(grid, v), v) + steam * heat_f * _u(heat_u, v))
+                            / trips(v))
 
                 def cff_energy_inv(v, mass=mass, r3=r3, trips=trips, grid=grid, elec_keys=elec_keys, kwh=kwh,
                                    steam=steam, heat_key=heat_key):
                     w = n_units * mass(v) / 1000 * float(r3(v)) / trips(v)
                     return {elec_keys[_i(grid, v)]: -w * kwh, heat_key: -w * steam}
 
-                terms.append(Term(f"{pid}.{c['id']}.cff_energy.end_of_life", _deps(mass, trips, grid, *r3_params),
+                terms.append(Term(f"{pid}.{c['id']}.cff_energy.end_of_life",
+                                  _deps(mass, trips, grid, *r3_params, *elec_u, heat_u),
                                   cff_energy, sign, cff_energy_inv))
 
     if not spec["components"]:       # nothing whose mass the legs of the region would carry
@@ -539,16 +592,16 @@ def _product_terms(b, spec, sign, n_units):
 
     def transport(xp_, v, masses=masses, dist=dist, legs=legs):
         tonnes = sum(mp(v) for mp in masses) / 1e6
-        return n_units * tonnes * legs * sum(km(v) * f for km, f, _ in dist)
+        return n_units * tonnes * legs * sum(km(v) * f * _u(u, v) for km, f, _, u in dist)
 
     def transport_inv(v, masses=masses, dist=dist, legs=legs):
         tonnes = n_units * sum(mp(v) for mp in masses) / 1e6 * legs
         out = {}
-        for km, _, key in dist:
+        for km, _, key, _u_ in dist:
             out[key] = out.get(key, 0.0) + tonnes * km(v)
         return out
 
-    terms.append(Term(f"{pid}.transport", _deps(*total_mass, *[k for k, _, _ in dist]),
+    terms.append(Term(f"{pid}.transport", _deps(*total_mass, *[k for k, _, _, _u_ in dist], *[x[3] for x in dist]),
                       transport, sign, transport_inv))
 
     # supply of the packaging to the filler, once per container produced
@@ -556,16 +609,17 @@ def _product_terms(b, spec, sign, n_units):
     if supply:
         def supply_t(xp_, v, masses=masses, supply=supply, trips=trips):
             tonnes = sum(mp(v) for mp in masses) / 1e6
-            return n_units * tonnes * sum(km(v) * f for km, f, _ in supply) / trips(v)
+            return n_units * tonnes * sum(km(v) * f * _u(u, v) for km, f, _, u in supply) / trips(v)
 
         def supply_inv(v, masses=masses, supply=supply, trips=trips):
             tonnes = n_units * sum(mp(v) for mp in masses) / 1e6 / trips(v)
             out = {}
-            for km, _, key in supply:
+            for km, _, key, _u_ in supply:
                 out[key] = out.get(key, 0.0) + tonnes * km(v)
             return out
 
-        terms.append(Term(f"{pid}.supply_transport", _deps(*total_mass, trips, *[k for k, _, _ in supply]),
+        terms.append(Term(f"{pid}.supply_transport",
+                          _deps(*total_mass, trips, *[k for k, _, _, _u_ in supply], *[x[3] for x in supply]),
                           supply_t, sign, supply_inv))
 
     if spec["refillable"]:
@@ -576,24 +630,29 @@ def _product_terms(b, spec, sign, n_units):
                             given.get("wash_heat_mj"), "refillable.wash_heat_mj")
         water = b.continuous(f"{pid}.wash_water_kg", r["wash_water_kg"], r["wash_water_kg"][3].format(p=f'"{pname}" container'),
                              given.get("wash_water_kg"), "refillable.wash_water_kg")
-        grid, elec, elec_keys = b.electricity()
+        grid, elec, elec_keys, elec_u = b.electricity()
         heat_f, water_f = b.f(cat.UTILITIES["heat"]), b.f(cat.UTILITIES["water"])
+        heat_u, water_u = b.u(cat.UTILITIES["heat"]), b.u(cat.UTILITIES["water"])
 
-        def washing(xp_, v, kwh=kwh, heat=heat, water=water, grid=grid):
-            return n_units * (kwh(v) * elec[idx(grid, v)] + heat(v) * heat_f + water(v) * water_f)
+        def washing(xp_, v, kwh=kwh, heat=heat, water=water, grid=grid, elec_u=elec_u, heat_u=heat_u,
+                    water_u=water_u):
+            return n_units * (kwh(v) * _table(xp, elec, elec_u, idx(grid, v), v) + heat(v) * heat_f * _u(heat_u, v)
+                              + water(v) * water_f * _u(water_u, v))
 
         def washing_inv(v, kwh=kwh, heat=heat, water=water, grid=grid):
             return {elec_keys[_i(grid, v)]: n_units * kwh(v), cat.UTILITIES["heat"]: n_units * heat(v),
                     cat.UTILITIES["water"]: n_units * water(v)}
 
-        terms.append(Term(f"{pid}.washing", _deps(kwh, heat, water, grid), washing, sign, washing_inv))
+        terms.append(Term(f"{pid}.washing", _deps(kwh, heat, water, grid, *elec_u, heat_u, water_u),
+                          washing, sign, washing_inv))
     return terms
 
 
 # ----------------------------------------------------------------- model
 
 def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=None,
-                functional_unit_l=1.0, xp=np, shared=None, country=None, system_model="cut-off"):
+                functional_unit_l=1.0, xp=np, shared=None, country=None, system_model="cut-off",
+                inventory_uncertainty=False):
     """Comparative Model: delta = I_A - I_B per functional unit (litres delivered).
 
     region   region code from data/regions/ ("PT", "DE", "BR", "BR-N", "BR-AM", ...);
@@ -602,6 +661,10 @@ def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=
              from data/factors/ when None.
     shared   values the user already knows for shared choices, e.g.
              {"distribution_km": 120} or {"electricity": "national grid (SIN)"}.
+    inventory_uncertainty  True: when the factor file carries the uncertainty of its datasets
+             (written by experiments/extract_uncertainty.py), every factor varies in the Monte Carlo
+             draws as a choice that nobody is asked. Off by default: the results of the paper and
+             the app do not use it until it has been run and read (experiments/PLAN_2026-11-15.md, A3).
     system_model  "cut-off" (ISO default, ILCD Situation A) or "cff", the EU PEF
              Circular Footprint Formula with the parameters of Part C of Annex II in data/cff/
              and the credit for recovered energy (B = 0).
@@ -618,7 +681,7 @@ def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=
     a, b_ = load_spec(spec_a), load_spec(spec_b)
     if a["id"] == b_["id"]:
         raise ValueError("the two alternatives need different ids")
-    b = _Builder(region, category, factors, xp, shared, system_model)
+    b = _Builder(region, category, factors, xp, shared, system_model, inventory_uncertainty)
     if system_model == "cff":
         missing = sorted({c["material"] for spec in (a, b_) for c in spec["components"]} - set(b.cff))
         if missing:
@@ -633,7 +696,7 @@ def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=
     model.factor_data = factors
     model.build_args = {"spec_a": a, "spec_b": b_, "region": region.code,
                         "functional_unit_l": functional_unit_l, "shared": shared,
-                        "system_model": system_model}
+                        "system_model": system_model, "inventory_uncertainty": inventory_uncertainty}
     model.meta = {"country": region.code, "region": region.name, "region_path": region.path,
                   "sources_needed": region.sources_needed() if (a["components"] or b_["components"]) else [],
                   "category": category,
@@ -663,4 +726,5 @@ def rebuild(model, category):
     args = model.build_args
     return build_model(args["spec_a"], args["spec_b"], args["region"], category, model.factor_data,
                        args["functional_unit_l"], model.xp, args["shared"],
-                       system_model=args.get("system_model", "cut-off"))
+                       system_model=args.get("system_model", "cut-off"),
+                       inventory_uncertainty=args.get("inventory_uncertainty", False))

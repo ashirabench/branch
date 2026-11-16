@@ -15,7 +15,7 @@ class State:
         self.S = S.copy()
         self.contrib = xp.stack([model.term_value(m, self.S) for m in range(len(model.terms))])
         self.delta = self.contrib.sum(axis=0)
-        self.open = [c.name for c in model.choices if c.is_open()]
+        self.open = [c.name for c in model.choices if c.is_open() and c.askable]   # what can still be asked
         self.fixed = {c.name: c.encode(c.fixed) for c in model.choices if not c.is_open()}
         self.unknown = []  # asked, human said "I don't know": prior kept
 

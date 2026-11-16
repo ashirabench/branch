@@ -49,6 +49,8 @@ def reversals(model, result, grid=49, top=5):
     a_lower = float(p_a_lower(st.delta)) >= 0.5
     found = []
     for c in model.choices:
+        if not c.askable:                          # nobody can change the uncertainty of the database
+            continue
         now = _current(c, result)
         if c.kind == "categorical":
             vals = np.arange(len(c.labels), dtype=float)
