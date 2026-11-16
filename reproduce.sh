@@ -74,6 +74,8 @@ if want experiments; then
     done
     CONFIRM=1 bash experiments/benchmark/run_benchmark.sh   # new seeds 1000 to 1029 for the chosen setting
     bash experiments/benchmark/run_proposal_experiments.sh  # other impact categories and knowledge ablations
+    bash experiments/benchmark/run_more_seeds.sh            # the larger run: 5,400 sessions per category
+    bash experiments/benchmark/run_v02_experiments.sh       # experiments after the audit (docs/CLAIMS.md, rows 2 to 4 and 9 to 12)
   else
     echo "skipped: no factors (see stage 2); the paper uses paper/data/*.csv"
   fi

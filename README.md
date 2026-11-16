@@ -106,7 +106,7 @@ bash reproduce.sh paper      # figures, tables and the PDF from the committed su
 QUICK=1 bash reproduce.sh    # 3 seeds and one question per round, to check the pipeline in minutes
 ```
 
-Every number that the experiments of the benchmark put in the text is generated into `paper/tables/numbers.tex`, so prose and tables cannot disagree.
+The numbers of the benchmark are generated into `paper/tables/numbers.tex`, and a test compares the table of the later experiments with the committed summaries, so prose and data cannot drift apart.
 
 ## Citation
 

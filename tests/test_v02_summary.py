@@ -107,3 +107,27 @@ def test_equivalence_reading_needs_the_interval_inside_the_margin(tmp_path, monk
     write(-0.2, 0.6)
     assert "NOT shown" in v02_summary.reading_equivalence("eq")
     assert v02_summary.reading_equivalence("missing") is None
+
+
+def test_table_of_the_paper_matches_the_committed_summaries():
+    """The numbers of the table "Experiments after the audit" are typed by hand: they must be the ones
+    of paper/data/v02_2026-11-16/."""
+    import re
+    root = os.path.dirname(HERE)
+    tex = open(os.path.join(root, "paper", "main.tex")).read()
+    rows = {"Other product families": "families", "Beverage packages, cut-off": "cutoff",
+            "Beverage packages, Circular Footprint Formula": "cff", "Portugal and Germany, BAFU factors": "bafu12",
+            "Portugal and Germany, 21 factors from ELCD": "elcd"}
+    for label, block in rows.items():
+        line = next(x for x in tex.split("\n") if x.startswith(label + " &"))
+        cells = [c.strip().rstrip("\\").strip() for c in line.split("&")]
+        d = {t: pd.read_csv(os.path.join(root, "paper", "data", "v02_2026-11-16", f"{block}_{t}.csv")).set_index("strategy")
+             for t in ("prior", "tails")}
+        p, t = d["prior"], d["tails"]
+        flip, ent = p.loc["decision_flip"], p.loc["entropy"]
+        assert cells[1] == f"{int(flip.cases)} ({int(flip.pairs)})" and int(cells[2]) == int(flip.cases_no_question)
+        assert [float(c) for c in cells[3:6]] == [round(float(p.loc[s].q_mean), 2) for s in ("decision_flip", "sobol", "entropy")]
+        lo, hi = v02_summary.interval(ent.dq_ci95_pair)
+        assert cells[6] == f"{ent.dq_vs_decision_flip:.2f} ({lo:.2f}--{hi:.2f})"
+        wlo, whi = v02_summary.interval(t.loc["decision_flip"].wrong_ci95_pair)
+        assert cells[7] == f"{t.loc['decision_flip'].wrong_when_certified_pct:.1f} ({wlo}--{whi})"
