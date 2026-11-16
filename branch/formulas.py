@@ -40,6 +40,11 @@ class Sym:
         return self.text if self.atom else f"({self.text})"
 
     def _op(self, other, op, value, swap=False):
+        if not isinstance(other, Sym):          # leave out what changes nothing: x * 1, x / 1, x + 0, x - 0
+            k = float(other)
+            if (op == "*" and k == 1.0) or (op == "/" and k == 1.0 and not swap) \
+                    or (op == "+" and k == 0.0) or (op == "-" and k == 0.0 and not swap):
+                return self
         a, b = (Sym._of(other), self) if swap else (self, Sym._of(other))
         return Sym(f"{a._wrap()} {op} {b._wrap()}", value, atom=False)
 
@@ -103,9 +108,9 @@ def trace(model, world, names):
             part = amount.text if isinstance(amount, Sym) else None
             if isinstance(amount, Sym) and not amount.atom:
                 part = f"({part})"
-            if part is None and text is not None:
+            if part is None and text is not None and float(amount) != 0.0:
                 part = Sym._of(float(amount)).text
             elif part is not None and text is None and value != 0.0:
                 text = Sym._of(value).text
-            side[key] = (value + float(amount), part if text is None else f"{text} + {part}")
+            side[key] = (value + float(amount), text if part is None else part if text is None else f"{text} + {part}")
     return out, sorted(failed)

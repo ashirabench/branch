@@ -37,6 +37,8 @@ def main():
     ap.add_argument("--port", type=int, default=8080, help="openLCA IPC server port")
     ap.add_argument("--diagnose", action="store_true",
                     help="with --push: check every exchange alone in openLCA to explain a difference")
+    ap.add_argument("--backup-confirmed", dest="backup_confirmed", action="store_true",
+                    help="with --push: the open database is a copy or has a backup (otherwise the demo asks)")
     ap.add_argument("--defaults", action="store_true",
                     help="ask nothing: keep every default (used to check BRANCH against openLCA)")
     args = ap.parse_args()
@@ -68,6 +70,11 @@ def main():
     if (args.push or args.jsonld) and args.toy:
         print("The toy case has no openLCA datasets behind it: nothing to send.")
     elif args.push or args.jsonld:
+        if args.push and not args.backup_confirmed:
+            ok = input("\nBRANCH will write two processes, two flows and two product systems into the database open "
+                       "in openLCA.\nIs it a copy, or do you have a backup? Type yes to send: ").strip().lower()
+            if ok not in ("yes", "y"):
+                sys.exit("Nothing was sent. In openLCA: right click the database, Backup database.")
         if args.push:
             out = olca_bridge.push_comparison(c, model, result, jsonld_path=args.jsonld)
             print("\nSent to openLCA (category BRANCH):", ", ".join(p.name for p in out["processes"]))
