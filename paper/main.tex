@@ -218,7 +218,7 @@ of electricity, tonne kilometre of transport, MJ of heat, kg of water) and store
 describe six packaging materials (PET, HDPE, LDPE, glass, aluminium and liquid packaging board) with their
 production and end of life processes, three transport modes, heat, water, three secondary packaging items
 (corrugated box, stretch film and pallet) and 82 electricity grids, of which 81 are national or regional
-and one is global. Each material uses the current dataset of BAFU:2026 for that material where the database has one. I read the list of its disposal datasets on 14 November 2026 and found that the incineration and the landfill of PET and of polyethylene had been using the dataset of a plastics mixture; PET now uses its own incineration dataset and polyethylene its own datasets for both routes, and all the results below come after that correction. Three stand-ins remain because the database offers nothing better. The landfill of PET uses the plastics mixture, since the PET landfill dataset is marked obsolete. The three packaging glass datasets are themselves marked obsolete, and the database has no current container glass (flat glass is a different product). The oil-fired plant of the isolated systems of Brazil uses the European average, since the database has that plant only for European countries. BRANCH computes every factor for one unit of the process's reference
+and one is global. Each material uses the current dataset of BAFU:2026 for that material where the database has one. PET uses its own incineration dataset and polyethylene its own datasets for both routes. Three stand-ins remain because the database offers nothing better. The landfill of PET uses the plastics mixture, since the PET landfill dataset is marked obsolete. The three packaging glass datasets are themselves marked obsolete, and the database has no current container glass (flat glass is a different product). The oil-fired plant of the isolated systems of Brazil uses the European average, since the database has that plant only for European countries. BRANCH computes every factor for one unit of the process's reference
 exchange, for example 1 kWh, because it writes its amounts in that unit. Nine more packaging materials need
 24 further factors, and the factor of any other process of the database is read when a person names it.
 
@@ -228,10 +228,7 @@ the electricity mix, distribution distances and the priors of waste statistics, 
 its provenance (published source or assumption). For Portugal, Germany and Brazil the priors of recycling
 rates, of the split between incineration and landfill and of recycled content come from national
 statistics (Eurostat and the packaging reports of APA for Portugal, BMUV, GVM and ZSVR for Germany, ABIPET,
-ABRALATAS, Tetra Pak and ABREMA for Brazil); trips, washing and distances remain assumptions. These
-national priors entered the code on 4 November 2026, after the benchmark below was run with the catalogue
-defaults. I re-ran the whole benchmark on 13 November 2026 with the national priors, after the checks described below, on 15 November 2026 after the correction of the disposal datasets, and on 16 November 2026 after the correction of aluminium described below. The results
-come from that last run. The code also ships subregions such as the Brazilian
+ABRALATAS, Tetra Pak and ABREMA for Brazil); trips, washing and distances remain assumptions. Every result below uses these national priors. The code also ships subregions such as the Brazilian
 state of Amazonas, where the electricity question (national grid or isolated oil system) and a river leg
 in the supply chain become open choices.
 
@@ -253,7 +250,7 @@ pointed out that this favoured the refillable bottle, since I had widened the he
 I widened the electricity for washing as well, from an upper bound of 30~Wh to 50~Wh. The values
 are in \texttt{data/prior\_checks.csv}, and a test fails when a prior excludes one of them. The widening
 changed no verdict at the central values of the 18 cases, and all the results below use the widened priors;
-the repository keeps the summaries from before the widening. The correction of the disposal datasets also changed no verdict at the central values; it moved the impact of the products by at most 5.1\% (the beverage carton in Germany) and the mean number of questions in the chosen setting from 2.75 to 2.87, and the repository keeps the summaries from before it as well. The widening of the washing electricity changes no verdict at the central values either (Section~\ref{sec:v02}).
+the repository keeps the summaries from before the widening. The widening of the washing electricity changes no verdict at the central values either (Section~\ref{sec:robust}).
 
 \paragraph{Audit of the datasets.}
 On 16 November 2026 I opened in the database every dataset that BRANCH uses (70 processes) and compared its
@@ -441,6 +438,15 @@ can write the resolved model as openLCA JSON-LD or push it to a running openLCA,
 
 \subsection{Setup}
 
+\paragraph{Cases.}
+The experiments use two sets of comparisons, both built by me on real inventory data. The \emph{beverage
+cases} are the six pairs of the four beverage packages of Section~\ref{sec:materials} in Portugal, Germany
+and Brazil, \nCases{} cases; I chose the setting of the application on them. The \emph{other families} are
+ten pairs that played no part in any choice, each in the same three regions, 30 cases: three pairs of cups
+(polystyrene, PLA and expanded polystyrene), three pairs of bottles (polypropylene, PVC and PET), a steel
+can against the aluminium can, a carton box against a paper bag, and a bag-in-box and a carton box against
+the beverage carton.
+
 \paragraph{Simulated experts.}
 For each case and seed, the simulation draws a hidden ``true'' value of every choice, and the expert
 answers each question with it. The verdict at the true values serves as the reference. The experiments
@@ -450,57 +456,101 @@ the beliefs are right. In the \emph{tails} model it draws each truth from the ou
 the most probable category), which tests the certificate when the beliefs are wrong in a way they do not
 anticipate. I chose 10\% because the agent represents a continuous answer by its 10th to 90th
 percentiles, so every true value then lies outside all the answers the agent considers, while it stays a
-value the prior allows.
+value the prior allows. A third model, \emph{adverse}, is wrong in one direction: every continuous
+choice takes a value from the half of its prior that pushes the difference between the products against the
+verdict the priors favour, and categorical choices come from their priors.
 
 \paragraph{Design.}
 The design crosses \nCases{} cases with 30 seeds, which gives \nRuns{} runs per strategy and batch size.
 Following \citet{faria2022}, the batch size goes from 1 to 5. The certificate takes the values
 $\tau=5\%$ and $\tau=2.5\%$. Climate change is the main indicator because it is the category that
 companies are most often asked to report, and the report still gives all 16 categories. The outcome is the number of
-questions until certification and whether the certified verdict agrees with the reference.
+questions until certification and whether the certified verdict agrees with the reference. The 30 cases of other families run in the chosen setting only.
 
 \paragraph{Statistics.}
-The sessions of one case share its beliefs, so the unit of inference is the case, not the session.
-Every strategy sees the same cases, seeds and simulated experts. I compare each strategy with
-\texttt{decision\_flip} through its mean number of questions per case, with an exact paired sign-flip
-permutation test over the \nCases{} cases and a Holm correction over the nine rival strategies of each batch size.
-The 95\% intervals of the question savings and of the share of wrong certificates come from a bootstrap
-over cases with 10,000 resamples. When no certificate is wrong, I give the exact binomial interval over
-sessions, which ignores the clustering and is therefore optimistic. At $\tau=5\%$ the agent certifies
-\nNoQLoose{} of the \nCases{} cases before any question, and at $\tau=2.5\%$ it certifies \nNoQStrict{}. Every strategy
-ties on those cases, so the tests rest on 5 informative cases at $\tau=5\%$ and 8 at $\tau=2.5\%$. With 5
-cases the smallest $p$ value the test can give is 0.06, and with 8 it is 0.008, which the Holm correction
-over nine strategies turns into 0.070. No difference in these \nCases{} cases can therefore reach the 5\%
-level after correction, however large it is. The cases are not independent either: they are six pairs of
-products in three regions. A review of the plan on 16 November 2026 made the pair the unit of the
-experiments that came after it (Section~\ref{sec:v02}), which give every interval over pairs and rest
-the one confirmatory test of the paper on ten pairs.
+The sessions of one case share its beliefs, and the regions of one pair of products share most of their
+choices. The unit of inference is therefore the pair, and every interval comes from a bootstrap that
+resamples whole pairs, with 10,000 resamples; I give the interval over cases beside it where the two
+differ. With 6 or 10 pairs such an interval is coarse and tends to be too narrow. Every strategy sees the
+same cases, seeds and simulated experts, so all comparisons are paired. The paper has one confirmatory
+test, fixed before its runs: on the other families, with experts from the priors, decision flip needs
+fewer questions than entropy if the interval over pairs of the difference excludes zero and an exact
+sign-flip test over the pair means gives $p\le0.05$. Equivalence with the Sobol index of the impact has its
+own rule: the interval over pairs of the difference must lie inside half a question, less than the one
+question a person can notice. Everything else is description. On the beverage cases I also report an
+exact paired sign-flip test over cases with a Holm correction over the nine rival strategies of each batch
+size, as the first version of this work did. At $\tau=5\%$ the agent certifies \nNoQLoose{} of the \nCases{}
+cases before any question and at $\tau=2.5\%$ it certifies \nNoQStrict{}; every strategy ties on those, so
+only 5 and 8 cases inform that test, its smallest Holm-adjusted $p$ value is 0.070, and no difference on
+the beverage cases can reach the 5\% level. When no certificate is wrong, I give the exact binomial
+interval over sessions, which ignores the clustering and is therefore optimistic. The plans, with the
+dates of their changes, are in \texttt{experiments/record/}.
 
-\paragraph{New seeds.}
-I chose the batch size of the application on this benchmark, in the version of the model that still
-counted secondary aluminium twice (Section~\ref{sec:materials}). I did not choose it again after the
-correction, because choosing after seeing the corrected results would repeat the fault that new seeds are
-meant to expose. To check the choice, I ran 30 new seeds
-(1000 to 1029) on the same \nCases{} cases with tail experts and $\tau=2.5\%$, for two and three questions
-per round. These sessions played no part in the choice, but the cases are the same.
+\paragraph{Seeds.}
+Seeds 0 to 29 on the beverage cases chose the batch size and the certificate of the application, on a
+version of the model that I later corrected (Section~\ref{sec:discussion}); I did not choose again after
+the correction, since choosing after seeing the corrected results would repeat the fault that new seeds
+are meant to expose. Seeds 1000 to 1029 and 2000 to 2299 check the certificate on the beverage cases.
+Seeds 200 to 229 serve the other families and the robustness runs, and seeds 300 to 329 the equivalence
+test and the adverse expert. No seed serves two purposes.
 
 \paragraph{Reproducibility.}
 A single command installs the environment, extracts the factors from a local openLCA, reruns every
 experiment, regenerates every figure and table, and recompiles this paper (\texttt{bash reproduce.sh}).
 
-\subsection{Results}
+\subsection{How many questions}\label{sec:questions}
 
-I report the benchmark that I ran on 16 November 2026, after the correction of aluminium
-(Section~\ref{sec:materials}). The correction made the benchmark easier, because the can now loses clearly
-in most of its comparisons: the priors alone decide \nNoQStrict{} of the \nCases{} cases at $\tau=2.5\%$,
-against 6 before.
+Table~\ref{tab:v02} gives the runs on seeds 200 to 229.
 
-\paragraph{Question efficiency.}
+\paragraph{Fewer questions than uncertainty sampling (the confirmatory test).}
+On the 30 cases of other families, with experts from the priors, decision flip needs 2.91 questions and
+entropy 5.01. The difference of 2.11 questions has an interval over pairs of 0.83 to 3.57, and the exact
+test over the ten pairs gives $p=0.016$, the smallest value that the seven informative pairs allow. The
+statement holds. It says that a strategy that looks at whether a choice matters beats one that does not,
+on products the setting was not chosen on. The uncertainty sampling baselines look only at how spread the
+answers to a choice are, so every continuous choice gets the same score and they ask in the order of the
+model.
+
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lccccccc}
+\toprule
+& & & \multicolumn{3}{c}{$Q$, experts from priors} & Entropy minus & W\%, experts \\
+Block & Cases (pairs) & $N_0$ & Decision flip & Sobol & Entropy & decision flip & from tails \\
+\midrule
+Other product families & 30 (10) & 11 & 2.91 & 2.89 & 5.01 & 2.11 (0.83--3.57) & 1.6 (0.3--3.0) \\
+Beverage packages, cut-off & 18 (6) & 10 & 2.03 & 2.03 & 2.72 & 0.69 (0.07--1.57) & 3.1 (0.9--5.4) \\
+Beverage packages, Circular Footprint Formula & 18 (6) & 9 & 2.79 & 2.77 & 4.14 & 1.35 (0.44--2.27) & 2.8 (1.5--4.3) \\
+\midrule
+Portugal and Germany, BAFU factors & 12 (6) & 7 & 1.94 & 1.93 & 2.50 & 0.56 (0.05--1.32) & 4.2 (1.4--7.2) \\
+Portugal and Germany, 21 factors from ELCD & 12 (6) & 7 & 1.72 & 1.71 & 2.36 & 0.64 (0.08--1.32) & 2.8 (0.8--4.7) \\
+\bottomrule
+\end{tabular}
+\caption{The runs on sessions that chose nothing, in the chosen setting ($\tau=2.5\%$, three questions per
+round) on seeds 200 to 229. $N_0$ is the number of cases certified from the priors alone, $Q$ the mean
+number of questions to certify and W\% the share of the certificates of decision flip that are wrong. The
+intervals are 95\% bootstrap intervals over pairs of products.}
+\label{tab:v02}
+\end{table*}
+
+\paragraph{Equivalence with the Sobol index of the impact.}
+The comparison that matters to an LCA practitioner is with the Sobol index of the impact, and there the
+two strategies tie in every table of this paper. A tie is not a test, so I fixed one: the two are
+equivalent if the 95\% interval over pairs of their difference lies inside half a question, on seeds 300
+to 329, used for nothing else. I chose the margin after having seen differences of a few hundredths, which
+is why the test runs on new sessions; half a question is less than the one question a person can notice.
+In the 30 cases of other families the Sobol index needs 3.16 questions and decision flip 3.14 (difference
+0.03, interval $-0.01$ to 0.08). In the \nCases{} cases they need 1.98 and 1.99 ($-0.01$, interval $-0.06$
+to 0.02). Both intervals lie well inside the margin. On real comparisons BRANCH therefore asks what the
+expert's ranking would ask, without the expert, and adds the rule that says when to stop.
+
+\paragraph{The \nCases{} beverage cases.}
 Figure~\ref{fig:batch} shows the mean number of questions with prior experts and $\tau=5\%$. With one
 question per round, decision flip needs \qFlipPriorOne{} questions, entropy and least confident
 \qEntPriorOne{}, and random \qRandPriorOne{}. The gap to entropy is 0.61 questions (interval over cases
-0.14 to 1.16; raw $p=0.06$, the smallest value that 5 informative cases allow). The uncertainty sampling
-baselines look only at how spread the answers to a choice are, not at whether the choice matters. They
+0.14 to 1.16; raw $p=0.06$, the smallest value that 5 informative cases allow). The uncertainty sampling baselines
 beat random order, but by a much smaller margin than decision flip does. Sobol of the impact needs the
 same number of questions (\qSobolPriorOne{}, $p=\pSobolPriorOne$), because in these cases the choices that
 dominate the variance of $\Delta$ also tend to dominate the verdict. The gap of 0.01 questions has a
@@ -515,6 +565,48 @@ priors with $\tau=5\%$, each point pools \nRuns{} runs, Least confident coincide
 dotted line marks the three questions per round of the application.}
 \label{fig:batch}
 \end{figure}
+
+\paragraph{The chosen setting on the beverage cases.}
+The web application uses $\tau=2.5\%$ and three questions per round. Table~\ref{tab:main} gives
+every strategy in this setting under both expert models. With prior experts, decision flip needs
+\qFlipChosen{} questions, against \qEntChosen{} for entropy and \qRandChosen{} at random, 29\% fewer
+than uncertainty sampling and less than half of random order (0.83 questions fewer than entropy, interval
+over cases 0.27 to 1.50 and over pairs 0.11 to 2.05). It needs the same number as the Sobol index of the
+impact (\qSobolChosen{}, $p=\pSobolChosen$).
+Three questions per round cost about 1.1 questions compared with the most aggressive setting
+($\tau=5\%$ and one question per round, \qFlipPriorOne{} questions), and about a third of a question
+compared with two questions per round (\qFlipChosenTwo{}).
+
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{lcccccc}
+\toprule
+& \multicolumn{3}{c}{Experts from priors} & \multicolumn{3}{c}{Experts from tails}\\
+Strategy & $Q$ & $p$ & W\% & $Q$ & $p$ & W\% \\
+\midrule
+\tabinput{tables/main.tex}
+\bottomrule
+\end{tabular}
+\caption{The strategies compared in the chosen setting ($\tau=2.5\%$, three questions per round). $Q$ is
+the mean number of questions to certify, $p$ is the Holm-adjusted case-level permutation $p$ value against
+decision flip, and W\% is the share of certified verdicts that are wrong. Each cell pools \nRuns{} runs.
+The tails columns come from the runs used to choose the setting, and the new seeds give \wFlipHoldThree{} for
+decision flip.}
+\label{tab:main}
+\end{table*}
+
+\paragraph{Where the two scores part: an illustration.}
+Proposition~\ref{prop:sobol} says that a choice can dominate the variance of the result without changing
+the verdict, and no real case above separates the two scores. To see whether they can part at all, I ran
+100 synthetic models of 40 choices, which are not products, with five sessions each and experts from the
+priors. With one question per round, decision flip needs 5.25 questions and the Sobol index of the impact
+5.68 (difference 0.43, interval over models 0.07 to 0.82), and the two differ in 76 of the 100 models.
+With three questions per round the difference is 0.29 and its interval contains zero ($-0.03$ to 0.64).
+Entropy needs about 22 questions in both settings. The advantage over the Sobol index of the impact is
+therefore shown on synthetic models with one question per round, and not shown in the chosen setting or on
+real comparisons.
 
 \paragraph{The literal loss is less efficient.}
 As Proposition~\ref{prop:stall} suggests, with prior experts the plug-in estimate of $\min(p,1-p)$ asks
@@ -548,6 +640,8 @@ Holm-adjusted case-level $p<0.05$ against $p(1-p)$.}
 \label{tab:losses}
 \end{table*}
 
+\subsection{The certificate}\label{sec:certificate}
+
 \paragraph{The certificate when the beliefs are right, and when they are wrong.}
 With prior experts the truth comes from the same distributions the agent reasons with, so a share of wrong
 certificates below $\tau$ is what the mathematics promises. Observing it checks the implementation, not
@@ -566,9 +660,7 @@ Because 540 sessions leave that interval wide, I had fixed a larger run
 (\texttt{experiments/record/PLAN\_2026-11-15.md}): 300 further seeds (2000 to 2299) per case, 5,400 sessions, in
 the same setting. It gives 3.3\% wrong certificates (179 of 5,400; interval over cases 1.4--5.6\%). I
 report the three figures together: \wFlipChosenTails{} on the seeds used to choose the setting,
-\wFlipHoldThree{} on the first new seeds and 3.3\% on the larger run. Before the correction of aluminium
-the same three runs gave 1.7\%, 2.6\% and 1.4\%, and the version of this paper of 15 November concluded
-that three questions per round kept the target. With the corrected model I can only say that the share
+\wFlipHoldThree{} on the first new seeds and 3.3\% on the larger run. The share
 stays between about 2\% and 5\%, near the target and sometimes above it. Most of the wrong certificates
 come from cases that the agent certifies without asking anything: 132 of the 179 of the larger run come
 from four such cases with the can. A certificate issued with no question is only as good as the priors.
@@ -582,45 +674,28 @@ dashed lines show the certificate $\tau$, and the hollow markers show the run wi
 \label{fig:calibration}
 \end{figure}
 
-\paragraph{Chosen setting.}
-The web application uses $\tau=2.5\%$ and three questions per round. Table~\ref{tab:main} gives
-every strategy in this setting under both expert models. With prior experts, decision flip needs
-\qFlipChosen{} questions, against \qEntChosen{} for entropy and \qRandChosen{} at random, 29\% fewer
-than uncertainty sampling and less than half of random order (0.83 questions fewer than entropy, interval
-over cases 0.27 to 1.50 and over pairs 0.11 to 2.05). It needs the same number as the Sobol index of the
-impact (\qSobolChosen{}, $p=\pSobolChosen$; Section~\ref{sec:v02} tests this equivalence on new sessions).
-Three questions per round cost about 1.1 questions compared with the most aggressive setting
-($\tau=5\%$ and one question per round, \qFlipPriorOne{} questions), and about a third of a question
-compared with two questions per round (\qFlipChosenTwo{}).
+\paragraph{A second wrong expert.}
+The tail expert is one kind of error, wrong at random on either side. With the adverse expert, wrong on
+one side only, 0.1\% of the certificates are wrong
+in the 30 cases of other families (interval over pairs 0.0--0.3\%) and 4.8\% in the \nCases{} cases
+(1.9--7.8\%), on seeds 300 to 329. The beverage cases are again the ones where the certificate errs near or
+above its target, and their interval contains the target. In the other families the tail expert gives 1.6\% (0.3--3.0\%).
 
-\begin{table*}[t]
-\centering
-\small
-\setlength{\tabcolsep}{8pt}
-\begin{tabular}{lcccccc}
-\toprule
-& \multicolumn{3}{c}{Experts from priors} & \multicolumn{3}{c}{Experts from tails}\\
-Strategy & $Q$ & $p$ & W\% & $Q$ & $p$ & W\% \\
-\midrule
-\tabinput{tables/main.tex}
-\bottomrule
-\end{tabular}
-\caption{The strategies compared in the chosen setting ($\tau=2.5\%$, three questions per round). $Q$ is
-the mean number of questions to certify, $p$ is the Holm-adjusted case-level permutation $p$ value against
-decision flip, and W\% is the share of certified verdicts that are wrong. Each cell pools \nRuns{} runs.
-The tails columns come from the runs used to choose the setting, and the new seeds give \wFlipHoldThree{} for
-decision flip.}
-\label{tab:main}
-\end{table*}
+\subsection{Robustness}\label{sec:robust}
 
-\subsection{Other impact categories and knowledge ablations}\label{sec:proposal}
+The runs of this subsection are descriptive. Each was fixed in a plan before it ran, and none of them
+can turn the confirmatory test.
 
-The proposal also promised results beyond climate change and ablations of the agent's knowledge. I fixed
-both runs in a file of the repository before any of them existed (\texttt{experiments/record/PLAN\_2026-11-13.md}):
-the chosen setting, seeds 0 to 29, both expert models and four strategies. I report them as descriptive,
-without new tests, because the cases are the same \nCases{} and so the runs are not independent evidence.
-Before the runs, the new code path reproduced the climate change summaries of Table~\ref{tab:main} exactly.
-Table~\ref{tab:proposal} gives the results.
+\paragraph{Other impact categories.}
+The order of the strategies is the same in acidification, water use and fossil resource use as in climate
+change: decision flip and Sobol tie, entropy needs more questions and random order the most. Acidification
+and water use are easier than climate change, since \pNoQAcid{} and \pNoQWater{} of the \nCases{} cases need no
+question, so only five or six cases inform those rows. With experts from the tails, the share of wrong certificates is
+\pwTailsWater{} for water use, \pwTailsAcid{} (\pwTailsCiAcid{}) for acidification and \pwTailsFossil{}
+(\pwTailsCiFossil{}) for fossil resources, against \pwTailsClim{} for climate change on the same seeds. The
+setting was chosen on climate change, so the other rows test it on outcomes it was not tuned on: it stays under the target in two of them, and in fossil
+resources its interval contains the target. The larger run of 300 further seeds gives 1.3\% for
+acidification (71 of 5,400; interval over cases 0.5--2.3\%).
 
 \begin{table*}[t]
 \centering
@@ -644,17 +719,6 @@ model.}
 \label{tab:proposal}
 \end{table*}
 
-\paragraph{Other impact categories.}
-The order of the strategies is the same in acidification, water use and fossil resource use as in climate
-change: decision flip and Sobol tie, entropy needs more questions and random order the most. Acidification
-and water use are easier than climate change, since \pNoQAcid{} and \pNoQWater{} of the \nCases{} cases need no
-question, so only five or six cases inform those rows. With experts from the tails, the share of wrong certificates is
-\pwTailsWater{} for water use, \pwTailsAcid{} (\pwTailsCiAcid{}) for acidification and \pwTailsFossil{}
-(\pwTailsCiFossil{}) for fossil resources, against \pwTailsClim{} for climate change on the same seeds. The
-setting was chosen on climate change, so the other rows test it on outcomes it was not tuned on: it stays under the target in two of them, and in fossil
-resources its interval contains the target. The larger run of 300 further seeds gives 1.3\% for
-acidification (71 of 5,400; interval over cases 0.5--2.3\%).
-
 \paragraph{Knowledge ablations.}
 Without the location, the agent uses the global electricity mix and the default priors, while the expert
 answers with national values, which fall outside the default range for some choices. The agent does not ask
@@ -668,83 +732,6 @@ priors together, so it cannot say which of the two matters more, and neither com
 cannot be run because BRANCH does not implement them. The global electricity mix used here is the one
 grid that the validation against openLCA does not cover in a product system; only its unit was audited.
 
-\subsection{Experiments after the audit}\label{sec:v02}
-
-The runs of this subsection were fixed in a file of the repository before they existed
-(\texttt{experiments/record/PLAN\_2026-11-15.md}, with the changes of 16 November dated in it). They use the
-chosen setting, four strategies, both expert models and seeds 200 to 229, which nothing before had used.
-A statistical review of the plan changed three things before any run. The unit of inference is the pair of
-products, since the regions of one pair share most of their choices, so every interval resamples whole
-pairs; with 6 or 10 pairs such an interval is coarse and tends to be too narrow. There is one confirmatory
-reading, and the others are secondary. And a statement about questions holds only if its interval over
-pairs excludes zero and an exact sign-flip test over the pair means gives $p\le0.05$.
-Table~\ref{tab:v02} gives the blocks.
-
-\begin{table*}[t]
-\centering
-\small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{lccccccc}
-\toprule
-& & & \multicolumn{3}{c}{$Q$, experts from priors} & Entropy minus & W\%, experts \\
-Block & Cases (pairs) & $N_0$ & Decision flip & Sobol & Entropy & decision flip & from tails \\
-\midrule
-Other product families & 30 (10) & 11 & 2.91 & 2.89 & 5.01 & 2.11 (0.83--3.57) & 1.6 (0.3--3.0) \\
-Beverage packages, cut-off & 18 (6) & 10 & 2.03 & 2.03 & 2.72 & 0.69 (0.07--1.57) & 3.1 (0.9--5.4) \\
-Beverage packages, Circular Footprint Formula & 18 (6) & 9 & 2.79 & 2.77 & 4.14 & 1.35 (0.44--2.27) & 2.8 (1.5--4.3) \\
-\midrule
-Portugal and Germany, BAFU factors & 12 (6) & 7 & 1.94 & 1.93 & 2.50 & 0.56 (0.05--1.32) & 4.2 (1.4--7.2) \\
-Portugal and Germany, 21 factors from ELCD & 12 (6) & 7 & 1.72 & 1.71 & 2.36 & 0.64 (0.08--1.32) & 2.8 (0.8--4.7) \\
-\bottomrule
-\end{tabular}
-\caption{The experiments fixed after the audit, in the chosen setting ($\tau=2.5\%$, three questions per
-round) on seeds 200 to 229. $N_0$ is the number of cases certified from the priors alone, $Q$ the mean
-number of questions to certify and W\% the share of the certificates of decision flip that are wrong. The
-intervals are 95\% bootstrap intervals over pairs of products.}
-\label{tab:v02}
-\end{table*}
-
-\paragraph{Other product families (the confirmatory reading).}
-Ten pairs that the benchmark does not contain, each in Portugal, Germany and Brazil: three pairs of cups
-(polystyrene, PLA and expanded polystyrene), three pairs of bottles (polypropylene, PVC and PET), a steel
-can against the aluminium can, a carton box against a paper bag, and a bag-in-box and a carton box against
-the beverage carton. With experts from the priors, decision flip needs 2.91 questions and entropy 5.01.
-The difference of 2.11 questions has an interval over pairs of 0.83 to 3.57, and the exact test over the
-ten pairs gives $p=0.016$, the smallest value that the seven informative pairs allow. The statement
-holds. It says that a strategy that looks at whether a choice matters beats one that does not, on
-products the setting was not chosen on. With experts from the tails, 1.6\% of the certificates are wrong
-(0.3--3.0\%), an interval that contains the target.
-
-\paragraph{Equivalence with the Sobol index of the impact.}
-The comparison that matters to an LCA practitioner is with the Sobol index of the impact, and there the
-two strategies tie in every table of this paper. A tie is not a test, so I fixed one: the two are
-equivalent if the 95\% interval over pairs of their difference lies inside half a question, on seeds 300
-to 329, used for nothing else. I chose the margin after having seen differences of a few hundredths, which
-is why the test runs on new sessions; half a question is less than the one question a person can notice.
-In the 30 cases of other families the Sobol index needs 3.16 questions and decision flip 3.14 (difference
-0.03, interval $-0.01$ to 0.08). In the \nCases{} cases they need 1.98 and 1.99 ($-0.01$, interval $-0.06$
-to 0.02). Both intervals lie well inside the margin. On real comparisons BRANCH therefore asks what the
-expert's ranking would ask, without the expert, and adds the rule that says when to stop.
-
-\paragraph{Where the two scores part: an illustration.}
-Proposition~\ref{prop:sobol} says that a choice can dominate the variance of the result without changing
-the verdict, and no real case above separates the two scores. To see whether they can part at all, I ran
-100 synthetic models of 40 choices, which are not products, with five sessions each and experts from the
-priors. With one question per round, decision flip needs 5.25 questions and the Sobol index of the impact
-5.68 (difference 0.43, interval over models 0.07 to 0.82), and the two differ in 76 of the 100 models.
-With three questions per round the difference is 0.29 and its interval contains zero ($-0.03$ to 0.64).
-Entropy needs about 22 questions in both settings. The advantage over the Sobol index of the impact is
-therefore shown on synthetic models with one question per round, and not shown in the chosen setting or on
-real comparisons.
-
-\paragraph{A second wrong expert.}
-The tail expert is one kind of error, wrong at random on either side. I added a second one before running
-it: every continuous choice takes a value from the half of its prior that pushes the difference between
-the products against the verdict the priors favour. With this expert, 0.1\% of the certificates are wrong
-in the 30 cases of other families (interval over pairs 0.0--0.3\%) and 4.8\% in the \nCases{} cases
-(1.9--7.8\%), on seeds 300 to 329. The beverage cases are again the ones where the certificate errs near or
-above its target, and their interval contains the target.
-
 \paragraph{A second database.}
 To see whether the results depend on the unit factors of one database, I replaced 21 of the 29 factors
 that the cases of Portugal and Germany use with values that I computed from the ELCD~3.2 database
@@ -756,8 +743,7 @@ needs 0.64 questions more than decision flip with the mixed factors and 0.56 wit
 the difference of 0.09 has an interval over pairs of $-0.92$ to 1.03. No difference was detected, which is
 not evidence that the two are equal. The verdict at the central values changes in one of the twelve
 cases (PET against refillable glass in Germany), which measures the databases and not the agent. This
-test changes the factors of the same products. It is a test of robustness to the factors, and the other
-product families are the test on other products.
+test changes the factors of the same products: it is a test of robustness to the factors, not to the products.
 
 \paragraph{Another rule for recycling.}
 The benchmark uses the cut-off rule. I added the Circular Footprint Formula \citep{zampori2019} with the
@@ -861,6 +847,18 @@ not they move the result. Decision flip asks about a choice only when its answer
 verdict, whatever its type. This is the human-centred point of the work, because a person's
 attention is the scarce resource.
 
+\paragraph{Errors found and corrected.}
+Four errors were found during the project, each by a check built to find that kind of error. The check
+against openLCA found that one factor was computed per MJ and used per kWh, a gap of 2.3\% in one case.
+Reading the list of datasets of the database found that PET and polyethylene used the disposal datasets of
+a plastics mixture, which moved the impact of a product by at most 5.1\%. A review of the plan found that
+the prior of the washing electricity excluded the one published measurement. And opening every dataset
+found the double count of secondary aluminium (Section~\ref{sec:materials}). The last one changed a
+conclusion: with the earlier model the three runs with tail experts gave 1.7\%, 2.6\% and 1.4\% of wrong
+certificates, and I had written that three questions per round kept the target; with the corrected model
+they give \wFlipChosenTails{}, \wFlipHoldThree{} and 3.3\%. The repository keeps the summaries from before
+each correction.
+
 \paragraph{Efficiency and fragility.}
 The calibration result is a warning that may generalise beyond LCA. A myopic value of information
 strategy is efficient precisely because it stops as soon as the beliefs say the matter is settled. When the
@@ -908,7 +906,7 @@ disposal are two separate questions. This way is checked against openLCA but is 
 and even there 6 to 9 of the 31 priors of the benchmark are assumptions and 20 to 22 have a source for their centre only. A company in
 any other of the \nGrids{} electricity grids of the database can run BRANCH, but with default priors: for PET
 against refillable glass in France, 12 of the 14 open choices are assumptions. The certificate was chosen on climate change, and its share of wrong certificates exceeds 2.5\% in climate change and in fossil resources on the seeds of the benchmark
-with experts from the tails (Section~\ref{sec:proposal}).
+with experts from the tails (Sections~\ref{sec:certificate} and~\ref{sec:robust}).
 
 \paragraph{What changed since the proposal.}
 The proposal of October 2026 fixed the commitments of this project, and the work departed from it in nine
@@ -918,7 +916,7 @@ Environmental Footprint reference package as the database. It was not available 
 test with experts from the tails showed \wFlipTailsOne{} wrong certificates in that setting, so the chosen
 setting asks three questions per round with $\tau=2.5\%$, and I tested it on new seeds. Fourth, the
 proposal planned Wilcoxon tests. The sessions of one case are not independent, so I test at the level of
-cases with a permutation test and a Holm correction, and I added the Sobol index of the impact as a
+cases with a permutation test and a Holm correction and, after a review of the plan, at the level of pairs of products; I also added the Sobol index of the impact as a
 baseline. Fifth, the proposal planned reference models built by hand in openLCA. Instead BRANCH writes each
 model into openLCA and openLCA recalculates it. This checks the computation, and it found the unit error
 described in Section~\ref{sec:validation}, but it does not check the modelling, which the comparison
@@ -926,7 +924,7 @@ with published studies covers only in part. Sixth, the priors for recycling and 
 statistics, and a check against ten published values widened two ranges. Spreads from the pedigree matrix
 are not implemented. Seventh, two planned parts are missing: the study with five to seven participants and the ablation of the
 pedigree spreads. The other impact categories and the other two knowledge ablations were run late, on a plan
-fixed beforehand (Section~\ref{sec:proposal}). Eighth, the title of the proposal kept the human in command. The
+fixed beforehand (Section~\ref{sec:robust}). Eighth, the title of the proposal kept the human in command. The
 course's terms fit the system better: the human in the loop is the base, and the human is in command at
 three points (Section~\ref{sec:roles}). Ninth, the proposal named packaging as the benchmark, not as the scope. After the benchmark I added the second way of
 describing a product, so that the agent serves any comparison whose processes are in the database. The main difficulty was that a strategy can look efficient and be
@@ -935,7 +933,7 @@ unsafe at once, and only the test built to make the certificate fail showed it.
 \paragraph{Limitations.}
 The simulated experts are not people. They answer every question with the true value, whereas a person
 may misremember a distance or guess a share \citep{ohagan2006}, so the results say nothing yet about real
-users. The benchmark covers four products and three regions, its tests concern climate change only, and only 8 to 12 of its
+users. The benchmark covers four products and three regions, its tests concern climate change only, and only 5 to 8 of its
 cases are informative. The runs in three other impact categories and the two ablations reuse the same cases and are descriptive. The run with new seeds reuses the same cases. The priors treat the choices as
 independent; the recycling and disposal priors come from national statistics, but the component masses, the trips outside Germany, washing, the distribution distance, the recycled content of aluminium and, in Brazil, of PET, and the burden of recycled PET still rest on
 assumptions, which every report marks. The strategy is myopic. The benchmark
@@ -949,7 +947,7 @@ synthetic models with one question per round. The comparisons were built by me, 
 gives every continuous choice the same score, and the two wrong experts are two kinds of error among many.
 I do not know in which direction the independence of the priors moves the probability of a wrong verdict.
 The uncertainty that the database states for its datasets is not in the results, for the reason given in
-Section~\ref{sec:v02}.
+Section~\ref{sec:robust}.
 
 %% ------------------------------------------------------------------
 \section{Conclusions and Future Work}\label{sec:conclusions}
