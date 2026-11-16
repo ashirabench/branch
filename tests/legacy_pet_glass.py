@@ -69,7 +69,7 @@ def legacy_pet_vs_refillable_glass(factors, country="PT", category=DEFAULT_CATEG
         Choice("glass_trips", "continuous", ("triangular", {"low": 5, "mode": 15, "high": 40}),
                "ASSUMPTION: refill cycles per bottle; replace with sector data",
                question="How many times is each glass bottle filled over its life?"),
-        Choice("wash_kwh", "continuous", ("uniform", {"low": 0.005, "high": 0.03}),
+        Choice("wash_kwh", "continuous", ("uniform", {"low": 0.005, "high": 0.05}),
                "ASSUMPTION: electricity for washing and refilling per bottle",
                question="Electricity used to wash and refill one bottle (kWh)?"),
         Choice("wash_heat_mj", "continuous", ("uniform", {"low": 0.05, "high": 0.5}),

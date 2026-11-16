@@ -11,7 +11,7 @@ _VALUES = {
     "pet_granulate_bottle_grade": 2.2, "pet_granulate_amorphous": 2.0, "stretch_blow_moulding": 0.8,
     "hdpe_granulate": 1.9, "ldpe_granulate": 2.0, "injection_moulding": 1.3, "film_extrusion": 0.6,
     "glass_packaging_white": 0.95, "glass_packaging_green": 0.85, "glass_packaging_brown": 0.9,
-    "aluminium_wrought_mix": 9.0, "aluminium_secondary_old_scrap": 0.6, "sheet_rolling_aluminium": 0.5,
+    "aluminium_primary": 9.0, "aluminium_secondary_old_scrap": 0.6, "sheet_rolling_aluminium": 0.5,
     "liquid_packaging_board": 1.0, "corrugated_board_box": 1.0,
     "electricity_mv_PT": 0.30, "electricity_mv_DE": 0.50, "electricity_mv_BR": 0.15,
     "electricity_oil_power_plant": 0.85,

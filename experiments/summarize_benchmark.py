@@ -6,7 +6,13 @@ Writes <folder>/ALL_summary.csv with, per strategy and batch size: runs, mean an
 median questions, share certified and share of certified verdicts that are wrong.
 
 The unit of inference is the CASE, not the session: the sessions of one case share
-its beliefs, so they are not independent. Hence
+its beliefs, so they are not independent. Cases are not independent either: the same
+pair of products appears in several regions. So every interval is given twice, by case
+and by PAIR (all the regions of a pair are resampled together; a file named
+<region>_<a>_vs_<b> belongs to the pair <a>_vs_<b>). With 6 or 10 pairs the pair
+interval is coarse, and it is the one the readings of the plan use. Hence
+  wrong_ci95_pair, dq_ci95_pair  the two intervals below, resampling pairs
+  pairs                        number of pairs
   wrong_ci95                   95% percentile interval of a bootstrap over cases
                                (10,000 resamples; exact binomial over sessions when
                                no certificate is wrong, since the bootstrap is then 0)
@@ -22,6 +28,7 @@ its beliefs, so they are not independent. Hence
 """
 import glob
 import os
+import re
 import sys
 
 import numpy as np
@@ -45,6 +52,27 @@ def sign_flip_p(diff):
     return float((stats >= obs - 1e-12).mean())
 
 
+def pair_of(case):
+    """<region>_<a>_vs_<b> -> <a>_vs_<b>; a name of another shape is its own pair."""
+    m = re.match(r"^[A-Z]{2,3}(?:-[A-Z0-9]+)?_(.+_vs_.+)$", case)
+    return m.group(1) if m else case
+
+
+def pair_index(cases, n=10_000, seed=0):
+    """(resamples x pairs) indices and, per pair, the positions of its cases."""
+    pairs = sorted({pair_of(c) for c in cases})
+    members = [np.array([i for i, c in enumerate(cases) if pair_of(c) == p]) for p in pairs]
+    return np.random.default_rng(seed).integers(0, len(pairs), size=(n, len(pairs))), members
+
+
+def boot_ratio(num, den, idx, members=None):
+    """Resampled sum(num) / sum(den): over cases, or over pairs when members is given."""
+    if members is not None:
+        num = np.array([num[m].sum() for m in members])
+        den = np.array([den[m].sum() for m in members])
+    return num[idx].sum(1) / np.maximum(den[idx].sum(1), 1)
+
+
 def main(folder):
     frames = []
     for f in sorted(glob.glob(os.path.join(folder, "*_runs.csv"))):
@@ -57,6 +85,8 @@ def main(folder):
     df["wrong"] = (df.certified & ~df.correct.astype(bool)).astype(int)
     cases = sorted(df.case.unique())
     idx = np.random.default_rng(0).integers(0, len(cases), size=(10_000, len(cases)))
+    pidx, members = pair_index(cases)
+    ones = np.ones(len(cases))
     rows = []
     for b, gb in df.groupby("batch_size"):
         per = gb.groupby(["strategy", "case"]).agg(q=("questions", "mean"), w=("wrong", "sum"),
@@ -69,17 +99,18 @@ def main(folder):
             wrong, ncert = int(W.sum()), int(N.sum())
             binom = binomtest(wrong, ncert).proportion_ci() if ncert else None
             if wrong and ncert:
-                boot = W[idx].sum(1) / np.maximum(N[idx].sum(1), 1)
-                lo, hi = np.percentile(boot, [2.5, 97.5])
+                lo, hi = np.percentile(boot_ratio(W, N, idx), [2.5, 97.5])
+                plo, phi = np.percentile(boot_ratio(W, N, pidx, members), [2.5, 97.5])
             elif binom:
-                lo, hi = binom.low, binom.high
+                lo, hi = plo, phi = binom.low, binom.high
             else:
-                lo = hi = float("nan")
+                lo = hi = plo = phi = float("nan")
             row = dict(strategy=s, batch_size=b, runs=len(g), cases=g.case.nunique(),
                        q_mean=g.questions.mean(), q_median=g.questions.median(),
                        certified_pct=100 * g.certified.mean(),
                        wrong_when_certified_pct=100 * wrong / ncert if ncert else float("nan"),
                        wrong_ci95=f"{100 * lo:.1f} to {100 * hi:.1f}",
+                       wrong_ci95_pair=f"{100 * plo:.1f} to {100 * phi:.1f}", pairs=len(members),
                        binom_ci95=f"{100 * binom.low:.1f} to {100 * binom.high:.1f}" if binom else "",
                        cases_no_question=int((g.groupby("case").questions.max() == 0).sum()))
             if s != "decision_flip" and ref.q.notna().all():
@@ -87,6 +118,8 @@ def main(folder):
                 bd = diff[idx].mean(1)
                 row["dq_vs_decision_flip"] = diff.mean()
                 row["dq_ci95"] = "{:.2f} to {:.2f}".format(*np.percentile(bd, [2.5, 97.5]))
+                row["dq_ci95_pair"] = "{:.2f} to {:.2f}".format(
+                    *np.percentile(boot_ratio(diff, ones, pidx, members), [2.5, 97.5]))
                 row["p_raw"] = sign_flip_p(diff)
             block.append(row)
         raw = [(i, r["p_raw"]) for i, r in enumerate(block) if "p_raw" in r]

@@ -95,6 +95,7 @@ def main():
             continue
         f["uncertainty"] = {c: spread(v, f["impacts"].get(c)) for c, v in runs.items() if c in f["impacts"]}
         f["uncertainty_runs"] = time.strftime("%Y-%m-%d")
+        f["uncertainty_seconds"] = round(time.time() - t0, 1)
         with open(path + ".tmp", "w") as fh:
             json.dump(data, fh, indent=2)
         os.replace(path + ".tmp", path)
@@ -104,6 +105,33 @@ def main():
               f"({time.time() - t0:.0f} s; about {left / 60:.0f} min left)")
     without = [k for k in keys if not (data["factors"][k].get("uncertainty") or {}).get("Climate change", {}).get("gsd")]
     print(f"done. Factors without a usable uncertainty for Climate change: {without or 'none'}")
+    report(data, keys, os.path.join("outputs", "uncertainty_report.md"))
+
+
+def report(data, keys, out):
+    """What the simulation gave, factor by factor, for Climate change: the table the plan asks for (A3)."""
+    rows, total = [], 0.0
+    for k in keys:
+        f = data["factors"][k]
+        u = (f.get("uncertainty") or {}).get("Climate change") or {}
+        total += f.get("uncertainty_seconds") or 0.0
+        cell = lambda x: "" if x is None else f"{x:.3f}"  # noqa: E731
+        rows.append(f"| {k} | {u.get('n', '')} | {cell(u.get('gsd'))} | {cell(u.get('median_ratio'))} | "
+                    f"{cell(u.get('mean_ratio'))} | {u.get('other_sign', '')} | {f.get('uncertainty_seconds', '')} | "
+                    f"{u.get('note', '')} |")
+    gsd = [(data["factors"][k]["uncertainty"]["Climate change"]["gsd"], k) for k in keys
+           if ((data["factors"][k].get("uncertainty") or {}).get("Climate change") or {}).get("gsd")]
+    med = [abs(data["factors"][k]["uncertainty"]["Climate change"]["median_ratio"] - 1) for _, k in gsd]
+    lines = ["# Uncertainty of the factors of the benchmark, Climate change", "",
+             f"{len(gsd)} of {len(keys)} factors have a usable spread. Simulation time recorded: {total / 60:.1f} minutes.",
+             (f"Geometric standard deviation from {min(gsd)[0]:.3f} ({min(gsd)[1]}) to {max(gsd)[0]:.3f} ({max(gsd)[1]}). "
+              f"Largest distance between the median of the runs and the value BRANCH uses: {100 * max(med):.1f}%."
+              if gsd else "No factor has a usable spread."), "",
+             "| Factor | Runs | Geometric standard deviation | Median of the runs / value used | Mean / value used | "
+             "Runs of the other sign | Seconds | Note |", "|---|---|---|---|---|---|---|---|"] + rows
+    with open(out, "w") as fh:
+        fh.write("\n".join(lines) + "\n")
+    print(f"report: {out}")
 
 
 if __name__ == "__main__":

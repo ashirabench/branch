@@ -117,7 +117,11 @@ MATERIALS = {
     },
     "aluminium": {
         "label": "aluminium",
-        "datasets": {"wrought alloy mix": ("aluminium_wrought_mix", 1.0)},
+        # Primary aluminium, not the production mix: "Aluminium, production mix, wrought alloy, at plant"
+        # of BAFU:2026 is itself 53.6% primary, 38.1% secondary from new scrap and 8.3% secondary from
+        # old scrap (read in the database on 16 November 2026), so using it beside a recycled content
+        # counted the secondary metal twice (versions up to 0.1.2 did).
+        "datasets": {"primary aluminium": ("aluminium_primary", 1.0)},
         "conversion": "sheet_rolling_aluminium",
         "recycled": {
             "model": "dataset",
@@ -163,8 +167,10 @@ REFILLABLE = {
     "trips": ("triangular", {"low": 5, "mode": 15, "high": 40},
               "ASSUMPTION: refill cycles per container; replace with sector data",
               "How many times is each {p} filled over its life?"),
-    "wash_kwh": ("uniform", {"low": 0.005, "high": 0.03},
-                 "ASSUMPTION: electricity for washing and refilling per container",
+    "wash_kwh": ("uniform", {"low": 0.005, "high": 0.05},
+                 "ASSUMPTION: electricity for washing and refilling per container; the upper bound was widened "
+                 "from 0.03 on 16 Nov 2026 to include the 0.044 kWh measured in an Italian bottling plant, a figure "
+                 "that includes filling (Tua, Grosso and Rigamonti 2020)",
                  "Electricity used to wash and refill one {p} (kWh)?"),
     "wash_heat_mj": ("uniform", {"low": 0.05, "high": 0.5},
                      "ASSUMPTION: natural gas heat for washing per container; the upper bound was widened "
@@ -268,6 +274,9 @@ CFF_RECYCLING_RATIO = (
 # Heat that the recovered steam replaces. PEF asks for the specific substituted source; without it,
 # heat from natural gas (ELCD itself credits a district heating mix).
 CFF_SUBSTITUTED_HEAT = "heat"          # key of UTILITIES
+# Sensitivity runs of the energy credit (build_model(cff_heat=...)): the heat replaced is the Swiss
+# district heat average of BAFU:2026, or there is no credit for heat at all.
+CFF_HEAT_OPTIONS = {"gas": UTILITIES[CFF_SUBSTITUTED_HEAT], "district": "district_heat_ch_average", "none": None}
 
 
 def load_energy_recovery(root=None):

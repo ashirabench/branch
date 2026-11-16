@@ -45,7 +45,10 @@ PROCESSES = {
     "disposal_glass_incineration": ["Disposal, glass, 0% water, to municipal incineration"],
     "disposal_glass_landfill": ["Disposal, glass, 0% water, to inert material landfill",
                                 "Disposal, glass, 0% water, to construction waste landfill"],
-    "aluminium_wrought_mix": ["Aluminium, production mix, wrought alloy, at plant"],
+    # Primary metal: the production mix of wrought alloy already holds 46% of secondary aluminium.
+    "aluminium_primary": ["Aluminium, primary, at plant"],
+    # Only for a sensitivity run of the energy credit of the Circular Footprint Formula.
+    "district_heat_ch_average": ["District heat, at consumer, swiss average, allocation exergy"],
     "aluminium_secondary_old_scrap": ["Aluminium, secondary, from old scrap, at plant"],
     "liquid_packaging_board": ["Liquid packaging board, at plant"],
     # Added for the generic builder (catalogue.py). UNVERIFIED names: check with

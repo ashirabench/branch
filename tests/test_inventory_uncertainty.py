@@ -204,3 +204,29 @@ def test_an_aggregated_process_is_not_linked_to_unrelated_datasets():
     simulate_impacts(fake, o.Ref(id="p"), o.Ref(id="m"), 2)
     assert fake.linked == o.ProviderLinking.ONLY_DEFAULTS
     assert linking(o.Process(process_type=o.ProcessType.UNIT_PROCESS)).provider_linking == o.ProviderLinking.PREFER_DEFAULTS
+
+
+def test_correlated_run_moves_every_factor_with_one_draw():
+    """The bound opposite to independence: one draw nobody is asked, each factor scaled by its own spread."""
+    data = factors(1.2)
+    data["factors"]["electricity_mv_PT"]["uncertainty"][CAT]["gsd"] = 1.5
+    m = build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, data, inventory_uncertainty="correlated")
+    hidden = [c for c in m.choices if not c.askable]
+    assert [c.name for c in hidden] == ["factor.all"] and hidden[0].prior[0] == "normal"
+    plain = _build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, data)
+    w = {c.name: c.answers()[0][len(c.answers()[0]) // 2] for c in plain.choices}
+    assert np.isclose(m.delta_at(dict(w, **{"factor.all": 0.0})), plain.delta_at(w), rtol=1e-12)   # z = 0: central values
+    scaled = copy.deepcopy(data)                    # z = 1: every factor times its own gsd
+    for k, f in scaled["factors"].items():
+        f["impacts"][CAT] *= f["uncertainty"][CAT]["gsd"]
+    up = _build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, scaled)
+    assert np.isclose(m.delta_at(dict(w, **{"factor.all": 1.0})), up.delta_at(w), rtol=1e-9)
+    S = m.sample(500, seed=3)                       # the engine agrees with the scalar path
+    total = np.asarray(sum(m.term_value(i, S) for i in range(len(m.terms))))
+    row = {c.name: float(S[7, j]) for j, c in enumerate(m.choices)}
+    assert np.isclose(total[7], m.delta_at(row), rtol=1e-9)
+    r = run_agent(m, lambda n: draw_truth(m, 1)[n], strategy="decision_flip", batch_size=3, n_samples=2000,
+                  tau=0.025, seed=1, truth=draw_truth(m, 1))
+    assert "factor.all" not in r["asked"]
+    with pytest.raises(ValueError, match="inventory_uncertainty"):
+        _build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, data, inventory_uncertainty="half")

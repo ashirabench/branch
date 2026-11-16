@@ -205,12 +205,16 @@ class Param:
 
 class _Builder:
     def __init__(self, region, category, data, xp, shared=None, system_model="cut-off",
-                 inventory_uncertainty=False):
+                 inventory_uncertainty=False, cff_heat="gas", cff_overrides=None):
         self.region, self.category, self.data, self.xp = region, category, data, xp
         self.system_model = system_model
         self.inventory_uncertainty = inventory_uncertainty
+        self.cff_heat = cff_heat
         self.materials = cat.load_materials()
         self.cff = cat.load_cff() if system_model == "cff" else {}
+        for mid, changes in (cff_overrides or {}).items():
+            if mid in self.cff:
+                self.cff[mid] = {**self.cff[mid], **changes}
         self.energy = cat.load_energy_recovery() if system_model == "cff" else {}
         self.shared = shared or {}
         self.choices = {}
@@ -230,6 +234,16 @@ class _Builder:
         unc = ((self.data.get("factors", {}).get(key) or {}).get("uncertainty") or {}).get(self.category)
         if not unc or not unc.get("gsd") or float(unc["gsd"]) <= 1.0:
             return None
+        if self.inventory_uncertainty == "correlated":
+            # the bound opposite to independence: one standard normal draw moves every factor at once,
+            # each by its own geometric standard deviation
+            if COMMON_FACTOR_DRAW not in self.choices:
+                self.choices[COMMON_FACTOR_DRAW] = Choice(
+                    COMMON_FACTOR_DRAW, "continuous", ("normal", {"mean": 0.0, "sd": 1.0}),
+                    "SOURCE: uncertainty that the database states for the exchanges of its datasets, propagated by "
+                    "Monte Carlo runs in openLCA; ASSUMPTION of this sensitivity run: all factors move together",
+                    question="", askable=False)
+            return _Scaled(COMMON_FACTOR_DRAW, float(np.log(float(unc["gsd"]))), self.xp)
         name = f"factor.{key}"
         if name not in self.choices:
             gsd = float(unc["gsd"])
@@ -309,6 +323,21 @@ class _Builder:
 def _i(p, v):
     """Option index of a categorical Param in a world of scalars."""
     return int(round(float(p(v))))
+
+
+class _Scaled(Param):
+    """exp(sigma z): the multiplier of one factor when a single draw z moves every factor together."""
+
+    def __init__(self, name, sigma, xp):
+        super().__init__(name)
+        self.sigma, self.xp = sigma, xp
+
+    def __call__(self, v):
+        z = v[self.name]
+        return float(np.exp(self.sigma * z)) if isinstance(z, (int, float)) else self.xp.exp(self.sigma * z)
+
+
+COMMON_FACTOR_DRAW = "factor.all"
 
 
 def _deps(*params):
@@ -560,8 +589,11 @@ def _product_terms(b, spec, sign, n_units):
             if rec_energy:
                 kwh, steam = float(rec_energy["electricity_mj_per_kg"]) / 3.6, float(rec_energy["steam_mj_per_kg"])
                 grid, elec, elec_keys, elec_u = b.electricity()
-                heat_key = cat.UTILITIES[cat.CFF_SUBSTITUTED_HEAT]
-                heat_f, heat_u = b.f(heat_key), b.u(heat_key)
+                heat_key = cat.CFF_HEAT_OPTIONS[b.cff_heat]
+                if heat_key is None:                      # sensitivity: no credit for the heat
+                    heat_f, heat_u, steam = 0.0, None, 0.0
+                else:
+                    heat_f, heat_u = b.f(heat_key), b.u(heat_key)
                 if eol["model"] == "split":
                     r3, r3_params = (lambda v, rate=rate, share=share: (1 - rate(v)) * share(v)), (rate, share)
                 else:
@@ -577,7 +609,10 @@ def _product_terms(b, spec, sign, n_units):
                 def cff_energy_inv(v, mass=mass, r3=r3, trips=trips, grid=grid, elec_keys=elec_keys, kwh=kwh,
                                    steam=steam, heat_key=heat_key):
                     w = n_units * mass(v) / 1000 * float(r3(v)) / trips(v)
-                    return {elec_keys[_i(grid, v)]: -w * kwh, heat_key: -w * steam}
+                    out = {elec_keys[_i(grid, v)]: -w * kwh}
+                    if heat_key:
+                        out[heat_key] = -w * steam
+                    return out
 
                 terms.append(Term(f"{pid}.{c['id']}.cff_energy.end_of_life",
                                   _deps(mass, trips, grid, *r3_params, *elec_u, heat_u),
@@ -652,7 +687,7 @@ def _product_terms(b, spec, sign, n_units):
 
 def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=None,
                 functional_unit_l=1.0, xp=np, shared=None, country=None, system_model="cut-off",
-                inventory_uncertainty=False):
+                inventory_uncertainty=False, cff_heat="gas", cff_overrides=None):
     """Comparative Model: delta = I_A - I_B per functional unit (litres delivered).
 
     region   region code from data/regions/ ("PT", "DE", "BR", "BR-N", "BR-AM", ...);
@@ -665,12 +700,21 @@ def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=
              (written by experiments/extract_uncertainty.py), every factor varies in the Monte Carlo
              draws as a choice that nobody is asked. Off by default: the results of the paper and
              the app do not use it until it has been run and read (experiments/PLAN_2026-11-15.md, A3).
+             "correlated": a sensitivity run in which one draw moves every factor together, the bound
+             opposite to treating the factors as independent.
+    cff_heat  heat that the steam of a waste-to-energy plant replaces in the Circular Footprint Formula:
+             "gas" (default, heat from natural gas), "district" (Swiss district heat average) or "none".
+    cff_overrides  {material: {parameter: value}} over data/cff/, for sensitivity runs only.
     system_model  "cut-off" (ISO default, ILCD Situation A) or "cff", the EU PEF
              Circular Footprint Formula with the parameters of Part C of Annex II in data/cff/
              and the credit for recovered energy (B = 0).
     """
     if system_model not in ("cut-off", "cff"):
         raise ValueError("system_model must be 'cut-off' or 'cff'")
+    if cff_heat not in cat.CFF_HEAT_OPTIONS:
+        raise ValueError(f"cff_heat must be one of {sorted(cat.CFF_HEAT_OPTIONS)}")
+    if inventory_uncertainty not in (False, True, "correlated"):
+        raise ValueError("inventory_uncertainty must be False, True or 'correlated'")
     region = load_region(country or region)
     if factors is None:
         from .real_cases import load_factors
@@ -681,7 +725,7 @@ def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=
     a, b_ = load_spec(spec_a), load_spec(spec_b)
     if a["id"] == b_["id"]:
         raise ValueError("the two alternatives need different ids")
-    b = _Builder(region, category, factors, xp, shared, system_model, inventory_uncertainty)
+    b = _Builder(region, category, factors, xp, shared, system_model, inventory_uncertainty, cff_heat, cff_overrides)
     if system_model == "cff":
         missing = sorted({c["material"] for spec in (a, b_) for c in spec["components"]} - set(b.cff))
         if missing:
@@ -696,7 +740,8 @@ def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=
     model.factor_data = factors
     model.build_args = {"spec_a": a, "spec_b": b_, "region": region.code,
                         "functional_unit_l": functional_unit_l, "shared": shared,
-                        "system_model": system_model, "inventory_uncertainty": inventory_uncertainty}
+                        "system_model": system_model, "inventory_uncertainty": inventory_uncertainty,
+                        "cff_heat": cff_heat, "cff_overrides": cff_overrides}
     model.meta = {"country": region.code, "region": region.name, "region_path": region.path,
                   "sources_needed": region.sources_needed() if (a["components"] or b_["components"]) else [],
                   "category": category,
@@ -727,4 +772,5 @@ def rebuild(model, category):
     return build_model(args["spec_a"], args["spec_b"], args["region"], category, model.factor_data,
                        args["functional_unit_l"], model.xp, args["shared"],
                        system_model=args.get("system_model", "cut-off"),
-                       inventory_uncertainty=args.get("inventory_uncertainty", False))
+                       inventory_uncertainty=args.get("inventory_uncertainty", False),
+                       cff_heat=args.get("cff_heat", "gas"), cff_overrides=args.get("cff_overrides"))

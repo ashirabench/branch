@@ -274,7 +274,7 @@ def test_cff_matches_the_formula_by_hand(monkeypatch, tmp_path):
     m = build_model("aluminium_can_330ml", "pet_bottle_1l", "PT", CAT, data, system_model="cff")
     w = {c.name: c.answers()[0][len(c.answers()[0]) // 2] for c in m.choices}
     kg, r1, r2 = w["can.body_and_lid.mass_g"] / 1000, w["can.aluminium.recycled_content"], w["can.aluminium.recycling_rate"]
-    ev, erec = f("aluminium_wrought_mix"), f("aluminium_secondary_old_scrap")
+    ev, erec = f("aluminium_primary"), f("aluminium_secondary_old_scrap")
     n = 1 / 0.33
     content = (1 - r1) * ev + r1 * (0.5 * erec + 0.5 * ev * 0.9) + f("sheet_rolling_aluminium")
     credit = 0.5 * r2 * (erec - ev * 0.8)
@@ -381,3 +381,56 @@ def test_the_annex_tables_in_the_repository_are_the_ones_read_from_the_commissio
                         "annex_c_packaging_A_R1_R2.csv")
     with open(path, "rb") as fh:
         assert hashlib.sha256(fh.read()).hexdigest() == "25a37bab86944f25ba2fd8560ec6402bb6b6abb08f30bad9e6aca57fd7643764"
+
+
+def test_cff_heat_can_be_district_heat_or_nothing(monkeypatch, tmp_path):
+    """Sensitivity runs of the energy credit: the heat replaced is another dataset, or there is no credit for heat."""
+    from branch import catalogue
+    _cff(monkeypatch, tmp_path, 1.0)
+    data = fake_factors()
+    data["factors"]["district_heat_ch_average"] = {"impacts": {CAT: 0.02}}
+    f = lambda k: data["factors"][k]["impacts"][CAT]  # noqa: E731
+    rec = {"pet": {"electricity_mj_per_kg": 3.6, "steam_mj_per_kg": 10.0, "source": "TEST ONLY"}}
+    monkeypatch.setattr(catalogue, "load_energy_recovery", lambda r=None: rec)
+    kw = dict(system_model="cff")
+    gas = build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, data, **kw)
+    none = build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, data, cff_heat="none", **kw)
+    district = build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, data, cff_heat="district", **kw)
+    S = gas.sample(20, seed=2)
+    for r in range(S.shape[0]):
+        w = {c.name: float(S[r, j]) for j, c in enumerate(gas.choices)}
+        burnt_kg = w["pet.bottle.mass_g"] / 1000 * (1 - w["pet.pet.recycling_rate"]) * w["pet.pet.incineration_share"]
+        assert np.isclose(none.delta_at(w) - gas.delta_at(w), burnt_kg * 10.0 * f("heat_natural_gas_furnace"), rtol=1e-9)
+        assert np.isclose(district.delta_at(w) - none.delta_at(w), -burnt_kg * 10.0 * 0.02, rtol=1e-9)
+        inv = none.inventory(w)
+        assert "heat_natural_gas_furnace" not in inv[none.label_a] or inv[none.label_a]["heat_natural_gas_furnace"] >= 0
+    assert "district_heat_ch_average" not in required_factor_keys(["pet_bottle_1l"], "PT")   # never needed by default
+    with pytest.raises(ValueError, match="cff_heat"):
+        build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, data, cff_heat="coal", **kw)
+
+
+def test_cff_parameters_can_be_overridden_for_a_sensitivity_run():
+    """PET with the quality ratios of SSP recycling (1 and 1) instead of mechanical recycling (0.9)."""
+    data = fake_factors()
+    base = build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, data, system_model="cff")
+    ssp = build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, data, system_model="cff",
+                      cff_overrides={"pet": {"Qsin_Qp": 1.0, "Qsout_Qp": 1.0}})
+    w = {c.name: c.answers()[0][len(c.answers()[0]) // 2] for c in base.choices}
+    assert [c.name for c in base.choices] == [c.name for c in ssp.choices]
+    assert ssp.delta_at(w) != base.delta_at(w)
+    from branch import catalogue
+    assert catalogue.load_cff()["pet"]["Qsout_Qp"] == 0.9          # the file itself is untouched
+
+
+def test_aluminium_uses_primary_metal_beside_its_recycled_content():
+    """The production mix of wrought alloy already holds secondary aluminium (53.6% primary in BAFU:2026),
+    so beside a recycled content the virgin metal has to be the primary dataset."""
+    assert cat.MATERIALS["aluminium"]["datasets"] == {"primary aluminium": ("aluminium_primary", 1.0)}
+    assert "aluminium_primary" in required_factor_keys(["aluminium_can_330ml"], "PT")
+    assert "aluminium_wrought_mix" not in required_factor_keys(["aluminium_can_330ml"], "PT")
+
+
+def test_washing_electricity_includes_the_one_measurement():
+    """0.044 kWh per bottle (Tua, Grosso and Rigamonti 2020) lies inside the prior since 16 November 2026."""
+    dist, params = cat.REFILLABLE["wash_kwh"][:2]
+    assert dist == "uniform" and params["low"] < 0.044 < params["high"]

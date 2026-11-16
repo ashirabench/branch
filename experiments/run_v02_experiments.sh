@@ -3,11 +3,14 @@
 # None of them needs openLCA: they read the factor file.
 #
 #   bash experiments/run_v02_experiments.sh                # everything that the factor file allows
-#   bash experiments/run_v02_experiments.sh families       # one block: families | elcd | cff | uncertainty
+#   bash experiments/run_v02_experiments.sh families       # one block: families | elcd | cff | wash | uncertainty
 #   QUICK=1 bash experiments/run_v02_experiments.sh        # 3 seeds, N = 5,000: checks that it runs, not a result
 #
-# Setting of the paper: tau 2.5%, three questions per round, seeds 0 to 29, N = 20,000, four
-# strategies, experts from the priors and from their tails. Writes results/v02/<block>_<expert>/.
+# Setting of the paper: tau 2.5%, three questions per round, N = 20,000, four strategies, experts
+# from the priors and from their tails. Seeds 100 to 129: new seeds, because 0 to 29 chose the
+# setting of the paper (FIRST_SEED=0 repeats the old ones). Writes results/v02/<block>_<expert>/.
+# Sensitivity runs (not readings): wash_old, cff_heat_none, cff_heat_district, cff_pet_ssp,
+# uncertainty_correlated.
 # The block "uncertainty" runs only when the factor file carries the uncertainty of the datasets
 # (experiments/extract_uncertainty.py, which does need openLCA).
 set -euo pipefail
@@ -29,6 +32,12 @@ FAMILIES=(   # B2, fixed on 16 November 2026: "A B" per line
 )
 STRATS=(decision_flip sobol entropy random)
 if [[ "${QUICK:-0}" == "1" ]]; then SEEDS=3; N=5000; else SEEDS=30; N=20000; fi
+FIRST="${FIRST_SEED:-100}"
+has_factor() { python - "$BAFU" "$1" <<'PY'
+import json, sys
+sys.exit(0 if sys.argv[2] in json.load(open(sys.argv[1]))["factors"] else 1)
+PY
+}
 BAFU="$(ls -t data/factors/*.json 2>/dev/null | head -1 || true)"
 [[ -n "$BAFU" ]] || { echo "No factors in data/factors/."; exit 1; }
 WHAT="${1:-all}"
@@ -46,7 +55,7 @@ run() {  # block name, factor file, regions (quoted list), pairs (function or "f
     for region in $regions; do
       while read -r a b; do
         BRANCH_FACTORS="$factors" python experiments/run_grid.py --case real --a "$a" --b "$b" --region "$region" \
-          --batch 3 --seeds "$SEEDS" --n "$N" --tau 0.025 --truth "$truth" --strategies "${STRATS[@]}" \
+          --batch 3 --seeds "$SEEDS" --first-seed "$FIRST" --n "$N" --tau 0.025 --truth "$truth" --strategies "${STRATS[@]}" \
           --tag "$out/${region}_$(name "$a")_vs_$(name "$b")" "$@" >/dev/null
       done < <(if [[ "$pairs" == "families" ]]; then printf '%s\n' "${FAMILIES[@]}"; else bench_pairs; fi)
     done
@@ -89,6 +98,20 @@ if want cff; then
   echo "== A2. Circular Footprint Formula against cut-off, the 18 cases"
   run cutoff "$BAFU" "PT DE BR" bench
   run cff "$BAFU" "PT DE BR" bench --system-model cff
+  echo "== A2, sensitivity: no credit for heat, district heat instead of gas, PET quality 1"
+  run cff_heat_none "$BAFU" "PT DE BR" bench --system-model cff --cff-heat none
+  if has_factor district_heat_ch_average; then
+    run cff_heat_district "$BAFU" "PT DE BR" bench --system-model cff --cff-heat district
+  else
+    echo "   district heat skipped: no factor district_heat_ch_average (python experiments/extract_factors.py --update --only district_heat_ch_average)"
+  fi
+  run cff_pet_ssp "$BAFU" "PT DE BR" bench --system-model cff --cff-pet-ssp
+fi
+
+if want wash; then
+  echo "== A1, sensitivity: washing electricity with the upper bound of before 16 November (0.03 kWh)"
+  [[ -d results/v02/cutoff_prior ]] || run cutoff "$BAFU" "PT DE BR" bench
+  run wash_old "$BAFU" "PT DE BR" bench --wash-kwh-high 0.03
 fi
 
 if want uncertainty; then
@@ -101,6 +124,8 @@ PY
     echo "== A3. The uncertainty of the datasets in every draw, the 18 cases"
     [[ -d results/v02/cutoff_prior ]] || run cutoff "$BAFU" "PT DE BR" bench
     run uncertainty "$BAFU" "PT DE BR" bench --inventory-uncertainty on
+    echo "== A3, sensitivity: all factors moving together (the bound opposite to independence)"
+    run uncertainty_correlated "$BAFU" "PT DE BR" bench --inventory-uncertainty correlated
   else
     echo "== A3 skipped: $BAFU has no uncertainty yet (python experiments/extract_uncertainty.py, with openLCA open)"
   fi

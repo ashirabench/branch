@@ -150,7 +150,7 @@
   }
  },
  "gaps": [
-  "aluminium_wrought_mix",
+  "aluminium_primary",
   "aluminium_secondary_old_scrap",
   "sheet_rolling_aluminium",
   "disposal_aluminium_incineration",
@@ -160,7 +160,7 @@
   "film_extrusion"
  ],
  "why_gaps": {
-  "aluminium_wrought_mix, aluminium_secondary_old_scrap, sheet_rolling_aluminium": "ELCD has aluminium sheet only as one data set that already joins primary production, rolling and recycling, so the recycled content cannot vary",
+  "aluminium_primary, aluminium_secondary_old_scrap, sheet_rolling_aluminium": "ELCD has aluminium sheet only as one data set that already joins primary production, rolling and recycling, so the recycled content cannot vary",
   "disposal_aluminium_incineration, disposal_aluminium_landfill": "ELCD has incineration and landfill of ferro metals, not of aluminium",
   "stretch_blow_moulding, injection_moulding, film_extrusion": "ELCD has no plastic conversion processes"
  }

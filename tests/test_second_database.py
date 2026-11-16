@@ -88,7 +88,7 @@ def test_hybrid_replaces_the_21_and_leaves_the_8():
 def test_another_category_fails_on_a_replaced_factor_instead_of_mixing_databases():
     from branch.builder import factor
     out = hybrid(fake_base(), load("elcd32_factors.json"))
-    assert factor(out, "aluminium_wrought_mix", "Water use") == 1.0
+    assert factor(out, "aluminium_primary", "Water use") == 1.0
     with pytest.raises(KeyError):
         factor(out, "electricity_mv_PT", "Water use")
 
