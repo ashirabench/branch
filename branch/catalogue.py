@@ -118,8 +118,8 @@ MATERIALS = {
     "aluminium": {
         "label": "aluminium",
         # Primary aluminium, not the production mix: "Aluminium, production mix, wrought alloy, at plant"
-        # of BAFU:2026 is itself 53.6% primary, 38.1% secondary from new scrap and 8.3% secondary from
-        # old scrap (read in the database on 16 November 2026), so using it beside a recycled content
+        # of BAFU:2026 is itself a mix of primary and secondary aluminium, the primary metal a little
+        # over half (read in the database on 16 November 2026), so using it beside a recycled content
         # counted the secondary metal twice (versions up to 0.1.2 did).
         "datasets": {"primary aluminium": ("aluminium_primary", 1.0)},
         "conversion": "sheet_rolling_aluminium",

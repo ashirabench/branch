@@ -259,11 +259,11 @@ the repository keeps the summaries from before the widening. The correction of t
 On 16 November 2026 I opened in the database every dataset that BRANCH uses (70 processes) and compared its
 name, location, reference unit and inputs with what the model assumes. One error came out. The catalogue
 took ``Aluminium, production mix, wrought alloy'' as the virgin metal, beside a recycled content asked as a
-choice, and that dataset is itself 53.6\% primary aluminium, 38.1\% secondary from new scrap and 8.3\%
-secondary from old scrap. With a recycled content of 55\% the model used 24\% of primary metal where it
-meant 45\%. The versions of BRANCH before this one, and the version of this paper of 15 November, carry the error,
+choice, and that dataset is itself a mix of primary aluminium and of secondary aluminium from new and from
+old scrap, the primary metal a little over half. With a recycled content of 55\% the model used about
+half as much primary metal as it meant. The versions of BRANCH before this one, and the version of this paper of 15 November, carry the error,
 which favoured the can and the foil of the carton. The virgin metal is now primary aluminium,
-whose climate impact per kg is 1.8 times that of the mix. Among the \nCases{} cases one verdict at the central
+whose climate impact per kg is markedly higher than that of the mix. Among the \nCases{} cases one verdict at the central
 values changes, refillable glass against the can in Brazil, where the can led and the glass now leads. The
 share of prior draws in which the other product beats the can rises in all six cases where it was not
 already 1, for example from 0.55 to 0.99 for PET against the can in Portugal
@@ -769,8 +769,8 @@ are close. Three sensitivity runs change little: with no credit for heat or with
 place of heat from gas a fourth case changes (PET against the can in Germany, where the two products are
 level), and a quality ratio of 1 for recycled PET changes none. Two limits apply. The recycling rates of
 the Annex are measured at the output of the recycling plant and the rates of BRANCH at collection or at
-the input, so the credit may be overestimated. And the packaging glass of the database already contains
-62 to 85\% of cullet and the converter steel 22\% of scrap, so their ``virgin'' impact in the formula is
+the input, so the credit may be overestimated. And the packaging glass of the database is already mostly
+cullet and its converter steel about a fifth scrap, so their ``virgin'' impact in the formula is
 not virgin.
 
 \paragraph{Sensitivity to the washing prior, and the uncertainty of the datasets.}
@@ -973,7 +973,11 @@ database and in two Brazilian regions.
 Future work includes a study with SME managers and LCA practitioners, experts who answer with error,
 codified rules and sourced priors for domains beyond packaging, more regions and impact categories in the benchmark, a non-myopic strategy that looks two questions ahead,
 secondary packaging in the bill of materials, uncertainty for single-value datasets and integration closer
-to openLCA, as a contribution to olca-app under its MPL 2.0 licence.
+to openLCA. BRANCH is Python with NumPy and openLCA is a Java application, so the realistic path is the one
+this version takes: BRANCH stays a companion that talks to openLCA through its IPC interface, and what it
+sends is a native model, with the choices as input parameters, the amounts as formulas and the priors as
+uncertainty, which openLCA's own Monte Carlo simulation can run. A panel inside openLCA would need the
+question strategy rewritten in Java, which I have not done.
 
 \paragraph{Code and data.}
 The repository \repo{} holds the software, the tests, the benchmark summaries, the validation

@@ -48,4 +48,4 @@ exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name=NAME, console=True,
 coll = COLLECT(exe, a.binaries, a.datas, name=NAME)
 if sys.platform == "darwin":
     app = BUNDLE(coll, name=f"{NAME}.app", bundle_identifier="org.branch.openlca",
-                 info_plist={"CFBundleShortVersionString": "0.1.2", "NSHighResolutionCapable": True})
+                 info_plist={"CFBundleShortVersionString": "0.2.0", "NSHighResolutionCapable": True})

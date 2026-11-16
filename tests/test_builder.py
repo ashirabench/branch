@@ -423,7 +423,7 @@ def test_cff_parameters_can_be_overridden_for_a_sensitivity_run():
 
 
 def test_aluminium_uses_primary_metal_beside_its_recycled_content():
-    """The production mix of wrought alloy already holds secondary aluminium (53.6% primary in BAFU:2026),
+    """The production mix of wrought alloy already holds secondary aluminium (a little over half primary in BAFU:2026),
     so beside a recycled content the virgin metal has to be the primary dataset."""
     assert cat.MATERIALS["aluminium"]["datasets"] == {"primary aluminium": ("aluminium_primary", 1.0)}
     assert "aluminium_primary" in required_factor_keys(["aluminium_can_330ml"], "PT")

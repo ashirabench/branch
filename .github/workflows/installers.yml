@@ -47,17 +47,26 @@ jobs:
         run: |
           if [ "$RUNNER_OS" = "macOS" ]; then BIN="dist/BRANCH for openLCA.app/Contents/MacOS/BRANCH for openLCA"; else BIN="dist/BRANCH for openLCA/BRANCH for openLCA.exe"; fi
           "$BIN" > smoke.log 2>&1 &
+          APP_PID=$!
           for i in $(seq 1 60); do sleep 3; grep -q "running at" smoke.log && break; done
           cat smoke.log
           URL=$(grep -o "http://127.0.0.1:[0-9]*" smoke.log | tail -1)
           curl -sf "$URL" > /dev/null && echo "page served at $URL"
           # one whole comparison in the built app: version on the page, questions, manager report
           python packaging/smoke_session.py "$URL"
+          # stop the app: left running, it keeps files open and the disk image below can fail with "Resource busy"
+          kill "$APP_PID" 2>/dev/null || true
+          sleep 3
       - name: Package (macOS dmg)
         if: runner.os == 'macOS'
         run: |
           mkdir dmg && cp -R "dist/BRANCH for openLCA.app" dmg/ && ln -s /Applications dmg/Applications
-          hdiutil create -volname "BRANCH for openLCA" -srcfolder dmg -ov -format UDZO "BRANCH-for-openLCA-${{ matrix.arch }}.dmg"
+          # hdiutil sometimes answers "Resource busy" on the hosted runners: try up to three times
+          for attempt in 1 2 3; do
+            hdiutil create -volname "BRANCH for openLCA" -srcfolder dmg -ov -format UDZO "BRANCH-for-openLCA-${{ matrix.arch }}.dmg" && break
+            [ "$attempt" = 3 ] && exit 1
+            sleep 15
+          done
       - name: Package (Windows installer)
         if: runner.os == 'Windows'
         shell: pwsh
