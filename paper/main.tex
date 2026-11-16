@@ -550,7 +550,7 @@ expert's ranking would ask, without the expert, and adds the rule that says when
 Figure~\ref{fig:batch} shows the mean number of questions with prior experts and $\tau=5\%$. With one
 question per round, decision flip needs \qFlipPriorOne{} questions, entropy and least confident
 \qEntPriorOne{}, and random \qRandPriorOne{}. The gap to entropy is 0.61 questions (interval over cases
-0.14 to 1.16; raw $p=0.06$, the smallest value that 5 informative cases allow). The uncertainty sampling baselines
+0.14 to 1.16 and over pairs 0.04 to 1.61; raw $p=0.06$, the smallest value that 5 informative cases allow). The uncertainty sampling baselines
 beat random order, but by a much smaller margin than decision flip does. Sobol of the impact needs the
 same number of questions (\qSobolPriorOne{}, $p=\pSobolPriorOne$), because in these cases the choices that
 dominate the variance of $\Delta$ also tend to dominate the verdict. The gap of 0.01 questions has a
@@ -658,7 +658,7 @@ sessions give lower shares. On the new seeds, three questions per round give \wF
 (\ciFlipHoldThree{}), 13 wrong certificates in 540, and two give \wFlipHoldTwo{} (\ciFlipHoldTwo{}).
 Because 540 sessions leave that interval wide, I had fixed a larger run
 (\texttt{experiments/record/PLAN\_2026-11-15.md}): 300 further seeds (2000 to 2299) per case, 5,400 sessions, in
-the same setting. It gives 3.3\% wrong certificates (179 of 5,400; interval over cases 1.4--5.6\%). I
+the same setting. It gives 3.3\% wrong certificates (179 of 5,400; interval over cases 1.4--5.6\% and over pairs 0.9--6.3\%). I
 report the three figures together: \wFlipChosenTails{} on the seeds used to choose the setting,
 \wFlipHoldThree{} on the first new seeds and 3.3\% on the larger run. The share
 stays between about 2\% and 5\%, near the target and sometimes above it. Most of the wrong certificates
@@ -783,8 +783,7 @@ whether a person can use it.
 
 \paragraph{Agreement with openLCA.}
 For every benchmark case, BRANCH pushed the model resolved at the median of each continuous choice and
-the most probable option of each categorical one to openLCA. I ran this check again on 16 November 2026, with the
-national priors, the corrected disposal datasets and primary aluminium. openLCA then built and calculated the two product systems with its own linking and the EF~3.1
+the most probable option of each categorical one to openLCA. The model sent is the one the connector builds, with every choice as a parameter and the amounts as formulas of those parameters. openLCA then built and calculated the two product systems with its own linking and the EF~3.1
 method. Over the 36 products of the \nCases{} cases, the largest relative difference between openLCA and
 BRANCH for climate change was \maxDiffBench{}. The surrogate therefore reproduces openLCA to numerical
 precision for these products. The check was not a formality. Its first run found a 2.3\% gap for the refillable glass bottle.
