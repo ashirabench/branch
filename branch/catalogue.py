@@ -122,9 +122,11 @@ MATERIALS = {
         "recycled": {
             "model": "dataset",
             "key": "aluminium_secondary_old_scrap",
-            "content": ("uniform", {"low": 0.2, "high": 0.7},
-                        "ASSUMPTION: recycled content of can sheet; one can maker declares 70% in Europe for 2021 "
-                        "(Ardagh Metal Packaging 2022), inside this range"),
+            "content": ("uniform", {"low": 0.4, "high": 0.7},
+                        "SOURCE: 70% recycled content declared by one can maker in Europe for 2021 "
+                        "(Ardagh Metal Packaging 2022, ISO 14021 definition) is the upper bound; the PEF default "
+                        "for a beverage can body is 55% (Part C of Annex II, version 2.1, May 2020); "
+                        "the lower bound of 40% is my choice"),
         },
         "end_of_life": {
             "model": "split",
@@ -169,9 +171,9 @@ REFILLABLE = {
                      "from 0.4 on 13 Nov 2026 to include the 0.459 MJ measured in an Italian bottling plant "
                      "(Tua, Grosso and Rigamonti 2020)",
                      "Heat used to wash one {p} (MJ of natural gas)?"),
-    "wash_water_kg": ("uniform", {"low": 0.2, "high": 1.5},
-                      "ASSUMPTION: water for washing per container; 0.67 l measured in an Italian bottling "
-                      "plant (Tua, Grosso and Rigamonti 2020) lies inside this range",
+    "wash_water_kg": ("uniform", {"low": 0.25, "high": 1.0},
+                      "SOURCE: 0.67 l of water per bottle measured in an Italian bottling plant "
+                      "(Tua, Grosso and Rigamonti 2020); the bounds of 0.25 and 1.0 l are my choice",
                       "Water used to wash one {p} (litres)?"),
 }
 # Refillables travel back empty to the bottler: two legs per trip.
@@ -256,6 +258,33 @@ def split_by_factors(factors, root=None):
 # Circular Footprint Formula parameters (EU Product Environmental Footprint)
 # --------------------------------------------------------------------------
 
+# Recycling at end of life when the database has no recycling dataset for the material: its
+# impact as a share of the virgin material, asked like any other choice.
+CFF_RECYCLING_RATIO = (
+    "uniform", {"low": 0.2, "high": 0.5},
+    "ASSUMPTION: impact of recycling the used material as a share of the impact of the virgin material, "
+    "because the database has no recycling dataset for it; the same range as recycled PET",
+    "Impact of recycling used {label} relative to making virgin {label} (0 to 1)?")
+# Heat that the recovered steam replaces. PEF asks for the specific substituted source; without it,
+# heat from natural gas (ELCD itself credits a district heating mix).
+CFF_SUBSTITUTED_HEAT = "heat"          # key of UTILITIES
+
+
+def load_energy_recovery(root=None):
+    """{material: {"electricity_mj_per_kg", "steam_mj_per_kg", "source"}} from data/cff/energy_recovery.json:
+    what a waste-to-energy plant delivers per kg of the material burnt. Used only by the Circular
+    Footprint Formula, whose energy term credits the electricity and heat that this energy replaces.
+    A material without an entry gets no credit."""
+    import json
+    import os
+    root = root or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "cff")
+    path = os.path.join(root, "energy_recovery.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path) as fh:
+        return json.load(fh)["materials"]
+
+
 def load_cff(root=None):
     """CFF parameters per material from data/cff/<material>.json:
 
@@ -272,7 +301,7 @@ def load_cff(root=None):
     out = {}
     if os.path.isdir(root):
         for f in sorted(os.listdir(root)):
-            if f.endswith(".json"):
+            if f.endswith(".json") and f != "energy_recovery.json":
                 with open(os.path.join(root, f)) as fh:
                     p = json.load(fh)
                 missing = {"A", "Qsin_Qp", "Qsout_Qp", "source"} - set(p)

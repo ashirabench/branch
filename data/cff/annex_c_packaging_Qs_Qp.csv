@@ -1,0 +1,12 @@
+material,Qsin_Qp,Qsout_Qp,comment
+Glass,1,1,
+Steel,1,1,
+Aluminium,1,1,
+Other metals,1,1,
+Paper and cardboard,0.85,0.85,This value shall be used when the recycling process doesn't consider fibre losses
+Paper and cardboard,1,1,This value shall be used when the recycling process considers fibre losses
+PET - SSP recycling,1,1,
+PET mechanical recycling,0.9,0.9,the file writes these two with a decimal comma
+PP,0.9,0.9,
+HDPE,0.9,0.9,
+LDPE film,0.75,0.75,

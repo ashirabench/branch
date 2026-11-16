@@ -54,6 +54,30 @@ left join tbl_locations l on l.id=p.f_location left join tbl_process_docs d on d
 left join tbl_actors a on a.id=d.f_dataset_owner where p.process_type='LCI_RESULT'"""
 CATEGORY_SQL = """select c.id, m.name, c.name from tbl_impact_categories c
 join tbl_impact_methods m on c.f_impact_method=m.id"""
+# Electricity and steam that the average European waste-to-energy plant of ELCD delivers per data set
+# (the versions without energy credit, reference -1000 kg, list them as product outputs).
+ENERGY_SQL = """select p.ref_id, p.name, r.resulting_amount_value, f.name, e.resulting_amount_value, u.name, a.name
+from tbl_processes p join tbl_exchanges r on r.id=p.f_quantitative_reference
+join tbl_exchanges e on e.f_owner=p.id join tbl_flows f on f.id=e.f_flow join tbl_units u on u.id=e.f_unit
+left join tbl_process_docs d on d.id=p.f_process_doc left join tbl_actors a on a.id=d.f_dataset_owner
+where p.name like 'Waste incineration%' and e.is_input=0
+and f.name in ('electricity from waste incineration', 'process steam from waste incineration')"""
+# BRANCH material -> start of the name of the ELCD incineration data set. Aluminium and PLA have none.
+ENERGY_MATERIALS = {
+    "pet": "Waste incineration of plastics (PET, PMMA, PC)",
+    "hdpe": "Waste incineration of plastics (PE, PP, PS, PB)",
+    "ldpe": "Waste incineration of plastics (PE, PP, PS, PB)",
+    "pp": "Waste incineration of plastics (PE, PP, PS, PB)",
+    "ps": "Waste incineration of plastics (PE, PP, PS, PB)",
+    "eps": "Waste incineration of plastics (PE, PP, PS, PB)",
+    "pvc": "Waste incineration of plastics (rigid PVC)",
+    "liquid_packaging_board": "Waste incineration of paper fraction",
+    "corrugated_board": "Waste incineration of paper fraction",
+    "cartonboard": "Waste incineration of paper fraction",
+    "kraft_paper": "Waste incineration of paper fraction",
+    "glass": "Waste incineration of glass/inert material",
+    "steel": "Waste incineration of ferro metals",
+}
 CHECK_SQL = [   # each must return 0: nothing this script would silently get wrong
     "select count(*) from tbl_exchanges e join tbl_processes p on p.id=e.f_owner "
     "where p.process_type='LCI_RESULT' and e.resulting_amount_formula is not null",
@@ -95,7 +119,7 @@ def main():
             z.extractall(db)
         subprocess.run(["javac", "-d", tmp, os.path.join(HERE, "Query.java")], check=True)
         cp = os.pathsep.join([tmp, os.path.abspath(args.derby)])
-        cats, procs, *checks = run(db, cp, [CATEGORY_SQL, PROCESS_SQL] + CHECK_SQL)
+        cats, procs, energy_rows, *checks = run(db, cp, [CATEGORY_SQL, PROCESS_SQL, ENERGY_SQL] + CHECK_SQL)
         for sql, rows in zip(CHECK_SQL, checks):
             if rows[0][0] != "0":
                 sys.exit(f"check failed ({rows[0][0]} rows): {sql}")
@@ -135,6 +159,28 @@ def main():
         json.dump(data, fh, indent=1)
         fh.write("\n")
     print(f"wrote {len(factors)} factors from {len(procs)} aggregated processes to {args.out}")
+
+    plants = {}
+    for ref_id, name, ref_amount, flow, amount, unit, owner in energy_rows:
+        if unit != "MJ" or abs(float(ref_amount) + 1000.0) > 1e-6:
+            sys.exit(f"energy recovery: unexpected unit or reference in {name}: {unit}, {ref_amount}")
+        d = plants.setdefault(name, {"id": ref_id, "owner": owner})
+        d["electricity_mj_per_kg" if flow.startswith("electricity") else "steam_mj_per_kg"] = float(amount) / 1000.0
+    recovery = {}
+    for material, start in ENERGY_MATERIALS.items():
+        hit = [(n, d) for n, d in plants.items() if n.startswith(start)]
+        if len(hit) != 1 or len(hit[0][1]) != 4:
+            sys.exit(f"energy recovery of {material}: {len(hit)} data sets start with {start!r}")
+        recovery[material] = dict(hit[0][1], process=hit[0][0])
+    out2 = os.path.join(os.path.dirname(args.out), "elcd32_energy_recovery.json")
+    with open(out2, "w") as fh:
+        json.dump({"database": data["database"], "citation": data["citation"], "computed": data["computed"],
+                   "about": "MJ of electricity and of process steam delivered per kg of waste burnt in the average "
+                            "European waste-to-energy plant of ELCD 3.2 (product outputs of the incineration data "
+                            "sets without energy credit). Net of the plant's own use, as the data sets state them.",
+                   "materials": recovery, "no_data_set": ["aluminium", "pla"]}, fh, indent=1)
+        fh.write("\n")
+    print(f"wrote the energy recovered for {len(recovery)} materials to {out2}")
 
 
 if __name__ == "__main__":

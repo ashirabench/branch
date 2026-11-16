@@ -1,0 +1,70 @@
+{
+ "about": "Electricity and steam delivered per kg of material burnt, copied from data/second_database/elcd32_energy_recovery.json (written by experiments/second_database/read_elcd.py). Aluminium and PLA have no ELCD incineration data set and get no credit.",
+ "materials": {
+  "pet": {
+   "electricity_mj_per_kg": 3.115905,
+   "steam_mj_per_kg": 10.136227,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of plastics (PET, PMMA, PC)' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  },
+  "hdpe": {
+   "electricity_mj_per_kg": 5.27657,
+   "steam_mj_per_kg": 17.350802,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of plastics (PE, PP, PS, PB)' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  },
+  "ldpe": {
+   "electricity_mj_per_kg": 5.27657,
+   "steam_mj_per_kg": 17.350802,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of plastics (PE, PP, PS, PB)' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  },
+  "pp": {
+   "electricity_mj_per_kg": 5.27657,
+   "steam_mj_per_kg": 17.350802,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of plastics (PE, PP, PS, PB)' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  },
+  "ps": {
+   "electricity_mj_per_kg": 5.27657,
+   "steam_mj_per_kg": 17.350802,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of plastics (PE, PP, PS, PB)' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  },
+  "eps": {
+   "electricity_mj_per_kg": 5.27657,
+   "steam_mj_per_kg": 17.350802,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of plastics (PE, PP, PS, PB)' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  },
+  "pvc": {
+   "electricity_mj_per_kg": 2.095043,
+   "steam_mj_per_kg": 5.224974,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of plastics (rigid PVC)' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  },
+  "liquid_packaging_board": {
+   "electricity_mj_per_kg": 1.08811,
+   "steam_mj_per_kg": 3.352155,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of paper fraction in municipal solid waste (MSW)' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  },
+  "corrugated_board": {
+   "electricity_mj_per_kg": 1.08811,
+   "steam_mj_per_kg": 3.352155,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of paper fraction in municipal solid waste (MSW)' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  },
+  "cartonboard": {
+   "electricity_mj_per_kg": 1.08811,
+   "steam_mj_per_kg": 3.352155,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of paper fraction in municipal solid waste (MSW)' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  },
+  "kraft_paper": {
+   "electricity_mj_per_kg": 1.08811,
+   "steam_mj_per_kg": 3.352155,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of paper fraction in municipal solid waste (MSW)' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  },
+  "glass": {
+   "electricity_mj_per_kg": -0.145149,
+   "steam_mj_per_kg": -0.564417,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of glass/inert material' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  },
+  "steel": {
+   "electricity_mj_per_kg": -0.319622,
+   "steam_mj_per_kg": -1.18956,
+   "source": "SOURCE: product outputs of the ELCD 3.2 data set 'Waste incineration of ferro metals' (average European waste-to-energy plant, owner CEWEP - Confederation of European Waste-to-Energy Plants e.V.), per kg burnt"
+  }
+ }
+}

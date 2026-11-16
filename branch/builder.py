@@ -29,6 +29,7 @@ with the key "<product>.<component>.mass_g".
 Optional per material, written under "materials": {"pet": {...}}:
 "dataset" (option label), "recycled_content", "recycling_rate",
 "incineration_share", "end_of_life" (option label); each fixes that choice.
+With the Circular Footprint Formula also "recycling_ratio".
 
 Choice names: "<product>.<component>.mass_g" for masses,
 "<product>.<material>.<field>" for material choices (dataset,
@@ -208,6 +209,7 @@ class _Builder:
         self.system_model = system_model
         self.materials = cat.load_materials()
         self.cff = cat.load_cff() if system_model == "cff" else {}
+        self.energy = cat.load_energy_recovery() if system_model == "cff" else {}
         self.shared = shared or {}
         self.choices = {}
         self._legs, self._elec = {}, None
@@ -410,7 +412,11 @@ def _product_terms(b, spec, sign, n_units):
             elif ratio is not None:
                 erec_eol = ("ratio", ratio, None)
             else:
-                raise ValueError(f"data/cff/{mid}.json needs recycling_eol_key: {label} has no recycled dataset")
+                # no recycling dataset in the database: its impact as a share of the virgin material,
+                # an explicit choice that the agent can ask about
+                rr = cat.CFF_RECYCLING_RATIO
+                erec_eol = ("ratio", b.continuous(f"{pid}.{mid}.recycling_ratio", rr[:3], rr[3].format(label=label),
+                                                  known.get("recycling_ratio"), f"{mid}.recycling_ratio"), None)
 
             # recycled content: R1 (A Erec + (1-A) Ev Qsin/Qp) instead of R1 Erec
             if rec is not None:
@@ -497,6 +503,33 @@ def _product_terms(b, spec, sign, n_units):
             deps_cff = _deps(mass, ds, r2_param, trips, erec_eol[1] if erec_eol[0] == "ratio" else None)
             terms.append(Term(f"{pid}.{c['id']}.cff.end_of_life", deps_cff, cff_eol, sign, cff_eol_inv))
 
+            # energy recovery, with B = 0 (the PEF default): R3 x (E_ER - LHV X_elec E_SE,elec - LHV X_heat E_SE,heat).
+            # R3 x E_ER is already the incineration part of the end of life term above; what the
+            # formula adds is the credit for the electricity and the heat that the plant delivers.
+            rec_energy = b.energy.get(mid)
+            if rec_energy:
+                kwh, steam = float(rec_energy["electricity_mj_per_kg"]) / 3.6, float(rec_energy["steam_mj_per_kg"])
+                grid, elec, elec_keys = b.electricity()
+                heat_key = cat.UTILITIES[cat.CFF_SUBSTITUTED_HEAT]
+                heat_f = b.f(heat_key)
+                if eol["model"] == "split":
+                    r3, r3_params = (lambda v, rate=rate, share=share: (1 - rate(v)) * share(v)), (rate, share)
+                else:
+                    burnt = xp.asarray([1.0 if "incinerat" in lab else 0.0 for lab in eol["options"]], dtype=xp.float64)
+                    r3, r3_params = (lambda v, fate=fate, burnt=burnt: burnt[idx(fate, v)]), (fate,)
+
+                def cff_energy(xp_, v, mass=mass, r3=r3, trips=trips, grid=grid, elec=elec, kwh=kwh, steam=steam,
+                               heat_f=heat_f):
+                    return -n_units * mass(v) / 1000 * r3(v) * (kwh * elec[idx(grid, v)] + steam * heat_f) / trips(v)
+
+                def cff_energy_inv(v, mass=mass, r3=r3, trips=trips, grid=grid, elec_keys=elec_keys, kwh=kwh,
+                                   steam=steam, heat_key=heat_key):
+                    w = n_units * mass(v) / 1000 * float(r3(v)) / trips(v)
+                    return {elec_keys[_i(grid, v)]: -w * kwh, heat_key: -w * steam}
+
+                terms.append(Term(f"{pid}.{c['id']}.cff_energy.end_of_life", _deps(mass, trips, grid, *r3_params),
+                                  cff_energy, sign, cff_energy_inv))
+
     if not spec["components"]:       # nothing whose mass the legs of the region would carry
         return terms
 
@@ -570,7 +603,8 @@ def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=
     shared   values the user already knows for shared choices, e.g.
              {"distribution_km": 120} or {"electricity": "national grid (SIN)"}.
     system_model  "cut-off" (ISO default, ILCD Situation A) or "cff", the EU PEF
-             Circular Footprint Formula with Annex C parameters from data/cff/.
+             Circular Footprint Formula with the parameters of Part C of Annex II in data/cff/
+             and the credit for recovered energy (B = 0).
     """
     if system_model not in ("cut-off", "cff"):
         raise ValueError("system_model must be 'cut-off' or 'cff'")
@@ -588,7 +622,8 @@ def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=
     if system_model == "cff":
         missing = sorted({c["material"] for spec in (a, b_) for c in spec["components"]} - set(b.cff))
         if missing:
-            raise ValueError("The Circular Footprint Formula needs PEF Annex C parameters in data/cff/ for: "
+            raise ValueError("The Circular Footprint Formula needs the parameters of Part C of Annex II "
+                             "(former PEF Annex C) in data/cff/ for: "
                              + ", ".join(missing))
     if a["components"] or b_["components"]:
         b.legs("distribution")        # shared choices first, as in the hand written model

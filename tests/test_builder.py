@@ -1,6 +1,8 @@
 """The generic builder must reproduce the hand written PET vs glass model exactly,
 and build any pair of benchmark products. No openLCA needed: the unit impact
 factors are synthetic numbers with the same keys as a real extraction."""
+import os
+
 import numpy as np
 import pytest
 
@@ -159,8 +161,8 @@ def test_a_region_can_override_a_categorical_prior():
     m = build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, data)
     c = m.by_name["glass.glass.end_of_life"]
     assert c.labels == ["recycling (cut-off)", "landfill", "incineration"]
-    assert np.allclose(c.probs, [0.52, 0.35, 0.13])
-    assert "SIGRE" in c.source
+    assert np.allclose(c.probs, [0.56, 0.32, 0.12])
+    assert "Eurostat" in c.source
     plain = build_model("pet_bottle_1l", "glass_refillable_1l", PLAIN, CAT, fake_factors())
     assert np.allclose(plain.by_name["glass.glass.end_of_life"].probs, [0.6, 0.3, 0.1])
 
@@ -251,8 +253,10 @@ def _cff(monkeypatch, tmp_path, A):
     monkeypatch.setattr(catalogue, "load_cff", lambda r=None: real(root))
 
 
-def test_cff_with_A_equal_1_is_cut_off(monkeypatch, tmp_path):
+def test_cff_with_A_equal_1_and_no_energy_credit_is_cut_off(monkeypatch, tmp_path):
+    from branch import catalogue
     _cff(monkeypatch, tmp_path, 1.0)
+    monkeypatch.setattr(catalogue, "load_energy_recovery", lambda r=None: {})
     data = fake_factors()
     for a, b in [("pet_bottle_1l", "glass_refillable_1l"), ("aluminium_can_330ml", "beverage_carton_1l")]:
         cut = build_model(a, b, "PT", CAT, data)
@@ -283,9 +287,15 @@ def test_cff_matches_the_formula_by_hand(monkeypatch, tmp_path):
 
 
 def test_cff_inventory_matches_engine_and_needs_annex_c(monkeypatch, tmp_path):
+    from branch import catalogue
     from branch.builder import factor
-    with pytest.raises(ValueError, match="Annex C"):
-        build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, fake_factors(), system_model="cff")
+    empty = tmp_path / "none"
+    empty.mkdir()
+    real = catalogue.load_cff
+    with monkeypatch.context() as mp:                 # a folder without parameter files
+        mp.setattr(catalogue, "load_cff", lambda r=None: real(str(empty)))
+        with pytest.raises(ValueError, match="Annex C"):
+            build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, fake_factors(), system_model="cff")
     _cff(monkeypatch, tmp_path, 0.2)
     data = fake_factors()
     m = build_model("beverage_carton_1l", "glass_refillable_1l", "PT", CAT, data, system_model="cff")
@@ -310,3 +320,64 @@ def test_tail_experts_are_drawn_away_from_the_priors():
                 assert int(t[c.name]) != int(np.argmax(c.probs))
     r = run_agent(m, lambda n: t[n], n_samples=3000, truth=t)
     assert r["questions"] <= len(m.choices)
+
+
+def test_cff_energy_credit_matches_the_formula_by_hand(monkeypatch, tmp_path):
+    """Energy term with B = 0: R3 (E_ER - electricity delivered x E_SE,elec - steam delivered x E_SE,heat).
+    R3 x E_ER is the incineration part of the end of life; the credit is what the formula adds."""
+    from branch import catalogue
+    _cff(monkeypatch, tmp_path, 1.0)                  # A = 1: the material part of the formula is cut-off
+    data = fake_factors()
+    f = lambda k: data["factors"][k]["impacts"][CAT]  # noqa: E731
+    rec = {"pet": {"electricity_mj_per_kg": 3.6, "steam_mj_per_kg": 10.0, "source": "TEST ONLY"},
+           "glass": {"electricity_mj_per_kg": -0.36, "steam_mj_per_kg": -0.5, "source": "TEST ONLY"}}
+    monkeypatch.setattr(catalogue, "load_energy_recovery", lambda r=None: rec)
+    cff = build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, data, system_model="cff")
+    monkeypatch.setattr(catalogue, "load_energy_recovery", lambda r=None: {})
+    plain = build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, data, system_model="cff")
+    assert [t.name for t in cff.terms if "cff_energy" in t.name] == ["pet.bottle.cff_energy.end_of_life",
+                                                                     "glass.bottle.cff_energy.end_of_life"]
+    elec, heat = f("electricity_mv_PT"), f("heat_natural_gas_furnace")
+    S = cff.sample(40, seed=5)
+    for r in range(S.shape[0]):
+        w = {c.name: float(S[r, j]) for j, c in enumerate(cff.choices)}
+        r3_pet = (1 - w["pet.pet.recycling_rate"]) * w["pet.pet.incineration_share"]
+        burnt = cff.by_name["glass.glass.end_of_life"].labels[int(round(w["glass.glass.end_of_life"]))] == "incineration"
+        pet = -w["pet.bottle.mass_g"] / 1000 * r3_pet * (1.0 * elec + 10.0 * heat)
+        glass = -w["glass.bottle.mass_g"] / 1000 * (1.0 if burnt else 0.0) * (-0.1 * elec - 0.5 * heat) / w["glass.trips"]
+        assert np.isclose(cff.delta_at(w) - plain.delta_at(w), pet - glass, rtol=1e-9, atol=1e-15)
+        inv = cff.inventory(w)                        # the inventory carries the credit too
+        tot = {k: sum(x * f(key) for key, x in v.items()) for k, v in inv.items()}
+        assert np.isclose(tot[cff.label_a] - tot[cff.label_b], cff.delta_at(w), rtol=1e-9)
+
+
+def test_cff_runs_on_the_real_parameter_files_and_asks_about_missing_recycling_datasets():
+    """Part C of Annex II is in data/cff/; glass, HDPE, LDPE and the board have no recycling dataset,
+    so their recycling burden is an explicit ASSUMPTION choice instead of an error."""
+    from branch import catalogue
+    params = catalogue.load_cff()
+    assert params["pet"]["A"] == 0.5 and params["aluminium"]["A"] == 0.2 and params["ldpe"]["Qsout_Qp"] == 0.75
+    assert all(p["source"].startswith("SOURCE: ") and "Annex II" in p["source"] for p in params.values())
+    data = fake_factors()
+    for a, b in [("pet_bottle_1l", "glass_refillable_1l"), ("aluminium_can_330ml", "beverage_carton_1l")]:
+        m = build_model(a, b, "DE", CAT, data, system_model="cff")
+        asked = {c.name: c for c in m.choices if c.name.endswith(".recycling_ratio")}
+        assert all(c.source.startswith("ASSUMPTION") for c in asked.values())
+        if a == "pet_bottle_1l":
+            assert set(asked) == {"glass.glass.recycling_ratio"}
+        else:
+            assert set(asked) == {"carton.liquid_packaging_board.recycling_ratio", "carton.ldpe.recycling_ratio",
+                                  "carton.hdpe.recycling_ratio"}
+        w = {c.name: c.answers()[0][len(c.answers()[0]) // 2] for c in m.choices}
+        assert np.isfinite(m.delta_at(w))
+    with pytest.raises(ValueError, match="Annex II"):   # no parameters for PLA in the official file
+        build_model("data/examples/pla_cup_05l.json", "pet_bottle_1l", "PT", CAT, data, system_model="cff")
+
+
+def test_the_annex_tables_in_the_repository_are_the_ones_read_from_the_commission():
+    """Checksum of the packaging rows computed in the browser on the Commission's file on 16 November 2026."""
+    import hashlib
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "cff",
+                        "annex_c_packaging_A_R1_R2.csv")
+    with open(path, "rb") as fh:
+        assert hashlib.sha256(fh.read()).hexdigest() == "25a37bab86944f25ba2fd8560ec6402bb6b6abb08f30bad9e6aca57fd7643764"

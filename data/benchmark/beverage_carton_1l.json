@@ -10,24 +10,23 @@
       "mass_prior": [
         "triangular",
         {
-          "low": 18,
-          "mode": 21,
-          "high": 25
+          "low": 19,
+          "mode": 22.3,
+          "high": 25.5
         },
-        "ASSUMPTION: board layer of a 1 L aseptic carton; replace with a sourced mass"
+        "SOURCE: 22.3 g of liquid packaging board in a 1 L aseptic carton (Schlecht and Wellenreuther 2020, ifeu, tables 10 and 11, package TBA Edge LC 30); the bounds of 19 and 25.5 g are my choice"
       ]
     },
     {
       "id": "pe_layers",
       "material": "ldpe",
       "mass_prior": [
-        "triangular",
+        "uniform",
         {
-          "low": 4,
-          "mode": 5.5,
-          "high": 7
+          "low": 4.9,
+          "high": 5.8
         },
-        "ASSUMPTION: polyethylene layers; replace with a sourced mass"
+        "SOURCE: 4.9 g of polymer in the 1 L carton for milk and 5.8 g in the one for juice (Schlecht and Wellenreuther 2020, ifeu, tables 10 and 11, package TBA Edge LC 30); the report says polymer without naming it, polyethylene is my reading"
       ]
     },
     {
@@ -37,11 +36,11 @@
       "mass_prior": [
         "triangular",
         {
-          "low": 0.8,
-          "mode": 1.2,
-          "high": 1.6
+          "low": 1.0,
+          "mode": 1.4,
+          "high": 1.8
         },
-        "ASSUMPTION: aluminium foil layer; replace with a sourced mass"
+        "SOURCE: 1.4 g of aluminium foil in a 1 L aseptic carton (Schlecht and Wellenreuther 2020, ifeu, tables 10 and 11, package TBA Edge LC 30); the bounds of 1.0 and 1.8 g are my choice"
       ],
       "recycled_content_prior": [
         "uniform",
@@ -62,7 +61,7 @@
           "mode": 2.6,
           "high": 3.5
         },
-        "ASSUMPTION: screw cap; replace with a sourced mass"
+        "SOURCE: 2.6 g of closure in a 1 L aseptic carton (Schlecht and Wellenreuther 2020, ifeu, tables 10 and 11, package TBA Edge LC 30); the bounds of 2 and 3.5 g are my choice"
       ]
     }
   ]

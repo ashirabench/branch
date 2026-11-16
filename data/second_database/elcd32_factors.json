@@ -2,7 +2,7 @@
  "database": "ELCD 3.2 (openLCA Nexus file elcd_3_2_greendelta_v2_18_correction_20220908)",
  "method": "EF 3.0 Method (adapted); IPCC 2021 AR6 for the second reading of climate change",
  "citation": "European Commission, Joint Research Centre, European Reference Life Cycle Database (ELCD), version 3.2; each factor names the owner of its data set",
- "computed": "2026-11-15",
+ "computed": "2026-11-16",
  "computed_by": "experiments/second_database/read_elcd.py",
  "aggregated_processes_in_the_file": 483,
  "factors": {

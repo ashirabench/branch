@@ -11,10 +11,10 @@
         "triangular",
         {
           "low": 10,
-          "mode": 13,
-          "high": 16
+          "mode": 12.1,
+          "high": 14
         },
-        "ASSUMPTION: 330 ml can, body and lid; replace with a sourced mass"
+        "SOURCE: 12.1 g for a 330 ml aluminium beverage can with data of 2018 (Metal Packaging Europe 2022); the source does not say whether the lid is included; the bounds of 10 and 14 g are my choice"
       ]
     }
   ]

@@ -1,0 +1,103 @@
+{
+ "database": "ELCD 3.2 (openLCA Nexus file elcd_3_2_greendelta_v2_18_correction_20220908)",
+ "citation": "European Commission, Joint Research Centre, European Reference Life Cycle Database (ELCD), version 3.2; each factor names the owner of its data set",
+ "computed": "2026-11-16",
+ "about": "MJ of electricity and of process steam delivered per kg of waste burnt in the average European waste-to-energy plant of ELCD 3.2 (product outputs of the incineration data sets without energy credit). Net of the plant's own use, as the data sets state them.",
+ "materials": {
+  "pet": {
+   "id": "9c0cf135-02aa-46a1-ae22-dfa2683c9bd8",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "electricity_mj_per_kg": 3.1159054005656,
+   "steam_mj_per_kg": 10.1362269540525,
+   "process": "Waste incineration of plastics (PET, PMMA, PC), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  },
+  "hdpe": {
+   "id": "e01167ad-6cf8-47a7-8df9-e89bf35cb704",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "steam_mj_per_kg": 17.350801681896197,
+   "electricity_mj_per_kg": 5.276570226320191,
+   "process": "Waste incineration of plastics (PE, PP, PS, PB), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  },
+  "ldpe": {
+   "id": "e01167ad-6cf8-47a7-8df9-e89bf35cb704",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "steam_mj_per_kg": 17.350801681896197,
+   "electricity_mj_per_kg": 5.276570226320191,
+   "process": "Waste incineration of plastics (PE, PP, PS, PB), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  },
+  "pp": {
+   "id": "e01167ad-6cf8-47a7-8df9-e89bf35cb704",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "steam_mj_per_kg": 17.350801681896197,
+   "electricity_mj_per_kg": 5.276570226320191,
+   "process": "Waste incineration of plastics (PE, PP, PS, PB), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  },
+  "ps": {
+   "id": "e01167ad-6cf8-47a7-8df9-e89bf35cb704",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "steam_mj_per_kg": 17.350801681896197,
+   "electricity_mj_per_kg": 5.276570226320191,
+   "process": "Waste incineration of plastics (PE, PP, PS, PB), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  },
+  "eps": {
+   "id": "e01167ad-6cf8-47a7-8df9-e89bf35cb704",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "steam_mj_per_kg": 17.350801681896197,
+   "electricity_mj_per_kg": 5.276570226320191,
+   "process": "Waste incineration of plastics (PE, PP, PS, PB), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  },
+  "pvc": {
+   "id": "962fee73-e692-4ae2-812d-ffac7edce7ba",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "electricity_mj_per_kg": 2.09504291227741,
+   "steam_mj_per_kg": 5.224973834291069,
+   "process": "Waste incineration of plastics (rigid PVC), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  },
+  "liquid_packaging_board": {
+   "id": "77b31dcd-5acd-47bf-8b6e-d9eadfd8b136",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "steam_mj_per_kg": 3.35215507848822,
+   "electricity_mj_per_kg": 1.08811016237837,
+   "process": "Waste incineration of paper fraction in municipal solid waste (MSW), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  },
+  "corrugated_board": {
+   "id": "77b31dcd-5acd-47bf-8b6e-d9eadfd8b136",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "steam_mj_per_kg": 3.35215507848822,
+   "electricity_mj_per_kg": 1.08811016237837,
+   "process": "Waste incineration of paper fraction in municipal solid waste (MSW), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  },
+  "cartonboard": {
+   "id": "77b31dcd-5acd-47bf-8b6e-d9eadfd8b136",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "steam_mj_per_kg": 3.35215507848822,
+   "electricity_mj_per_kg": 1.08811016237837,
+   "process": "Waste incineration of paper fraction in municipal solid waste (MSW), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  },
+  "kraft_paper": {
+   "id": "77b31dcd-5acd-47bf-8b6e-d9eadfd8b136",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "steam_mj_per_kg": 3.35215507848822,
+   "electricity_mj_per_kg": 1.08811016237837,
+   "process": "Waste incineration of paper fraction in municipal solid waste (MSW), at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  },
+  "glass": {
+   "id": "60815257-bdaa-495a-a8da-163c5ed2439d",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "steam_mj_per_kg": -0.564417234077025,
+   "electricity_mj_per_kg": -0.145149176105078,
+   "process": "Waste incineration of glass/inert material, at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  },
+  "steel": {
+   "id": "870ed176-3e13-4baa-8488-bbc3c9579ec5",
+   "owner": "CEWEP - Confederation of European Waste-to-Energy Plants e.V.",
+   "steam_mj_per_kg": -1.18956015673098,
+   "electricity_mj_per_kg": -0.319622185371278,
+   "process": "Waste incineration of ferro metals, at plant, average European waste-to-energy plant, without collection, transport and pre-treatment"
+  }
+ },
+ "no_data_set": [
+  "aluminium",
+  "pla"
+ ]
+}

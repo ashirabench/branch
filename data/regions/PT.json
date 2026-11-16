@@ -6,111 +6,178 @@
   "priors": {
     "pet.recycling_rate": [
       "beta",
-      {"a": 5.4, "b": 6.6},
+      {
+        "a": 5.4,
+        "b": 6.6
+      },
       "SOURCE: plastic packaging recycled in Portugal: 39.5% in 2023 (Eurostat env_waspacr, counted at the input to recycling) and 51.5% in 2024 (APA, SIGRE management report 2024, counted at sorting); no separate PET bottle figure yet, the deposit system for single use bottles was licensed in 2024. Prior centred between the two figures"
     ],
     "hdpe.recycling_rate": [
       "beta",
-      {"a": 5.4, "b": 6.6},
+      {
+        "a": 5.4,
+        "b": 6.6
+      },
       "SOURCE: plastic packaging recycled in Portugal: 39.5% in 2023 (Eurostat env_waspacr) and 51.5% in 2024 (APA, SIGRE management report 2024); all plastics together, no figure by polymer"
     ],
     "ldpe.recycling_rate": [
       "beta",
-      {"a": 5.4, "b": 6.6},
+      {
+        "a": 5.4,
+        "b": 6.6
+      },
       "SOURCE: plastic packaging recycled in Portugal: 39.5% in 2023 (Eurostat env_waspacr) and 51.5% in 2024 (APA, SIGRE management report 2024); all plastics together, films are usually below the average"
     ],
     "aluminium.recycling_rate": [
       "beta",
-      {"a": 2, "b": 6},
+      {
+        "a": 2,
+        "b": 6
+      },
       "SOURCE: 19.2% of aluminium packaging recycled in Portugal in 2024, 18.5% in 2023 (APA, SIGRE management report 2024 and 2023); the figure covers all aluminium packaging and there is no deposit system yet, so the prior is wide"
     ],
     "pet.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled, 30% recycled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "hdpe.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "ldpe.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "aluminium.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "liquid_packaging_board.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "corrugated_board.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "pp.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "ps.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "eps.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "pvc.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "pla.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "steel.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "kraft_paper.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "cartonboard.incineration_share": [
       "beta",
-      {"a": 2.7, "b": 7.3},
+      {
+        "a": 2.7,
+        "b": 7.3
+      },
       "SOURCE: municipal waste in Portugal in 2022: 20% incinerated, 55% landfilled (EEA country profile 2025, Eurostat env_wasmun), so about 27% of what is not recycled is incinerated"
     ],
     "pp.recycling_rate": [
       "beta",
-      {"a": 5.4, "b": 6.6},
+      {
+        "a": 5.4,
+        "b": 6.6
+      },
       "SOURCE: plastic packaging recycled in Portugal: 39.5% in 2023 (Eurostat env_waspacr) and 51.5% in 2024 (APA, SIGRE management report 2024); all plastics together, no figure by polymer"
     ],
     "glass.end_of_life": {
-      "weights": {"recycling (cut-off)": 0.52, "landfill": 0.35, "incineration": 0.13},
-      "source": "SOURCE: 51.8% of glass packaging recycled in Portugal in 2024, 50.4% in 2023 (APA, SIGRE management report 2024 and 2023); the rest follows municipal waste, 55% landfilled and 20% incinerated in 2022 (EEA country profile 2025)"
+      "weights": {
+        "recycling (cut-off)": 0.56,
+        "landfill": 0.32,
+        "incineration": 0.12
+      },
+      "source": "SOURCE: 55.9% of glass packaging recycled in Portugal in 2023 (Eurostat env_waspacr, rates for the 2025 target, table updated 10 November 2026; the same figure as the APA state of the environment report; the 61.4% of 2024 is provisional with a break in the series); the rest follows municipal waste, 55% landfilled and 20% incinerated in 2022 (EEA country profile 2025). Until 15 November 2026 this prior used 51.8%, the figure of the SIGRE management system alone"
     },
     "liquid_packaging_board.recycling_rate": [
       "beta",
-      {"a": 5.7, "b": 9.3},
+      {
+        "a": 5.7,
+        "b": 9.3
+      },
       "SOURCE: 38% of beverage cartons recycled in Portugal in 2022, about 10 kt (Tetra Pak, under its voluntary agreement with Sociedade Ponto Verde); APA allocates cartons to paper, plastic and aluminium and publishes no separate rate, and Zero Waste Europe estimates carton rates below the industry figures, so the prior is wide"
     ],
     "pet.recycled_content": [
       "beta",
-      {"a": 3, "b": 8},
+      {
+        "a": 3,
+        "b": 8
+      },
       "SOURCE: 24% average recycled content in PET beverage bottles in the EU in 2022 (PET Market in Europe: State of Play, Plastics Recyclers Europe, UNESDA, NMWE, Petcore Europe and ICIS, 2024); Directive (EU) 2019/904 requires 25% from 2025 and 30% from 2030"
     ]
   },

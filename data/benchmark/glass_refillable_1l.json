@@ -10,11 +10,11 @@
       "mass_prior": [
         "triangular",
         {
-          "low": 400,
-          "mode": 550,
-          "high": 750
+          "low": 450,
+          "mode": 480,
+          "high": 625
         },
-        "ASSUMPTION: typical 1 L refillable glass bottle"
+        "SOURCE: 452 g for a 1 L refillable glass bottle in Italy (Tua, Grosso and Rigamonti 2020) and 480 g of glass plus 10 g of coating in Germany (Schonert et al. 2002); the upper bound of 625 g is my choice"
       ]
     }
   ]

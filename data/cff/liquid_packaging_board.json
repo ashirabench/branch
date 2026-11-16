@@ -1,0 +1,6 @@
+{
+ "A": 0.2,
+ "Qsin_Qp": 0.85,
+ "Qsout_Qp": 0.85,
+ "source": "SOURCE: A from the row 'Paper, packaging - liquid beverage carton' of the sheet A - R1 - R2, Qsin/Qp and Qsout/Qp from the row 'Paper and cardboard' of the sheet Qs-Qp; Part C of Annex II (former Annex C), version 2.1, May 2020, European Commission, file Part_C_Annex_II_V2.1_May2020.ods read on 16 November 2026; 0.85 is the value for a recycling process that does not consider fibre losses"
+}
