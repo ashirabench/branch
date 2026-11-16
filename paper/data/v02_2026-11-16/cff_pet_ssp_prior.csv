@@ -1,0 +1,5 @@
+strategy,batch_size,runs,cases,q_mean,q_median,certified_pct,wrong_when_certified_pct,wrong_ci95,wrong_ci95_pair,pairs,binom_ci95,cases_no_question,dq_vs_decision_flip,dq_ci95,dq_ci95_pair,p_pair,p_raw,p_vs_decision_flip
+decision_flip,3,540,18,2.772222222222222,1.5,100.0,0.0,0.0 to 0.7,0.0 to 0.7,6,0.0 to 0.7,9,,,,,,
+sobol,3,540,18,2.783333333333333,1.5,100.0,0.0,0.0 to 0.7,0.0 to 0.7,6,0.0 to 0.7,9,0.011111111111111072,-0.02 to 0.04,-0.02 to 0.05,1.0,0.75,0.75
+entropy,3,540,18,4.116666666666666,1.5,100.0,0.0,0.0 to 0.7,0.0 to 0.7,6,0.0 to 0.7,9,1.344444444444444,0.68 to 2.02,0.44 to 2.27,0.125,0.00390625,0.01171875
+random,3,540,18,5.311111111111111,1.5,100.0,0.0,0.0 to 0.7,0.0 to 0.7,6,0.0 to 0.7,9,2.538888888888889,1.31 to 3.80,0.92 to 4.20,0.125,0.00390625,0.01171875
