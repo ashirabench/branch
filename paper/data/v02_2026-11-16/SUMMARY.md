@@ -1,6 +1,6 @@
 # Experiments of version 0.2
 
-Chosen setting: tau 2.5%, three questions per round. Readings as fixed in experiments/PLAN_2026-11-15.md, section "Changes of 16 November 2026": intervals over pairs of products decide, intervals over cases are shown beside them.
+Chosen setting: tau 2.5%, three questions per round. Readings as fixed in experiments/record/PLAN_2026-11-15.md, section "Changes of 16 November 2026": intervals over pairs of products decide, intervals over cases are shown beside them.
 
 ## Primary reading
 
