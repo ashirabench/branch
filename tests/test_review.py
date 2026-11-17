@@ -232,6 +232,10 @@ def test_the_release_command_knows_the_same_places():
     for name in ("pyproject.toml", "branch/__init__.py", "CITATION.cff", "packaging/windows.iss", "packaging/branch.spec"):
         assert script.count(f'"{name}"') == 1, name
     assert "\r" not in script
+    # the command tests with the packages each run on GitHub installs; the lists must not drift apart
+    for workflow, extras in (("tests.yml", '".[dev,experiments]"'), ("installers.yml", '".[app,olca,report]"')):
+        assert extras in read(".github", "workflows", workflow), workflow
+        assert extras in script, extras
 
 
 # ---------------------------------------------------------------- nothing of the licensed database

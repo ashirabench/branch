@@ -15,8 +15,9 @@
 #   2. the two texts above name the version
 #   3. no inventory data is tracked by git (factors, results, database files)
 #   4. no commit since the last tag names another author, a co-author or an AI tool
-#   5. in a fresh copy of the repository, with Windows line endings and a new environment:
-#      the version is set in the five files that state it, and every test passes
+#   5. in a fresh copy of the repository, with Windows line endings and new environments:
+#      the version is set in the five files that state it, and every test passes, once with the
+#      packages GitHub's test run installs and once with the ones the installer build installs
 #   6. the paper builds and has at most 15 pages (skipped with a notice when LaTeX is not installed;
 #      SKIP_PAPER=1 skips it on purpose)
 # Then it sets the version here, commits, tags and pushes, and waits until GitHub has built the
@@ -131,6 +132,12 @@ python3 -m venv "$TMP/env"
   (cd "$TMP/copy" && "$TMP/env/bin/python" -m pip install --quiet -e ".[dev,experiments]"); } >"$TMP/install.log" 2>&1 \
   || { cat "$TMP/install.log"; stop "the installation fails in a new environment (the log is above)"; }
 (cd "$TMP/copy" && "$TMP/env/bin/python" -m pytest -q) || stop "tests fail in a fresh copy (they may pass here because of files that are not in git)"
+echo "the same tests with the packages of the installer build"
+python3 -m venv "$TMP/env2"
+{ "$TMP/env2/bin/python" -m pip install --quiet --upgrade pip &&
+  (cd "$TMP/copy" && "$TMP/env2/bin/python" -m pip install --quiet -e ".[app,olca,report]" pytest); } >"$TMP/install2.log" 2>&1 \
+  || { cat "$TMP/install2.log"; stop "the installation of the installer build fails (the log is above)"; }
+(cd "$TMP/copy" && "$TMP/env2/bin/python" -m pytest -q) || stop "tests fail with the packages of the installer build (.github/workflows/installers.yml)"
 
 say "6. the paper"
 if [[ "${SKIP_PAPER:-0}" == "1" ]]; then
