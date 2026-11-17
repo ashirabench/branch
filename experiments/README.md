@@ -22,6 +22,7 @@ To repeat everything, use [`reproduce.sh`](../reproduce.sh) at the top of the re
 | `run_more_seeds.sh` | The larger run of 5,400 sessions |
 | `run_v02_experiments.sh` | The experiments after the audit of 16 November 2026: other product families, equivalence with the Sobol index, a second wrong expert, a second database, the Circular Footprint Formula, sensitivity runs |
 | `v02_summary.py` | Applies to those runs the readings fixed in `record/PLAN_2026-11-15.md` |
+| `interaction_check.py` | First order and total index of the verdict for every open choice, to see what the score misses |
 | `prior_sources.py` | Counts how much of each prior a source supports |
 | `paper_assets.py`, `proposal_assets.py` | Figures, tables and numbers of the paper from the summaries |
 | `analyze.py`, `bench_latency.py`, `make_notebook.py` | Plots of one run, time to choose a question, the walkthrough notebook |
@@ -34,6 +35,7 @@ To repeat everything, use [`reproduce.sh`](../reproduce.sh) at the top of the re
 | `list_datasets.py`, `audit_factors.py` | Lists what the database offers; checks the reference unit of every factor |
 | `validate_openlca.py` | Sends every benchmark case to openLCA and compares its result with BRANCH's |
 | `validate_materials.py`, `check_any_product.py`, `check_app_with_openlca.py` | The same check for the added materials, for products described by processes, and through the web application |
+| `validate_probability.py` | Checks the probability, not only the central value: 200 random worlds calculated by openLCA, world by world |
 | `clean_branch_objects.py` | Lists, and with `--delete` removes, the product systems, processes and flows that BRANCH wrote into the open database |
 | `extract_uncertainty.py` | Monte Carlo runs of each dataset in openLCA (not used in the results; see the paper) |
 | `openlca_lognormal/` | A minimal check of how openLCA draws a lognormal value |

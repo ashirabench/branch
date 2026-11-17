@@ -952,6 +952,7 @@ score over the impact score, for choices that move the result without moving the
 synthetic models with one question per round. The comparisons were built by me, the entropy baseline
 gives every continuous choice the same score, and the two wrong experts are two kinds of error among many.
 I do not know in which direction the independence of the priors moves the probability of a wrong verdict.
+The score is a first order index, so it cannot see a choice that matters only together with another. At the prior, in the 27 cases where the agent asks, the first order indices of the verdict sum to 0.16--0.67, so a third or more of its variance is joint; ranking by the total index would still ask the same first question in 26 of them and the same three in 26 (\texttt{paper/data/interactions\_2026-11-17.csv}).
 The uncertainty that the database states for its datasets is not in the delivered model;
 Section~\ref{sec:robust} gives the reason and bounds its effect.
 

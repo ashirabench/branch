@@ -40,6 +40,8 @@ All `Repeat` commands run from the top of the repository and need the unit facto
 
 | 17 | The third ablation of the proposal. With the spread that the database states for its datasets in the model (the pedigree spreads), the agent certifies 8 of the 18 cases from the priors alone instead of 10 and asks 1.26 questions more (0.37 to 2.36) when the spread goes to the 19 datasets whose runs are consistent, and 3 cases and 4.59 questions more (1.88 to 7.59) when it goes to all 30. 10% and 29% of the sessions then end without a certificate. The effect on wrong certificates has no clear direction (4.7% and 0.5% against 3.1%) | `paper/data/v02_2026-11-16/uncertainty_consistent_*.csv`, `uncertainty_*.csv`, `cutoff_*.csv` | `V uncertainty` (needs the uncertainty in the factor file) |
 
+| 18 | The score of decision flip is a first order index and cannot see a choice that matters only together with another (a test builds such a case). In the 27 cases where the agent asks at the prior, the first order indices of the verdict sum to 0.16 to 0.67, and ranking by the total index gives the same first question in 26 and the same first three in 26. This is measured at the prior only, not after answers | `paper/data/interactions_2026-11-17.csv` | `python experiments/benchmark/interaction_check.py`; `pytest tests/test_probability_checks.py` |
+
 ## Correctness of the computation and of the data
 
 | # | Statement | Evidence | Repeat |
