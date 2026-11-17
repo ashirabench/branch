@@ -3,7 +3,7 @@
 Every file here adds a material to the catalogue without touching the code (`branch/catalogue.py` loads them). A file named after a built in material (`pet`, `hdpe`, `ldpe`, `glass`, `aluminium`, `liquid_packaging_board`) replaces it.
 
 1. Find the datasets in your database: `python experiments/openlca/list_datasets.py --grep "tinplate" --full`.
-2. Add their name patterns to `PROCESSES` in `branch/olca_extract.py` and extract: `python experiments/openlca/extract_factors.py --update --only tinplate`.
+2. Add their names to the map of the database, `data/databases/bafu2026.json` (key, names, unit), and extract: `python experiments/openlca/extract_factors.py --update --only tinplate`.
 3. Write `data/materials/<id>.json`:
 
 ```json

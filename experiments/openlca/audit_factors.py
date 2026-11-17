@@ -2,8 +2,9 @@
 
     python experiments/openlca/audit_factors.py
 
-BRANCH multiplies every factor by an amount in a fixed unit: kWh for electricity,
-t*km for transport, MJ for heat, items for a pallet and kg for everything else. A
+BRANCH multiplies every factor by an amount in a fixed unit, the one the map of the
+database states for it (data/databases/): kWh for electricity, t*km for transport, MJ
+for heat, items for a pallet and kg for everything else. A
 factor extracted per another unit (the MJ against kWh error found in the validation)
 is wrong by a constant, so this script checks the reference unit of every factor,
 flags empty or non positive climate results, and says which factors the openLCA
@@ -30,6 +31,15 @@ EXPECTED = [  # (key pattern, accepted unit names in openLCA)
 
 
 def expected_units(key):
+    """The unit the map of the database states for this key (data/databases/), with the other ways
+    openLCA writes it; for a key outside the map (the grid of a country), the unit of its kind."""
+    try:
+        from branch.olca_extract import DATABASE_MAP
+        stated = DATABASE_MAP["datasets"].get(key, {}).get("unit")
+    except ImportError:              # olca_schema is not installed: the kinds below still hold
+        stated = None
+    if stated:
+        return next((units for _, units in EXPECTED if stated in units), {stated})
     for pat, units in EXPECTED:
         if re.search(pat, key):
             return units

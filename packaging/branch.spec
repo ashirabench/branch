@@ -23,7 +23,7 @@ for pkg in ("gradio", "gradio_client", "safehttpx", "groovy", "olca_schema", "ol
     except Exception:
         pass
 datas += collect_data_files("reportlab")
-for sub in ("regions", "materials", "benchmark", "cff"):
+for sub in ("regions", "materials", "benchmark", "cff", "databases"):
     src = os.path.join(ROOT, "data", sub)
     if os.path.isdir(src):
         datas.append((src, os.path.join("data", sub)))

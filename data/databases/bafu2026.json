@@ -1,0 +1,408 @@
+{
+ "about": "The names under which BRANCH finds each dataset it needs in one database. One file per database; docs/BRING_YOUR_DATABASE.md says how to write one. The names are tried in order, without regard to capitals, and the first that matches exactly one process wins; when several processes share a name and differ by location, location_preference decides.",
+ "database": "bafu2026",
+ "citation": "Life Cycle Inventory database of the Swiss Federal Administration, BAFU:2026",
+ "location_preference": [
+  "RER",
+  "Europe",
+  "GLO",
+  "Global",
+  "UCTE",
+  "CH",
+  "Switzerland"
+ ],
+ "grid_name_pattern": "^Electricity, medium voltage, production ([A-Za-z-]+), at grid$",
+ "datasets": {
+  "pet_granulate_bottle_grade": {
+   "names": [
+    "Polyethylene terephthalate, granulate, bottle grade, at plant"
+   ],
+   "unit": "kg"
+  },
+  "pet_granulate_amorphous": {
+   "names": [
+    "Polyethylene terephthalate, granulate, amorphous, at plant"
+   ],
+   "unit": "kg"
+  },
+  "stretch_blow_moulding": {
+   "names": [
+    "Stretch blow moulding",
+    "blow moulding"
+   ],
+   "unit": "kg"
+  },
+  "glass_packaging_white": {
+   "names": [
+    "xx Packaging glass, white, at plant"
+   ],
+   "unit": "kg",
+   "note": "The name starts with xx: the database marks these datasets as obsolete. Three copies differ by location."
+  },
+  "glass_packaging_green": {
+   "names": [
+    "xx Packaging glass, green, at plant"
+   ],
+   "unit": "kg",
+   "note": "As glass_packaging_white."
+  },
+  "glass_packaging_brown": {
+   "names": [
+    "xx Packaging glass, brown, at plant"
+   ],
+   "unit": "kg",
+   "note": "As glass_packaging_white."
+  },
+  "electricity_mv_PT": {
+   "names": [
+    "Electricity, medium voltage, production PT, at grid"
+   ],
+   "unit": "kWh"
+  },
+  "electricity_mv_DE": {
+   "names": [
+    "Electricity, medium voltage, production DE, at grid"
+   ],
+   "unit": "kWh"
+  },
+  "electricity_mv_BR": {
+   "names": [
+    "Electricity, medium voltage, production BR, at grid"
+   ],
+   "unit": "kWh"
+  },
+  "lorry_16_32t": {
+   "names": [
+    "Transport, freight, lorry, 16t-32t gross weight, fleet average"
+   ],
+   "unit": "t*km"
+  },
+  "tap_water_RER": {
+   "names": [
+    "Tap water, unspecified natural origin RER, at user"
+   ],
+   "unit": "kg"
+  },
+  "heat_natural_gas_furnace": {
+   "names": [
+    "Heat, natural gas, at industrial furnace 1MW"
+   ],
+   "unit": "MJ"
+  },
+  "disposal_polyethylene_terephthalate_incineration": {
+   "names": [
+    "Disposal, polyethylene terephtalate, 0.2% water, to municipal incineration"
+   ],
+   "unit": "kg"
+  },
+  "disposal_polyethylene_incineration": {
+   "names": [
+    "Disposal, polyethylene, 0.4% water, to municipal incineration"
+   ],
+   "unit": "kg"
+  },
+  "disposal_polyethylene_landfill": {
+   "names": [
+    "Disposal, polyethylene, 0.4% water, to sanitary landfill"
+   ],
+   "unit": "kg"
+  },
+  "disposal_plastics_mixture_incineration": {
+   "names": [
+    "Disposal, plastics, mixture, 15.3% water, to municipal incineration"
+   ],
+   "unit": "kg",
+   "note": "Stand-in for the plastics that have no incineration dataset of their own."
+  },
+  "disposal_plastics_mixture_landfill": {
+   "names": [
+    "Disposal, plastics, mixture, 15.3% water, to sanitary landfill"
+   ],
+   "unit": "kg",
+   "note": "Stand-in for the landfill of PET (its own dataset is marked obsolete) and of the plastics with no landfill dataset."
+  },
+  "disposal_glass_incineration": {
+   "names": [
+    "Disposal, glass, 0% water, to municipal incineration"
+   ],
+   "unit": "kg"
+  },
+  "disposal_glass_landfill": {
+   "names": [
+    "Disposal, glass, 0% water, to inert material landfill",
+    "Disposal, glass, 0% water, to construction waste landfill"
+   ],
+   "unit": "kg"
+  },
+  "aluminium_primary": {
+   "names": [
+    "Aluminium, primary, at plant"
+   ],
+   "unit": "kg",
+   "note": "The primary metal on purpose: the production mix of wrought alloy already holds secondary aluminium, and using it beside a recycled content counts that metal twice."
+  },
+  "district_heat_ch_average": {
+   "names": [
+    "District heat, at consumer, swiss average, allocation exergy"
+   ],
+   "unit": "MJ",
+   "note": "Only for a sensitivity run of the energy credit of the Circular Footprint Formula."
+  },
+  "aluminium_secondary_old_scrap": {
+   "names": [
+    "Aluminium, secondary, from old scrap, at plant"
+   ],
+   "unit": "kg"
+  },
+  "liquid_packaging_board": {
+   "names": [
+    "Liquid packaging board, at plant"
+   ],
+   "unit": "kg"
+  },
+  "hdpe_granulate": {
+   "names": [
+    "Polyethylene, HDPE, granulate, at plant"
+   ],
+   "unit": "kg"
+  },
+  "ldpe_granulate": {
+   "names": [
+    "Polyethylene, LDPE, granulate, at plant"
+   ],
+   "unit": "kg"
+  },
+  "injection_moulding": {
+   "names": [
+    "Injection moulding"
+   ],
+   "unit": "kg"
+  },
+  "film_extrusion": {
+   "names": [
+    "Extrusion, plastic film"
+   ],
+   "unit": "kg"
+  },
+  "sheet_rolling_aluminium": {
+   "names": [
+    "Sheet rolling, aluminium"
+   ],
+   "unit": "kg"
+  },
+  "disposal_aluminium_incineration": {
+   "names": [
+    "Disposal, aluminium, 0% water, to municipal incineration"
+   ],
+   "unit": "kg"
+  },
+  "disposal_aluminium_landfill": {
+   "names": [
+    "Disposal, aluminium, 0% water, to sanitary landfill"
+   ],
+   "unit": "kg"
+  },
+  "disposal_board_incineration": {
+   "names": [
+    "Disposal, packaging cardboard, 19.6% water, to municipal incineration"
+   ],
+   "unit": "kg"
+  },
+  "disposal_board_landfill": {
+   "names": [
+    "Disposal, packaging cardboard, 19.6% water, to sanitary landfill"
+   ],
+   "unit": "kg"
+  },
+  "transport_barge": {
+   "names": [
+    "Transport, barge"
+   ],
+   "unit": "t*km",
+   "note": "The factor must be per tonne kilometre."
+  },
+  "transport_freight_rail": {
+   "names": [
+    "Transport, freight, rail"
+   ],
+   "unit": "t*km",
+   "note": "The factor must be per tonne kilometre."
+  },
+  "electricity_oil_power_plant": {
+   "names": [
+    "Electricity, oil, at power plant"
+   ],
+   "unit": "kWh",
+   "note": "The database has no Brazilian oil fired plant: the European one is a stand-in."
+  },
+  "corrugated_board_box": {
+   "names": [
+    "Packaging, corrugated board, mixed fibre, single wall, at plant"
+   ],
+   "unit": "kg",
+   "note": "Several locations: the European one is preferred."
+  },
+  "packaging_film_ldpe": {
+   "names": [
+    "Packaging film, LDPE, at plant"
+   ],
+   "unit": "kg"
+  },
+  "eur_pallet": {
+   "names": [
+    "EUR-flat pallet"
+   ],
+   "unit": "Item(s)"
+  },
+  "pp_granulate": {
+   "names": [
+    "Polypropylene, granulate, at plant"
+   ],
+   "unit": "kg"
+  },
+  "ps_gpps": {
+   "names": [
+    "Polystyrene, general purpose, GPPS, at plant"
+   ],
+   "unit": "kg"
+  },
+  "ps_hips": {
+   "names": [
+    "Polystyrene, high impact, HIPS, at plant"
+   ],
+   "unit": "kg"
+  },
+  "eps_expandable": {
+   "names": [
+    "Polystyrene, expandable, at plant"
+   ],
+   "unit": "kg"
+  },
+  "pvc_regional_storage": {
+   "names": [
+    "Polyvinylchloride, at regional storage"
+   ],
+   "unit": "kg"
+  },
+  "pla_granulate": {
+   "names": [
+    "Polylactide, granulate, at plant"
+   ],
+   "unit": "kg"
+  },
+  "thermoforming": {
+   "names": [
+    "Thermoforming, with calendering"
+   ],
+   "unit": "kg"
+  },
+  "steel_unalloyed": {
+   "names": [
+    "Steel, converter, unalloyed, at plant"
+   ],
+   "unit": "kg"
+  },
+  "sheet_rolling_steel": {
+   "names": [
+    "Sheet rolling, steel"
+   ],
+   "unit": "kg"
+  },
+  "kraft_paper_unbleached": {
+   "names": [
+    "Kraft paper, unbleached, at plant"
+   ],
+   "unit": "kg"
+  },
+  "kraft_paper_bleached": {
+   "names": [
+    "Kraft paper, bleached, at plant"
+   ],
+   "unit": "kg"
+  },
+  "folding_boxboard": {
+   "names": [
+    "Folding boxboard, FBB, at plant"
+   ],
+   "unit": "kg"
+  },
+  "solid_bleached_board": {
+   "names": [
+    "Solid bleached board, SBB, at plant"
+   ],
+   "unit": "kg"
+  },
+  "solid_unbleached_board": {
+   "names": [
+    "Solid unbleached board, SUB, at plant"
+   ],
+   "unit": "kg"
+  },
+  "whitelined_chipboard": {
+   "names": [
+    "Whitelined chipboard, WLC, at plant"
+   ],
+   "unit": "kg"
+  },
+  "disposal_pp_incineration": {
+   "names": [
+    "Disposal, polypropylene, 15.9% water, to municipal incineration"
+   ],
+   "unit": "kg"
+  },
+  "disposal_ps_incineration": {
+   "names": [
+    "Disposal, polystyrene, 0.2% water, to municipal incineration"
+   ],
+   "unit": "kg"
+  },
+  "disposal_expanded_polystyrene_incineration": {
+   "names": [
+    "Disposal, expanded polystyrene, 5% water, to municipal incineration"
+   ],
+   "unit": "kg"
+  },
+  "disposal_ps_landfill": {
+   "names": [
+    "Disposal, polystyrene, 0.2% water, to sanitary landfill"
+   ],
+   "unit": "kg"
+  },
+  "disposal_pvc_incineration": {
+   "names": [
+    "Disposal, polyvinylchloride, 0.2% water, to municipal incineration"
+   ],
+   "unit": "kg"
+  },
+  "disposal_pvc_landfill": {
+   "names": [
+    "Disposal, polyvinylchloride, 0.2% water, to sanitary landfill"
+   ],
+   "unit": "kg"
+  },
+  "disposal_tin_sheet_incineration": {
+   "names": [
+    "Disposal, tin sheet, 0% water, to municipal incineration"
+   ],
+   "unit": "kg"
+  },
+  "disposal_tin_sheet_landfill": {
+   "names": [
+    "Disposal, tin sheet, 0% water, to sanitary landfill"
+   ],
+   "unit": "kg"
+  },
+  "disposal_packaging_paper_incineration": {
+   "names": [
+    "Disposal, packaging paper, 13.7% water, to municipal incineration"
+   ],
+   "unit": "kg"
+  },
+  "disposal_paper_landfill": {
+   "names": [
+    "Disposal, paper, 11.2% water, to sanitary landfill"
+   ],
+   "unit": "kg"
+  }
+ }
+}

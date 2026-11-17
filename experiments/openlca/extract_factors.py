@@ -30,6 +30,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 import olca_ipc as ipc  # noqa: E402
 import olca_schema as o  # noqa: E402
 
+from branch import olca_extract as extract_module  # noqa: E402
 from branch.olca_extract import (LOCATION_PREFERENCE, PROCESSES, all_processes, citation_for,  # noqa: E402,F401
                                  find_method, loc, match, norm, resolve, unit_impacts)
 
@@ -40,7 +41,9 @@ def main():
     ap.add_argument("--methods", action="store_true", help="list LCIA methods and exit")
     ap.add_argument("--find", help="list processes whose name contains this text and exit")
     ap.add_argument("--method", default="EF 3.1")
-    ap.add_argument("--database", default="bafu2026")
+    ap.add_argument("--map", default=None,
+                    help="map of another database: a name in data/databases/ or a file (docs/BRING_YOUR_DATABASE.md)")
+    ap.add_argument("--database", default=None, help="name written in the factor file (default: the one of the map)")
     ap.add_argument("--only", nargs="*", help="extract only these keys")
     ap.add_argument("--specs", nargs="+",
                     help="extract only the keys these products need (benchmark names or JSON files)")
@@ -52,6 +55,9 @@ def main():
     ap.add_argument("--update", action="store_true",
                     help="keep factors already in the output file and add the new ones")
     args = ap.parse_args()
+    if args.map:
+        extract_module.use_database_map(args.map)
+    args.database = args.database or extract_module.DATABASE_MAP["database"]
 
     client = ipc.Client(args.port)
     if args.methods:
@@ -80,9 +86,8 @@ def main():
         elif not (args.only or args.specs):
             chosen = [k for k in old.get("factors", {}) if k.startswith("proc:")]
     if args.all_grids:
-        pat = re.compile(r"^Electricity, medium voltage, production ([A-Za-z-]+), at grid$")
         for d in descs:
-            mm = pat.match((d.name or "").strip())
+            mm = extract_module.GRID_PATTERN.match((d.name or "").strip())
             if mm:
                 PROCESSES.setdefault(f"electricity_mv_{mm.group(1)}", [d.name])
         print(f"{sum(k.startswith('electricity_mv_') for k in PROCESSES)} national grids found")
@@ -91,7 +96,7 @@ def main():
         needed = required_factor_keys(args.specs, args.region)
         unknown = [k for k in needed if k not in PROCESSES and not k.startswith("proc:")]
         if unknown:
-            raise SystemExit(f"Add name patterns to PROCESSES for: {unknown}")
+            raise SystemExit(f"The map of the database (data/databases/) has no names for: {unknown}")
         keys = [k for k in needed if k not in out["factors"]]
     else:
         keys = args.only or [k for k in PROCESSES if k not in out["factors"]] + chosen
@@ -99,7 +104,7 @@ def main():
         ref, hits = resolve(descs, key, PROCESSES)
         if ref is None:
             out["unresolved"][key] = [h.name for h in hits[:15]]
-            print(f"  ?  {key}: {len(hits)} candidates, choose one and edit PROCESSES")
+            print(f"  ?  {key}: {len(hits)} candidates, choose one and write its exact name in the map of the database")
             for h in hits[:15]:
                 print(f"       - {h.name}   [{loc(h)}]")
             continue

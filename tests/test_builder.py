@@ -105,9 +105,8 @@ def test_every_catalogue_prior_is_tagged():
 
 
 def test_required_keys_are_all_known_to_the_extractor():
-    import re
-    src = open("branch/olca_extract.py").read()
-    known = set(re.findall(r'^\s+"([a-z0-9_A-Z]+)":\s*\[', src, re.M))
+    import json
+    known = set(json.load(open("data/databases/bafu2026.json", encoding="utf-8"))["datasets"])
     for country in ("PT", "DE", "BR"):
         missing = set(required_factor_keys(BENCH, country)) - known
         assert not missing, missing
@@ -183,8 +182,8 @@ def test_an_override_with_an_unknown_option_is_refused(tmp_path, monkeypatch):
 def test_every_region_needs_only_known_factor_keys():
     import re
     from branch.regions import list_regions
-    src = open("branch/olca_extract.py").read()
-    known = set(re.findall(r'^\s+"([a-z0-9_A-Z]+)":\s*\[', src, re.M))
+    import json
+    known = set(json.load(open("data/databases/bafu2026.json", encoding="utf-8"))["datasets"])
     for code in list_regions():
         if code == "GLO":
             continue

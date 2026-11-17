@@ -98,7 +98,7 @@ Simulated experts, comparisons that I built on real inventory data (BAFU:2026 wi
 | Folder | What is in it |
 |---|---|
 | [`branch/`](branch/) | The agent: beliefs, Monte Carlo, question strategies, the BDI loop, the builder of models, the reports, the openLCA connector, the web application |
-| [`data/`](data/) | Product files, materials, regions and their sources. Inventory factors are never committed |
+| [`data/`](data/) | Product files, materials, regions and their sources, and the map that says which dataset of the database stands for what ([using another database](docs/BRING_YOUR_DATABASE.md)). Inventory factors are never committed |
 | [`experiments/`](experiments/) | The experiments of the paper, the checks against openLCA, the scripts that build data files, and the plans written before each run ([guide](experiments/README.md)) |
 | [`examples/`](examples/) | A terminal demonstration |
 | [`tests/`](tests/) | The tests, run on every push. [`test_review.py`](tests/test_review.py) repeats the review of the repository: numbers written by hand against the data, every link, one version, nothing of the licensed database |

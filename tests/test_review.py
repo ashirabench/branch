@@ -189,8 +189,8 @@ def test_every_file_named_as_evidence_exists():
 def test_every_script_named_in_the_documents_exists():
     for doc in documents():
         for name in re.findall(r"((?:experiments|branch|tests|examples|packaging|docs|data|paper)/[\w./\-]+\.(?:py|sh|md|json|csv|tex))", read(doc)):
-            if "<" in name or "*" in name or name.startswith("data/factors"):
-                continue
+            if "<" in name or "*" in name or name.startswith("data/factors") or "mydb" in name:
+                continue                      # patterns, local files, and the example name of the database guide
             assert os.path.exists(os.path.join(ROOT, name)), f"{doc} names {name}, which does not exist"
 
 

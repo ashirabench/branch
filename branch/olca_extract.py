@@ -14,91 +14,56 @@ import time
 
 import olca_schema as o
 
-# key -> list of name patterns tried in order (case insensitive substring).
-# First unique match wins. When several datasets share the same name and
-# differ only by location, LOCATION_PREFERENCE decides (see match()).
-LOCATION_PREFERENCE = ["RER", "Europe", "GLO", "Global", "UCTE", "CH", "Switzerland"]
-PROCESSES = {
-    "pet_granulate_bottle_grade": ["Polyethylene terephthalate, granulate, bottle grade, at plant"],
-    "pet_granulate_amorphous": ["Polyethylene terephthalate, granulate, amorphous, at plant"],
-    "stretch_blow_moulding": ["Stretch blow moulding", "blow moulding"],
-    # The BAFU names of these start with "xx"; three copies differ by location.
-    "glass_packaging_white": ["xx Packaging glass, white, at plant"],
-    "glass_packaging_green": ["xx Packaging glass, green, at plant"],
-    "glass_packaging_brown": ["xx Packaging glass, brown, at plant"],
-    "electricity_mv_PT": ["Electricity, medium voltage, production PT, at grid"],
-    "electricity_mv_DE": ["Electricity, medium voltage, production DE, at grid"],
-    "electricity_mv_BR": ["Electricity, medium voltage, production BR, at grid"],
-    "lorry_16_32t": ["Transport, freight, lorry, 16t-32t gross weight, fleet average"],
-    "tap_water_RER": ["Tap water, unspecified natural origin RER, at user"],
-    "heat_natural_gas_furnace": ["Heat, natural gas, at industrial furnace 1MW"],
-    # Disposal of plastics: the dataset of the polymer where BAFU:2026 has a current one
-    # (list of 14 November 2026: PET incineration, polyethylene incineration and landfill).
-    # The PET landfill dataset of the database is marked obsolete ("xx"), so the landfill
-    # of PET uses the plastics mixture, a PROXY; so do the materials with no dataset at all.
-    "disposal_polyethylene_terephthalate_incineration": [
-        "Disposal, polyethylene terephtalate, 0.2% water, to municipal incineration"],
-    "disposal_polyethylene_incineration": ["Disposal, polyethylene, 0.4% water, to municipal incineration"],
-    "disposal_polyethylene_landfill": ["Disposal, polyethylene, 0.4% water, to sanitary landfill"],
-    "disposal_plastics_mixture_incineration": ["Disposal, plastics, mixture, 15.3% water, to municipal incineration"],
-    "disposal_plastics_mixture_landfill": ["Disposal, plastics, mixture, 15.3% water, to sanitary landfill"],
-    "disposal_glass_incineration": ["Disposal, glass, 0% water, to municipal incineration"],
-    "disposal_glass_landfill": ["Disposal, glass, 0% water, to inert material landfill",
-                                "Disposal, glass, 0% water, to construction waste landfill"],
-    # Primary metal: the production mix of wrought alloy already holds 46% of secondary aluminium.
-    "aluminium_primary": ["Aluminium, primary, at plant"],
-    # Only for a sensitivity run of the energy credit of the Circular Footprint Formula.
-    "district_heat_ch_average": ["District heat, at consumer, swiss average, allocation exergy"],
-    "aluminium_secondary_old_scrap": ["Aluminium, secondary, from old scrap, at plant"],
-    "liquid_packaging_board": ["Liquid packaging board, at plant"],
-    # Added for the generic builder (catalogue.py). UNVERIFIED names: check with
-    # --find and edit the pattern if a key ends up in "unresolved".
-    "hdpe_granulate": ["Polyethylene, HDPE, granulate, at plant"],
-    "ldpe_granulate": ["Polyethylene, LDPE, granulate, at plant"],
-    "injection_moulding": ["Injection moulding"],
-    "film_extrusion": ["Extrusion, plastic film"],
-    "sheet_rolling_aluminium": ["Sheet rolling, aluminium"],
-    "disposal_aluminium_incineration": ["Disposal, aluminium, 0% water, to municipal incineration"],
-    "disposal_aluminium_landfill": ["Disposal, aluminium, 0% water, to sanitary landfill"],
-    "disposal_board_incineration": ["Disposal, packaging cardboard, 19.6% water, to municipal incineration"],
-    "disposal_board_landfill": ["Disposal, packaging cardboard, 19.6% water, to sanitary landfill"],
-    # Regions (data/regions/). UNVERIFIED names. Factors must be per kWh and per t*km.
-    "transport_barge": ["Transport, barge"],
-    "transport_freight_rail": ["Transport, freight, rail"],
-    # BAFU:2026 has no Brazilian oil fired plant: UCTE (European average) is a PROXY.
-    "electricity_oil_power_plant": ["Electricity, oil, at power plant"],
-    # Secondary packaging (names checked in lists exported from the database, kept out of git). RER is preferred over CH.
-    "corrugated_board_box": ["Packaging, corrugated board, mixed fibre, single wall, at plant"],
-    "packaging_film_ldpe": ["Packaging film, LDPE, at plant"],
-    "eur_pallet": ["EUR-flat pallet"],
-    # More packaging materials (data/materials/). Names read in the BAFU-2026 v1.1 database files.
-    "pp_granulate": ["Polypropylene, granulate, at plant"],
-    "ps_gpps": ["Polystyrene, general purpose, GPPS, at plant"],
-    "ps_hips": ["Polystyrene, high impact, HIPS, at plant"],
-    "eps_expandable": ["Polystyrene, expandable, at plant"],
-    "pvc_regional_storage": ["Polyvinylchloride, at regional storage"],
-    "pla_granulate": ["Polylactide, granulate, at plant"],
-    "thermoforming": ["Thermoforming, with calendering"],
-    "steel_unalloyed": ["Steel, converter, unalloyed, at plant"],
-    "sheet_rolling_steel": ["Sheet rolling, steel"],
-    "kraft_paper_unbleached": ["Kraft paper, unbleached, at plant"],
-    "kraft_paper_bleached": ["Kraft paper, bleached, at plant"],
-    "folding_boxboard": ["Folding boxboard, FBB, at plant"],
-    "solid_bleached_board": ["Solid bleached board, SBB, at plant"],
-    "solid_unbleached_board": ["Solid unbleached board, SUB, at plant"],
-    "whitelined_chipboard": ["Whitelined chipboard, WLC, at plant"],
-    "disposal_pp_incineration": ["Disposal, polypropylene, 15.9% water, to municipal incineration"],
-    "disposal_ps_incineration": ["Disposal, polystyrene, 0.2% water, to municipal incineration"],
-    "disposal_expanded_polystyrene_incineration": [
-        "Disposal, expanded polystyrene, 5% water, to municipal incineration"],
-    "disposal_ps_landfill": ["Disposal, polystyrene, 0.2% water, to sanitary landfill"],
-    "disposal_pvc_incineration": ["Disposal, polyvinylchloride, 0.2% water, to municipal incineration"],
-    "disposal_pvc_landfill": ["Disposal, polyvinylchloride, 0.2% water, to sanitary landfill"],
-    "disposal_tin_sheet_incineration": ["Disposal, tin sheet, 0% water, to municipal incineration"],
-    "disposal_tin_sheet_landfill": ["Disposal, tin sheet, 0% water, to sanitary landfill"],
-    "disposal_packaging_paper_incineration": ["Disposal, packaging paper, 13.7% water, to municipal incineration"],
-    "disposal_paper_landfill": ["Disposal, paper, 11.2% water, to sanitary landfill"],
-}
+# Which process of the database stands for each thing BRANCH needs is not code: it is a file,
+# data/databases/<database>.json, one per database (docs/BRING_YOUR_DATABASE.md). This module reads
+# it into the names below, which the rest of the code uses.
+#   PROCESSES            key -> names tried in order (case insensitive). The first that matches
+#                        exactly one process wins.
+#   LOCATION_PREFERENCE  when several processes share the name and differ by location (see match()).
+#   GRID_PATTERN         how the database names the electricity of a country; group 1 is the code.
+MAP_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "databases")
+DEFAULT_MAP = "bafu2026"
+REQUIRED = ("database", "citation", "location_preference", "grid_name_pattern", "datasets")
+
+
+def load_database_map(name=None):
+    """The map of one database: a name in data/databases/ (without .json) or the path of a file."""
+    name = name or os.environ.get("BRANCH_DATABASE_MAP") or DEFAULT_MAP
+    path = name if os.path.isfile(name) else os.path.join(MAP_DIR, name + ".json")
+    if not os.path.isfile(path):
+        raise FileNotFoundError(f"No map of the database at {path}. docs/BRING_YOUR_DATABASE.md says how to write one.")
+    with open(path, encoding="utf-8") as fh:
+        m = json.load(fh)
+    missing = [k for k in REQUIRED if k not in m]
+    if missing:
+        raise ValueError(f"{path} lacks {missing}")
+    re.compile(m["grid_name_pattern"])
+    for key, entry in m["datasets"].items():
+        if not entry.get("names") or not all(isinstance(n, str) and n.strip() for n in entry["names"]):
+            raise ValueError(f"{path}: {key} needs a list of names")
+        if not entry.get("unit"):
+            raise ValueError(f"{path}: {key} needs the unit of its factor")
+    return m
+
+
+DATABASE_MAP = load_database_map()
+PROCESSES = {k: list(v["names"]) for k, v in DATABASE_MAP["datasets"].items()}
+LOCATION_PREFERENCE = list(DATABASE_MAP["location_preference"])
+GRID_PATTERN = re.compile(DATABASE_MAP["grid_name_pattern"])
+
+
+def use_database_map(name):
+    """Switch to the map of another database. The names above change in place, so every module that
+    imported them sees the new ones."""
+    global GRID_PATTERN
+    m = load_database_map(name)
+    DATABASE_MAP.clear()
+    DATABASE_MAP.update(m)
+    PROCESSES.clear()
+    PROCESSES.update({k: list(v["names"]) for k, v in m["datasets"].items()})
+    LOCATION_PREFERENCE[:] = m["location_preference"]
+    GRID_PATTERN = re.compile(m["grid_name_pattern"])
+    return m
 
 
 def norm(s):
@@ -265,6 +230,9 @@ def spread(values, central):
 
 
 def citation_for(database):
+    """How every report credits the database: the text of its map, when the map is of this database."""
+    if database == DATABASE_MAP["database"]:
+        return DATABASE_MAP["citation"]
     year = re.search(r"20\d\d", database or "")
     return ("Life Cycle Inventory database of the Swiss Federal Administration, BAFU:"
             + (year.group(0) if year else "20XY"))
@@ -296,9 +264,8 @@ def extract(client, path, method="EF 3.1", database="bafu2026", all_grids=True, 
             chosen = [k for k in old if k.startswith("proc:")]
     procs = dict(PROCESSES)
     if all_grids:
-        pat = re.compile(r"^Electricity, medium voltage, production ([A-Za-z-]+), at grid$")
         for d in descs:
-            mm = pat.match((d.name or "").strip())
+            mm = GRID_PATTERN.match((d.name or "").strip())
             if mm:
                 procs.setdefault(f"electricity_mv_{mm.group(1)}", [d.name])
     todo = [k for k in list(keys or procs) + chosen if k not in out["factors"]]

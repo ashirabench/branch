@@ -6,7 +6,7 @@ For someone who has read the [paper](../paper/main.pdf) and wants to find, chang
 
 ```
 two product files + region            data/benchmark/*.json, data/examples/, data/regions/*.json
-unit impact factors (read once)       data/factors/*.json, never committed
+unit impact factors (read once)       data/factors/*.json, never committed; found by the map data/databases/*.json
         |
         v
 builder.py      completes what the files leave out, from the rules of catalogue.py and regions.py
@@ -67,7 +67,7 @@ The proof of the identity is in [`lemma.md`](lemma.md) and its numerical check i
 | The uncertainty that the database states for its datasets (the third ablation) | `branch/builder.py` | `inventory_uncertainty`, `consistent_uncertainty` |
 | The 16 impact categories of EF 3.1 | `branch/indicators.py` | `EF31` |
 | Reading the unit factors from the open database, once | `branch/olca_extract.py` | `extract`, `unit_impacts` |
-| The names of the datasets BRANCH looks for in the database | `branch/olca_extract.py` | `PROCESSES` |
+| The names of the datasets BRANCH looks for in the database: a file per database, [`data/databases/`](../data/databases/) | `branch/olca_extract.py` | `load_database_map`, `PROCESSES` |
 | Loading the factor file; the list of assumptions of a model | `branch/real_cases.py` | `load_factors`, `assumptions` |
 
 ## What the person receives (paper, Sections "Outputs and safeguards" and "Validation of the product")
@@ -120,5 +120,5 @@ Which file of results supports which sentence is in [`CLAIMS.md`](CLAIMS.md); th
 | Add a region | A file in `data/regions/`, with a source for every number | `pytest tests/test_eu_regions.py tests/test_prior_checks.py` |
 | Change a prior | The region file, or the rule in `branch/catalogue.py`; state the source | Every experiment that used the prior is out of date: write the plan first, then run it again |
 | Add a way to choose questions | A function in `branch/query.py` and its name in `STRATEGIES` | `pytest tests/test_engine.py`; compare it in `experiments/benchmark/run_grid.py` |
-| Use another database | The names in `PROCESSES` of `branch/olca_extract.py` | [`RUNBOOK.md`](RUNBOOK.md), section 4 |
+| Use another database | A map of that database in `data/databases/`; no code | [`BRING_YOUR_DATABASE.md`](BRING_YOUR_DATABASE.md) |
 | Publish | Nothing here | [`RUNBOOK.md`](RUNBOOK.md), section 10 |

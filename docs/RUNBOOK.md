@@ -73,9 +73,10 @@ python experiments/openlca/extract_factors.py --method "EF 3.1"
 
 | What you see | Cause | Fix |
 |---|---|---|
-| `NOT READ: <key>: no process of the database has this exact name` | The database names that dataset differently (another version, another database) | `python experiments/openlca/extract_factors.py --find "<part of the name>"` lists candidates. The names BRANCH looks for are in `branch/olca_extract.py` |
-| `? <key>: N candidates` | Several processes match | Choose one and write its exact name in `branch/olca_extract.py` |
+| `NOT READ: <key>: no process of the database has this exact name` | The database names that dataset differently (another version, another database) | `python experiments/openlca/extract_factors.py --find "<part of the name>"` lists candidates. The names BRANCH looks for are in the map of the database, `data/databases/bafu2026.json` |
+| `? <key>: N candidates` | Several processes match | Choose one and write its exact name in the map of the database |
 | A new product or region needs factors the file lacks | The file was extracted before | Add `--update`: it reads only what is missing |
+| You want another database | Its datasets have other names | Write its map: [`BRING_YOUR_DATABASE.md`](BRING_YOUR_DATABASE.md) |
 
 ## 5. Use the application with real factors
 
