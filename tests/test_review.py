@@ -212,6 +212,24 @@ def test_the_paper_points_only_to_what_exists():
         assert glob.glob(os.path.join(ROOT, name.replace("\\_", "_"))), f"the paper names {name}"
 
 
+def test_the_architecture_page_names_only_what_the_code_has():
+    """docs/ARCHITECTURE.md says where each idea of the paper lives. Every file of its tables exists and
+    defines every name written beside it, so the page cannot fall behind the code without notice."""
+    rows = 0
+    for line in read("docs", "ARCHITECTURE.md").split("\n"):
+        cells = [c.strip() for c in line.split("|")]
+        if len(cells) < 5 or not re.fullmatch(r"`[\w/]+\.py`", cells[2]):
+            continue
+        path = cells[2].strip("`")
+        assert os.path.exists(os.path.join(ROOT, path)), f"{path} does not exist"
+        source = read(path)
+        for name in re.findall(r"`([^`]+)`", cells[3]):
+            n = re.escape(name)
+            assert re.search(rf"(def|class) {n}\b|^\s*{n}\b\s*[:=]|\b{n}=", source, re.M), f"{path} does not define {name}"
+        rows += 1
+    assert rows > 40
+
+
 # ---------------------------------------------------------------- one version
 
 def test_one_version_in_every_place_that_states_it():

@@ -103,7 +103,7 @@ Simulated experts, comparisons that I built on real inventory data (BAFU:2026 wi
 | [`examples/`](examples/) | A terminal demonstration |
 | [`tests/`](tests/) | The tests, run on every push. [`test_review.py`](tests/test_review.py) repeats the review of the repository: numbers written by hand against the data, every link, one version, nothing of the licensed database |
 | [`paper/`](paper/) | The paper and the summaries its numbers come from |
-| [`docs/`](docs/) | The claims and their evidence, the example, the usage guide, the [operating guide](docs/RUNBOOK.md) (every task, the result to expect, the known failures), the proof of the identity behind the score, the deployment guide |
+| [`docs/`](docs/) | [Where each idea of the paper lives in the code](docs/ARCHITECTURE.md), the claims and their evidence, the example, the usage guide, the [operating guide](docs/RUNBOOK.md) (every task, the result to expect, the known failures), the proof of the identity behind the score, the deployment guide |
 | [`packaging/`](packaging/) | The desktop connector for macOS and Windows |
 
 ## Reproducing the paper
