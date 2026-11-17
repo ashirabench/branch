@@ -1,3 +1,5 @@
 # Data files keep their exact bytes on every system: two tests compare their checksums with the sources
 *.csv -text
 *.json -text
+# shell scripts keep Unix line endings on every system, or bash refuses them
+*.sh text eol=lf
