@@ -36,7 +36,7 @@ To repeat everything, use [`reproduce.sh`](../reproduce.sh) at the top of the re
 | `validate_openlca.py` | Sends every benchmark case to openLCA and compares its result with BRANCH's |
 | `validate_materials.py`, `check_any_product.py`, `check_app_with_openlca.py` | The same check for the added materials, for products described by processes, and through the web application |
 | `validate_probability.py` | Checks the probability, not only the central value: 200 random worlds calculated by openLCA, world by world |
-| `read_database.py` | Reads a copy of the database file with SQL, without openLCA open: the counts the paper states (processes, exchanges, pedigree entries, lognormal exchanges, lognormal exchanges with the wrong sign) and the exchanges of every dataset BRANCH uses. Needs `pip install JPype1 jdk4py` |
+| `read_database.py` | Reads a copy of the database file with SQL, without openLCA open: the counts the paper states (processes, exchanges, pedigree entries, lognormal exchanges, lognormal exchanges with the wrong sign) and the exchanges of every dataset BRANCH uses. Needs `pip install -e ".[database]"` |
 | `clean_branch_objects.py` | Lists, and with `--delete` removes, the product systems, processes and flows that BRANCH wrote into the open database |
 | `extract_uncertainty.py` | Monte Carlo runs of each dataset in openLCA (not used in the results; see the paper) |
 | `openlca_lognormal/` | A minimal check of how openLCA draws a lognormal value |

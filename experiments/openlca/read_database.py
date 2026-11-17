@@ -19,7 +19,7 @@ Reports
     sql       any query; one line of output per row, tab separated
 
 What it needs
-    Two packages.       pip install JPype1 jdk4py
+    Two packages.       pip install -e ".[database]"   (JPype1 and jdk4py)
                         jdk4py brings a Java runtime, so nothing else has to be installed. To use
                         another Java (21 or newer), set JAVA_HOME.
     The Derby jars.     They ship inside openLCA. On a Mac the script finds them in
@@ -111,7 +111,7 @@ class Database:
         try:
             import jpype
         except ImportError:
-            sys.exit("This script needs two packages: pip install JPype1 jdk4py")
+            sys.exit('This script needs two packages: pip install -e ".[database]"')
         self.tmp = tempfile.mkdtemp(prefix="branch_db_")
         jars = find_jars(libs)
         self.conn = None

@@ -101,9 +101,9 @@ Simulated experts, comparisons that I built on real inventory data (BAFU:2026 wi
 | [`data/`](data/) | Product files, materials, regions and their sources. Inventory factors are never committed |
 | [`experiments/`](experiments/) | The experiments of the paper, the checks against openLCA, the scripts that build data files, and the plans written before each run ([guide](experiments/README.md)) |
 | [`examples/`](examples/) | A terminal demonstration |
-| [`tests/`](tests/) | 230 tests, run on every push |
+| [`tests/`](tests/) | The tests, run on every push |
 | [`paper/`](paper/) | The paper and the summaries its numbers come from |
-| [`docs/`](docs/) | The claims and their evidence, the example, the usage guide, the proof of the identity behind the score, the deployment guide |
+| [`docs/`](docs/) | The claims and their evidence, the example, the usage guide, the [operating guide](docs/RUNBOOK.md) (every task, the result to expect, the known failures), the proof of the identity behind the score, the deployment guide |
 | [`packaging/`](packaging/) | The desktop connector for macOS and Windows |
 
 ## Reproducing the paper
