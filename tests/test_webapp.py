@@ -3,7 +3,7 @@ import os
 
 import pytest
 
-from branch import webapp
+from branch import interview, webapp
 
 
 @pytest.fixture(autouse=True)
@@ -16,7 +16,7 @@ def test_no_factors_no_start(monkeypatch):
 
     def no_file(*args, **kwargs):          # as on a computer with no file in data/factors/
         raise FileNotFoundError("no factor file")
-    monkeypatch.setattr(webapp, "load_factors", no_file)
+    monkeypatch.setattr(interview, "load_factors", no_file)
     monkeypatch.delenv("BRANCH_DEMO")
     with pytest.raises(RuntimeError, match="No impact factors"):
         webapp.load_server_factors()

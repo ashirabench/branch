@@ -38,7 +38,7 @@ def fake_factors(seed=0):
             + required_factor_keys(BENCH, PLAIN))
     rng = np.random.default_rng(seed)
     return {"method": "synthetic", "path": "synthetic.json", "citation": "synthetic",
-            "factors": {k: {"impacts": {CAT: float(rng.uniform(0.01, 5))}} for k in set(keys)}}
+            "factors": {k: {"impacts": {CAT: float(rng.uniform(0.01, 5))}} for k in sorted(set(keys))}}
 
 
 def test_builder_reproduces_hand_written_pet_vs_glass():

@@ -26,8 +26,11 @@ make a backup first (in openLCA: right click the database, Backup database).
 Requires openLCA 2.x with the IPC server running (Tools > Developer tools >
 IPC Server, port 8080) and the database the factors were extracted from.
 """
+import logging
 import re
 import uuid
+from dataclasses import dataclass
+from typing import Any
 
 import olca_schema as o
 
@@ -40,6 +43,7 @@ CATEGORY = "BRANCH"
 NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "https://github.com/ashirabench/branch")
 ITEMS_PROPERTY, ITEMS_UNIT = "Number of items", "Item(s)"
 MAX_FORMULA = 900     # characters; the longest formula of the catalogue has 457
+log = logging.getLogger(__name__)
 
 
 def client(port: int = 8080):
@@ -58,11 +62,8 @@ def _uid(*parts):
     return str(uuid.uuid5(NAMESPACE, "|".join(str(p) for p in parts)))
 
 
-_CREATED = []      # unit group and flow property BRANCH had to add (also written to the JSON-LD zip)
-
-
 def _items_property(c):
-    """A 'number of items' flow property and its reference unit.
+    """A 'number of items' flow property, its reference unit, and what had to be added for it.
 
     The property is looked up by its name, because its identifier differs between databases; it is
     accepted only if the reference unit of its unit group is 'Item(s)'. Databases imported without the
@@ -79,8 +80,7 @@ def _items_property(c):
         fp_ref = next((d for d in c.get_descriptors(o.FlowProperty) if "item" in (d.name or "").lower()), None)
     unit = unit_of(fp_ref) if fp_ref is not None else None
     if unit is not None and (unit.name or "").lower().startswith("item"):
-        _CREATED[:] = []
-        return fp_ref, o.Ref(ref_type=o.RefType.Unit, id=unit.id, name=unit.name)
+        return fp_ref, o.Ref(ref_type=o.RefType.Unit, id=unit.id, name=unit.name), []
     unit = o.Unit(id=_uid("unit", ITEMS_UNIT), name=ITEMS_UNIT, conversion_factor=1.0, is_ref_unit=True)
     group = o.UnitGroup(id=_uid("unit group", "Units of items"), name="Units of items", category=CATEGORY, units=[unit])
     prop = o.FlowProperty(id=_uid("flow property", ITEMS_PROPERTY), name=ITEMS_PROPERTY, category=CATEGORY,
@@ -88,8 +88,7 @@ def _items_property(c):
                           unit_group=o.Ref(ref_type=o.RefType.UnitGroup, id=group.id, name=group.name))
     c.put(group)
     fp_ref = c.put(prop) or o.Ref(ref_type=o.RefType.FlowProperty, id=prop.id, name=prop.name)
-    _CREATED[:] = [group, prop]
-    return fp_ref, o.Ref(ref_type=o.RefType.Unit, id=unit.id, name=unit.name)
+    return fp_ref, o.Ref(ref_type=o.RefType.Unit, id=unit.id, name=unit.name), [group, prop]
 
 
 def _provider_exchange(c, factors, key):
@@ -129,8 +128,33 @@ def uncertainty_of(choice):
                   "keeps this parameter at its value")
 
 
+@dataclass
+class Built:
+    """What one comparison becomes in openLCA."""
+    objects: list          # [(flow, process)], one pair per alternative
+    linking: Any           # how openLCA must link them to the processes of the database
+    created: list          # unit group and flow property BRANCH had to add, [] when the database had them
+
+
+@dataclass
+class _Sending:
+    """What every object of one comparison shares while it is being built."""
+    c: Any
+    model: Any
+    result: dict
+    world: dict            # the value of every choice in the world that is sent
+    names: dict            # choice name -> parameter name in openLCA
+    untraced: Any          # choices whose formula could not be written
+    items_fp: Any
+    items_unit: Any
+    fu: str
+    base: tuple            # what the identifiers are derived from
+    side_of: dict          # choice name -> the alternatives whose terms use it
+    provider_types: list
+
+
 def build_objects(c, model, result):
-    """olca-schema objects for both alternatives: [(flow, process), ...].
+    """olca-schema objects for both alternatives (Built).
 
     Every continuous choice a person can answer is an input parameter of the process, the amounts of
     the exchanges are formulas of those parameters, and a choice that is still open carries its prior
@@ -138,73 +162,100 @@ def build_objects(c, model, result):
     Carlo simulation on the product system, therefore moves the model. Categorical choices pick a
     dataset or a route and are not numbers: they stay at the option of this world and are listed in
     the description of the process."""
-    factors = model.factor_data
     world = point_world(model, result)
     names = {ch.name: _param_name(ch.name) for ch in model.choices if ch.kind == "continuous" and ch.askable}
     if len(set(names.values())) != len(names):
         raise ValueError("two choices would get the same parameter name in openLCA")
     inventory, untraced = trace(model, world, names)
-    items_fp, items_unit = _items_property(c)
+    items_fp, items_unit, created = _items_property(c)
     fu = model.meta.get("functional_unit", "functional unit")
-    base = (model.label_a, model.label_b, fu, model.meta.get("country"))
+    s = _Sending(c, model, result, world, names, untraced, items_fp, items_unit, fu,
+                 (model.label_a, model.label_b, fu, model.meta.get("country")), _sides(model), [])
+    objects = [_alternative(s, label, exchanges) for label, exchanges in inventory.items()]
+    return Built(objects, linking_for(s.provider_types), created)
+
+
+def _sides(model):
+    """Which alternative each choice belongs to: a parameter goes into the process that uses it."""
     side_of = {}
     for t in model.terms:
         for d in t.deps:
             side_of.setdefault(d, set()).add(model.label_a if t.sign > 0 else model.label_b)
+    return side_of
 
-    out, provider_types = [], []
-    for label, exchanges in inventory.items():
-        flow = o.Flow(id=_uid(*base, "flow", label), name=f"BRANCH | {label} | {fu}", category=CATEGORY,
-                      flow_type=o.FlowType.PRODUCT_FLOW,
-                      flow_properties=[o.FlowPropertyFactor(flow_property=items_fp, conversion_factor=1.0,
-                                                            is_ref_flow_property=True)])
-        ex = [o.Exchange(internal_id=1, flow=o.Ref(ref_type=o.RefType.Flow, id=flow.id, name=flow.name),
-                         flow_property=items_fp, unit=items_unit, amount=1.0, is_input=False,
-                         is_quantitative_reference=True)]
-        for key, (amount, formula) in sorted(exchanges.items()):
-            if amount == 0:
-                continue
-            proc, ref = _provider_exchange(c, factors, key)
-            provider_types.append(getattr(proc, "process_type", None))
-            if formula is not None and len(formula) > MAX_FORMULA:
-                formula = None            # too long for the field of the database: the amount stays a number
-            waste = getattr(ref.flow, "flow_type", None) == o.FlowType.WASTE_FLOW
-            ex.append(o.Exchange(internal_id=len(ex) + 1, flow=ref.flow, flow_property=ref.flow_property,
-                                 unit=ref.unit, amount=float(amount), amount_formula=formula, is_input=not waste,
-                                 default_provider=o.Ref(ref_type=o.RefType.Process, id=proc.id, name=proc.name),
-                                 description=f"BRANCH factor key: {key}"))
-        params, fixed_options = [], []
-        for ch in model.choices:
-            if not ch.askable or label not in side_of.get(ch.name, ()):
-                continue
-            value = world[ch.name]
-            who = result["decided_by"][ch.name]
-            if ch.kind != "continuous":
-                fixed_options.append(f"{ch.question} {ch.decode(value)} (decided by: {who})")
-                continue
-            unc, why = (uncertainty_of(ch) if ch.is_open() else (None, None))
-            note = "" if ch.name not in untraced else " The amounts do not follow this parameter: its formula could not be written."
-            params.append(o.Parameter(
-                id=_uid(*base, "parameter", label, ch.name), name=names[ch.name], value=float(value),
-                is_input_parameter=True, parameter_scope=o.ParameterScope.PROCESS_SCOPE, uncertainty=unc,
-                description=(f"{ch.question} Value: {ch.decode(value)}. Decided by: {who}. "
-                             f"Source of the default: {ch.source}"
-                             + (f" No uncertainty in openLCA: {why}." if why else "") + note)))
-        desc = (f"Built by BRANCH. Comparison: {model.label_a} vs {model.label_b}, {fu}, "
-                f"{model.meta.get('country')}. Verdict: {result['verdict']} "
-                f"(probability wrong {result['p_flip']:.1%}, "
-                f"{'certified' if result['certified'] else 'not certified'}). "
-                f"The amounts are formulas of the input parameters of this process; a parameter that a person "
-                f"answered has no uncertainty, and an open one carries the prior BRANCH used. "
-                + ("Options fixed in this model, which are not numbers and cannot be parameters: "
-                   + "; ".join(fixed_options) + ". " if fixed_options else "")
-                + f"Data: {model.meta.get('citation')}.")
-        process = o.Process(id=_uid(*base, "process", label), name=f"BRANCH | {label}", category=CATEGORY,
-                            process_type=o.ProcessType.UNIT_PROCESS, description=desc,
-                            exchanges=ex, parameters=params, last_internal_id=len(ex))
-        out.append((flow, process))
-    build_objects.linking = linking_for(provider_types)
-    return out
+
+def _alternative(s, label, exchanges):
+    """(flow, process) of one alternative."""
+    flow = o.Flow(id=_uid(*s.base, "flow", label), name=f"BRANCH | {label} | {s.fu}", category=CATEGORY,
+                  flow_type=o.FlowType.PRODUCT_FLOW,
+                  flow_properties=[o.FlowPropertyFactor(flow_property=s.items_fp, conversion_factor=1.0,
+                                                        is_ref_flow_property=True)])
+    ex = _exchanges(s, flow, exchanges)
+    params, fixed_options = _parameters(s, label)
+    process = o.Process(id=_uid(*s.base, "process", label), name=f"BRANCH | {label}", category=CATEGORY,
+                        process_type=o.ProcessType.UNIT_PROCESS, description=_description(s, fixed_options),
+                        exchanges=ex, parameters=params, last_internal_id=len(ex))
+    return flow, process
+
+
+def _exchanges(s, flow, exchanges):
+    """The reference output, then one input per factor key, linked to the process of the database."""
+    ex = [o.Exchange(internal_id=1, flow=o.Ref(ref_type=o.RefType.Flow, id=flow.id, name=flow.name),
+                     flow_property=s.items_fp, unit=s.items_unit, amount=1.0, is_input=False,
+                     is_quantitative_reference=True)]
+    for key, (amount, formula) in sorted(exchanges.items()):
+        if amount == 0:
+            continue
+        proc, ref = _provider_exchange(s.c, s.model.factor_data, key)
+        s.provider_types.append(getattr(proc, "process_type", None))
+        if formula is not None and len(formula) > MAX_FORMULA:
+            formula = None            # too long for the field of the database: the amount stays a number
+        waste = getattr(ref.flow, "flow_type", None) == o.FlowType.WASTE_FLOW
+        ex.append(o.Exchange(internal_id=len(ex) + 1, flow=ref.flow, flow_property=ref.flow_property,
+                             unit=ref.unit, amount=float(amount), amount_formula=formula, is_input=not waste,
+                             default_provider=o.Ref(ref_type=o.RefType.Process, id=proc.id, name=proc.name),
+                             description=f"BRANCH factor key: {key}"))
+    return ex
+
+
+def _parameters(s, label):
+    """(input parameters of the continuous choices of this alternative, the options that were fixed)."""
+    params, fixed_options = [], []
+    for ch in s.model.choices:
+        if not ch.askable or label not in s.side_of.get(ch.name, ()):
+            continue
+        value = s.world[ch.name]
+        who = s.result["decided_by"][ch.name]
+        if ch.kind != "continuous":
+            fixed_options.append(f"{ch.question} {ch.decode(value)} (decided by: {who})")
+            continue
+        params.append(_parameter(s, label, ch, value, who))
+    return params, fixed_options
+
+
+def _parameter(s, label, ch, value, who):
+    unc, why = (uncertainty_of(ch) if ch.is_open() else (None, None))
+    note = ("" if ch.name not in s.untraced else
+            " The amounts do not follow this parameter: its formula could not be written.")
+    return o.Parameter(
+        id=_uid(*s.base, "parameter", label, ch.name), name=s.names[ch.name], value=float(value),
+        is_input_parameter=True, parameter_scope=o.ParameterScope.PROCESS_SCOPE, uncertainty=unc,
+        description=(f"{ch.question} Value: {ch.decode(value)}. Decided by: {who}. "
+                     f"Source of the default: {ch.source}"
+                     + (f" No uncertainty in openLCA: {why}." if why else "") + note))
+
+
+def _description(s, fixed_options):
+    model, result = s.model, s.result
+    return (f"Built by BRANCH. Comparison: {model.label_a} vs {model.label_b}, {s.fu}, "
+            f"{model.meta.get('country')}. Verdict: {result['verdict']} "
+            f"(probability wrong {result['p_flip']:.1%}, "
+            f"{'certified' if result['certified'] else 'not certified'}). "
+            f"The amounts are formulas of the input parameters of this process; a parameter that a person "
+            f"answered has no uncertainty, and an open one carries the prior BRANCH used. "
+            + ("Options fixed in this model, which are not numbers and cannot be parameters: "
+               + "; ".join(fixed_options) + ". " if fixed_options else "")
+            + f"Data: {model.meta.get('citation')}.")
 
 
 def _drop_old_systems(c, process):
@@ -232,20 +283,20 @@ def push_comparison(c, model, result, verify=True, jsonld_path=None):
     copies. Returns {"processes": [Ref], "systems": [Ref], "flows": [Ref], "check": {...} or None,
     "created": [names of the unit group and flow property BRANCH had to add], "replaced": int}.
     """
-    objs = build_objects(c, model, result)
-    linking = build_objects.linking
+    built = build_objects(c, model, result)
+    linking = built.linking
     procs, systems, flows, replaced = [], [], [], 0
-    for flow, process in objs:
+    for flow, process in built.objects:
         replaced += _drop_old_systems(c, process)
         c.put(flow)
         flows.append(o.Ref(ref_type=o.RefType.Flow, id=flow.id, name=flow.name))
         procs.append(c.put(process))
         systems.append(c.create_product_system(procs[-1], linking))
     if jsonld_path:
-        write_jsonld(jsonld_path, objs)
+        write_jsonld(jsonld_path, built.objects, built.created)
     check = verify_in_openlca(c, model, result, systems) if verify else None
     return {"processes": procs, "systems": systems, "flows": flows, "check": check,
-            "created": [x.name for x in _CREATED], "replaced": replaced}
+            "created": [x.name for x in built.created], "replaced": replaced}
 
 
 def _method(c, model):
@@ -263,6 +314,20 @@ def _method(c, model):
     return method, name
 
 
+def _impact(c, system, method, category):
+    """What openLCA calculates for one product system and one impact category."""
+    res = c.calculate(o.CalculationSetup(target=system, impact_method=method, amount=1.0))
+    res.wait_until_ready()
+    try:
+        return next(float(i.amount) for i in res.get_total_impacts() if i.impact_category.name == category)
+    finally:
+        res.dispose()
+
+
+def _relative(olca, branch):
+    return abs(olca - branch) / abs(branch) if branch else None
+
+
 def verify_in_openlca(c, model, result, systems):
     """Calculate the pushed systems in openLCA and compare with BRANCH."""
     category = model.meta.get("category")
@@ -272,26 +337,19 @@ def verify_in_openlca(c, model, result, systems):
     inv = model.inventory(point_world(model, result))
     out = {}
     for (label, exchanges), system in zip(inv.items(), systems):
-        res = c.calculate(o.CalculationSetup(target=system, impact_method=method, amount=1.0))
-        res.wait_until_ready()
-        try:
-            olca = next(float(i.amount) for i in res.get_total_impacts()
-                        if i.impact_category.name == category)
-        finally:
-            res.dispose()
+        olca = _impact(c, system, method, category)
         branch = sum(a * factor(model.factor_data, k, category) for k, a in exchanges.items())
-        out[label] = {"openLCA": olca, "BRANCH": branch,
-                      "relative_difference": abs(olca - branch) / abs(branch) if branch else None}
+        out[label] = {"openLCA": olca, "BRANCH": branch, "relative_difference": _relative(olca, branch)}
     return out
 
 
-def write_jsonld(path, objs):
+def write_jsonld(path, objs, created=()):
     """openLCA JSON-LD zip of the new flows and processes. Import it into the
     database that holds the BAFU processes so the providers resolve."""
     from olca_schema.zipio import ZipWriter
     w = ZipWriter(path)
     try:
-        for extra in _CREATED:
+        for extra in created:
             w.write(extra)
         for flow, process in objs:
             w.write(flow)
@@ -332,46 +390,47 @@ def diagnose_in_openlca(c, model, result, labels=None):
     Returns {label: [(factor key, openLCA, BRANCH, relative difference), ...]}."""
     method, _ = _method(c, model)
     category = model.meta.get("category")
+    built = build_objects(c, model, result)
     out = {}
-    objs = build_objects(c, model, result)
-    LINKING = build_objects.linking
-    for flow, process in objs:
+    for flow, process in built.objects:
         label = process.name.replace("BRANCH | ", "")
         if labels and label not in labels:
             continue
-        ref_ex = next(e for e in process.exchanges if e.is_quantitative_reference)
-        rows = []
-        for e in process.exchanges:
-            if e.is_quantitative_reference:
-                continue
-            key = e.description.split(": ", 1)[1]
-            f = o.Flow(id=str(uuid.uuid4()), name=f"BRANCH check | {key}", category=CATEGORY,
-                       flow_type=o.FlowType.PRODUCT_FLOW, flow_properties=flow.flow_properties)
-            r = o.Exchange(internal_id=1, flow=o.Ref(ref_type=o.RefType.Flow, id=f.id, name=f.name),
-                           flow_property=ref_ex.flow_property, unit=ref_ex.unit, amount=1.0, is_input=False,
-                           is_quantitative_reference=True)
-            one = o.Exchange(internal_id=2, flow=e.flow, flow_property=e.flow_property, unit=e.unit,
-                             amount=e.amount, amount_formula=e.amount_formula, is_input=e.is_input,
-                             default_provider=e.default_provider)
-            pr = o.Process(id=str(uuid.uuid4()), name=f"BRANCH check | {key}", category=CATEGORY,
-                           process_type=o.ProcessType.UNIT_PROCESS, exchanges=[r, one], last_internal_id=2,
-                           parameters=process.parameters if e.amount_formula else None)
-            c.put(f)
-            pref = c.put(pr)
-            sys_ref = c.create_product_system(pref, LINKING)
-            res = c.calculate(o.CalculationSetup(target=sys_ref, impact_method=method, amount=1.0))
-            res.wait_until_ready()
-            try:
-                olca = next(float(i.amount) for i in res.get_total_impacts()
-                            if i.impact_category.name == category)
-            finally:
-                res.dispose()
-            branch = e.amount * factor(model.factor_data, key, category)
-            rows.append((key, olca, branch, abs(olca - branch) / abs(branch) if branch else None))
-            for obj in (sys_ref, pref, o.Ref(ref_type=o.RefType.Flow, id=f.id)):
-                try:
-                    c.delete(obj)
-                except Exception:
-                    pass
-        out[label] = rows
+        out[label] = [_check_exchange_alone(c, model, flow, process, e, built.linking, method, category)
+                      for e in process.exchanges if not e.is_quantitative_reference]
     return out
+
+
+def _check_exchange_alone(c, model, flow, process, e, linking, method, category):
+    """(factor key, openLCA, BRANCH, relative difference) of one exchange in a process of its own."""
+    key = e.description.split(": ", 1)[1]
+    ref_ex = next(x for x in process.exchanges if x.is_quantitative_reference)
+    f = o.Flow(id=str(uuid.uuid4()), name=f"BRANCH check | {key}", category=CATEGORY,
+               flow_type=o.FlowType.PRODUCT_FLOW, flow_properties=flow.flow_properties)
+    r = o.Exchange(internal_id=1, flow=o.Ref(ref_type=o.RefType.Flow, id=f.id, name=f.name),
+                   flow_property=ref_ex.flow_property, unit=ref_ex.unit, amount=1.0, is_input=False,
+                   is_quantitative_reference=True)
+    one = o.Exchange(internal_id=2, flow=e.flow, flow_property=e.flow_property, unit=e.unit,
+                     amount=e.amount, amount_formula=e.amount_formula, is_input=e.is_input,
+                     default_provider=e.default_provider)
+    pr = o.Process(id=str(uuid.uuid4()), name=f"BRANCH check | {key}", category=CATEGORY,
+                   process_type=o.ProcessType.UNIT_PROCESS, exchanges=[r, one], last_internal_id=2,
+                   parameters=process.parameters if e.amount_formula else None)
+    c.put(f)
+    pref = c.put(pr)
+    sys_ref = c.create_product_system(pref, linking)
+    try:
+        olca = _impact(c, sys_ref, method, category)
+    finally:
+        _delete_quietly(c, sys_ref, pref, o.Ref(ref_type=o.RefType.Flow, id=f.id))
+    branch = e.amount * factor(model.factor_data, key, category)
+    return key, olca, branch, _relative(olca, branch)
+
+
+def _delete_quietly(c, *objects):
+    """Remove temporary objects; one that openLCA refuses to delete must not hide the result."""
+    for obj in objects:
+        try:
+            c.delete(obj)
+        except Exception as exc:                 # reported, never raised: the check itself has finished
+            log.warning("could not delete the temporary object %s from openLCA: %s", getattr(obj, "id", obj), exc)

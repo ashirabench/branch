@@ -21,6 +21,7 @@ montecarlo.py   State = 20,000 draws of every open choice, and the difference in
         |
         v
 agent.py        Session: compute p, certify or ask, take the answer, compute again
+        |       interview.py runs a session for a person; webapp.py is only the page
         |       query.py scores the open choices; the best three are asked
         v
 report.py, manager_report.py, whatif.py     the technical report, the PDF for a manager
@@ -52,7 +53,7 @@ openLCA is used twice and never in between: once to read the unit factors, and a
 | The identity with the Sobol index of the verdict (the lemma) | `branch/query.py` | `decision_flip_tp`, `_total_probability_reduction` |
 | The baselines: Sobol index of the impact, entropy, least confident, margin, random | `branch/query.py` | `sobol`, `entropy`, `least_confident`, `margin`, `random_strategy` |
 | The literal loss min(p, 1 − p) and the entropy of the verdict (ablations) | `branch/query.py` | `decision_flip_min`, `decision_entropy` |
-| The setting of the application: certificate of 2.5%, three questions per round | `branch/webapp.py` | `TAU`, `BATCH` |
+| The setting of the application: certificate of 2.5%, three questions per round | `branch/interview.py` | `TAU`, `BATCH` |
 
 The proof of the identity is in [`lemma.md`](lemma.md) and its numerical check in `tests/test_lemma.py`.
 
@@ -88,7 +89,9 @@ The proof of the identity is in [`lemma.md`](lemma.md) and its numerical check i
 | The report for a manager, one PDF in plain words | `branch/manager_report.py` | `manager_pdf` |
 | The smallest single change that reverses the verdict; the stages; all categories | `branch/whatif.py` | `reversals`, `stages`, `indicators` |
 | Plain help for every question | `branch/help.py` | `help_for` |
-| The page: start a session, record an answer, finish | `branch/webapp.py` | `start_session`, `record_answer`, `finish` |
+| A comparison from the forms to the reports, with no page in it | `branch/interview.py` | `prepare`, `question_view`, `answer`, `finish` |
+| What the person types, checked and turned into a product description | `branch/forms.py` | `spec_from_fields`, `inputs_from_table` |
+| The page itself: one function per panel, each button tied to a function of the interview | `branch/webapp.py` | `build_ui`, `_connect` |
 | The model as processes, parameters and formulas in openLCA | `branch/olca_bridge.py` | `build_objects`, `push_comparison` |
 | The amounts as formulas of the choices | `branch/formulas.py` | `trace` |
 | The prior of a choice as the uncertainty of a parameter in openLCA | `branch/olca_bridge.py` | `uncertainty_of` |
