@@ -190,14 +190,14 @@ def energy_recovery(energy_rows):
 
 
 def write_json(path, data):
-    with open(path, "w") as fh:
+    with open(path, "w", encoding="utf-8") as fh:
         json.dump(data, fh, indent=1)
         fh.write("\n")
 
 
 def main():
     args = parse_args()
-    with open(os.path.join(OUT_DIR, "elcd32_map.json")) as fh:
+    with open(os.path.join(OUT_DIR, "elcd32_map.json"), encoding="utf-8") as fh:
         mapping = json.load(fh)
     procs, energy_rows, impacts = query_file(args.zolca, args.derby)
     data = factor_file(mapping, procs, impacts)

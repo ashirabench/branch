@@ -55,7 +55,7 @@ def test_another_database_needs_only_another_map(tmp_path):
              "datasets": {"pet_granulate_bottle_grade": {"names": ["PET granulate, bottle grade"], "unit": "kg"},
                           "lorry_16_32t": {"names": ["Lorry transport, 16 to 32 t"], "unit": "t*km"}}}
     path = tmp_path / "mydb.json"
-    path.write_text(json.dumps(other))
+    path.write_text(json.dumps(other), encoding="utf-8")
     before = json.dumps(x.DATABASE_MAP, sort_keys=True)
     m = x.load_database_map(str(path))
     names, preference = x.names_of(m), m["location_preference"]
@@ -80,7 +80,7 @@ def test_a_map_with_a_gap_is_refused_in_words(tmp_path):
                          (dict(good, datasets={"k": {"names": [], "unit": "kg"}}), "names"),
                          ({k: v for k, v in good.items() if k != "citation"}, "citation")):
         path = tmp_path / "broken.json"
-        path.write_text(json.dumps(broken))
+        path.write_text(json.dumps(broken), encoding="utf-8")
         with pytest.raises(ValueError) as err:
             x.load_database_map(str(path))
         assert word in str(err.value)

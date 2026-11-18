@@ -15,7 +15,7 @@ BENCH = ["pet_bottle_1l", "glass_refillable_1l", "aluminium_can_330ml", "beverag
 
 
 def load(name):
-    with open(os.path.join(ROOT, "data", "second_database", name)) as fh:
+    with open(os.path.join(ROOT, "data", "second_database", name), encoding="utf-8") as fh:
         return json.load(fh)
 
 
@@ -96,6 +96,6 @@ def test_another_category_fails_on_a_replaced_factor_instead_of_mixing_databases
 def test_branch_factors_points_every_command_at_another_file(tmp_path, monkeypatch):
     from branch.real_cases import load_factors
     path = tmp_path / "other.json"
-    path.write_text(json.dumps(hybrid(fake_base(), load("elcd32_factors.json"))))
+    path.write_text(json.dumps(hybrid(fake_base(), load("elcd32_factors.json"))), encoding="utf-8")
     monkeypatch.setenv("BRANCH_FACTORS", str(path))
     assert load_factors()["path"] == str(path) and len(load_factors()["replaced_by_elcd"]) == 21

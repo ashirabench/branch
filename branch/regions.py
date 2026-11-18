@@ -95,7 +95,7 @@ def _raw(code, root):
             return {"code": code, "name": code, "parent": "GLO", "electricity": f"electricity_mv_{code}",
                     "sources_needed": [f"national packaging waste statistics for {code}"]}
         raise ValueError(f"unknown region {code!r}; known: {list_regions(root)}")
-    with open(path) as fh:
+    with open(path, encoding="utf-8") as fh:
         data = json.load(fh)
     if data.get("code") != code:
         raise ValueError(f"{path}: code must be {code!r}")

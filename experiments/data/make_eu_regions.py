@@ -78,11 +78,11 @@ INCINERATION = ["pet", "hdpe", "ldpe", "pp", "ps", "eps", "pvc", "pla", "alumini
 
 def read_tables():
     rates, muni = {}, {}
-    with open(os.path.join(SRC, "env_waspacr_2022_2024.csv")) as fh:
+    with open(os.path.join(SRC, "env_waspacr_2022_2024.csv"), encoding="utf-8") as fh:
         for r in csv.DictReader(fh):
             if r["rule"] == "new":
                 rates[(r["geo"], r["waste"])] = [(y, float(r[y])) for y in YEARS if r[y] != ""]
-    with open(os.path.join(SRC, "env_wasmun_2022_2024.csv")) as fh:
+    with open(os.path.join(SRC, "env_wasmun_2022_2024.csv"), encoding="utf-8") as fh:
         for r in csv.DictReader(fh):
             muni[(r["geo"], r["operation"])] = {y: float(r[y]) for y in YEARS if r[y] != ""}
     return rates, muni

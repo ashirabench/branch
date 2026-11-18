@@ -279,7 +279,7 @@ def extract(client, path, method="EF 3.1", database="bafu2026", all_grids=True, 
            "extracted": time.strftime("%Y-%m-%d"), "factors": {}, "unresolved": {}}
     chosen = []                      # processes people chose by name stay in the file across extractions
     if os.path.exists(path):
-        with open(path) as fh:
+        with open(path, encoding="utf-8") as fh:
             old = json.load(fh).get("factors", {})
         if update:
             out["factors"] = old
@@ -305,6 +305,6 @@ def extract(client, path, method="EF 3.1", database="bafu2026", all_grids=True, 
             out["unresolved"][key] = [f"calculation failed: {exc}"]
             say(i, len(todo), f"!! {key}: {exc}")
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-    with open(path, "w") as fh:
+    with open(path, "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=2)
     return out

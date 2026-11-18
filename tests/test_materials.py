@@ -83,7 +83,7 @@ def test_every_added_material_has_an_example_product():
     used = set()
     for path in EXAMPLES:
         import json
-        with open(path) as fh:
+        with open(path, encoding="utf-8") as fh:
             spec = json.load(fh)
         used |= {c["material"] for c in spec.get("components", [])}
         for c in spec.get("components", []):

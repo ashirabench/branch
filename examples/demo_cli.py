@@ -118,7 +118,7 @@ def main():
                        public_comparison=public)
     report = markdown_report(result, model)
     os.makedirs("outputs", exist_ok=True)
-    with open("outputs/report.md", "w") as fh:
+    with open("outputs/report.md", "w", encoding="utf-8") as fh:
         fh.write(report)
     print("\n" + report)
     print("Saved outputs/report.md")

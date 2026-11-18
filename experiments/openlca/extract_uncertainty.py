@@ -112,7 +112,7 @@ def simulate_one(client, descs, method, factor, runs):
 
 def save(data, path):
     """Written after every factor, through a temporary file: an interrupted run loses one factor at most."""
-    with open(path + ".tmp", "w") as fh:
+    with open(path + ".tmp", "w", encoding="utf-8") as fh:
         json.dump(data, fh, indent=2)
     os.replace(path + ".tmp", path)
 
@@ -164,7 +164,7 @@ def report(data, keys, out):
               if gsd else "No factor has a usable spread."), "",
              "| Factor | Runs | Geometric standard deviation | Median of the runs / value used | Mean / value used | "
              "Runs of the other sign | Seconds | Note |", "|---|---|---|---|---|---|---|---|"] + rows
-    with open(out, "w") as fh:
+    with open(out, "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines) + "\n")
     print(f"report: {out}")
 

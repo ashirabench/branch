@@ -78,7 +78,7 @@ def main():
 
     os.makedirs("outputs", exist_ok=True)
     path = f"outputs/datasets_{args.database}.csv"
-    with open(path, "w", newline="") as fh:
+    with open(path, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=list(rows[0]) if rows else ["name"])
         w.writeheader()
         w.writerows(rows)

@@ -35,7 +35,7 @@ def openlca(monkeypatch, tmp_path):
     factors = fake_factors()
     client = FakeOpenLCA(factors, waste_keys={"disposal_glass_landfill"})
     path = tmp_path / "factors.json"
-    path.write_text(json.dumps({k: v for k, v in factors.items() if k != "path"}))
+    path.write_text(json.dumps({k: v for k, v in factors.items() if k != "path"}), encoding="utf-8")
     monkeypatch.setenv("BRANCH_FACTORS", str(path))
     monkeypatch.setattr(olca_bridge, "client", lambda port=8080: client)
     monkeypatch.chdir(tmp_path)
@@ -46,7 +46,7 @@ def test_the_check_of_whole_products_agrees_and_cleans_up(openlca, monkeypatch, 
     out = tmp_path / "validation.csv"
     monkeypatch.setattr(sys, "argv", ["validate_openlca.py", "--regions", "PT", "DE", "--out", str(out)])
     script("validate_openlca.py").main()
-    rows = list(csv.DictReader(open(out)))
+    rows = list(csv.DictReader(open(out, encoding="utf-8")))
     assert len(rows) == 24, "6 pairs, 2 products, 2 regions"
     assert all(float(r["relative_difference"]) < 1e-12 and not r["cause"] for r in rows)
     assert "24 products checked, largest relative difference" in capsys.readouterr().out
@@ -61,7 +61,7 @@ def test_a_wrong_factor_is_found_and_named(openlca, monkeypatch, tmp_path, capsy
     out = tmp_path / "validation.csv"
     monkeypatch.setattr(sys, "argv", ["validate_openlca.py", "--regions", "PT", "--pairs", "1", "--out", str(out)])
     script("validate_openlca.py").main()
-    rows = list(csv.DictReader(open(out)))
+    rows = list(csv.DictReader(open(out, encoding="utf-8")))
     assert all(float(r["relative_difference"]) > 1e-4 and "lorry_16_32t x2" in r["cause"] for r in rows)
     assert not [k for k in openlca.left_behind() if "check" in str(getattr(openlca.store[k], "name", ""))]
 
@@ -72,7 +72,7 @@ def test_a_region_that_cannot_be_built_is_a_row_and_an_exit(openlca, monkeypatch
     with pytest.raises(SystemExit) as stop:
         script("validate_openlca.py").main()
     assert "could not be checked" in str(stop.value)
-    rows = list(csv.DictReader(open(out)))
+    rows = list(csv.DictReader(open(out, encoding="utf-8")))
     assert [r["region"] for r in rows if r["cause"].startswith("error")] == ["XX"]
 
 
@@ -83,7 +83,7 @@ def test_the_check_of_the_added_materials_runs_and_cleans_up(openlca, monkeypatc
     with pytest.raises(SystemExit) as stop:        # the synthetic factor file lacks the added materials
         module.main()
     assert "could not be checked" in str(stop.value)
-    rows = list(csv.DictReader(open(tmp_path / "materials.csv")))
+    rows = list(csv.DictReader(open(tmp_path / "materials.csv", encoding="utf-8")))
     assert rows and all(r["cause"].startswith(("skipped", "error")) or float(r["relative_difference"]) < 1e-12 for r in rows)
     assert openlca.left_behind() == []
 
@@ -92,8 +92,8 @@ def test_the_check_of_the_probability_world_by_world(openlca, monkeypatch, tmp_p
     out = tmp_path / "probability.csv"
     monkeypatch.setattr(sys, "argv", ["validate_probability.py", "--worlds", "12", "--n", "4000", "--out", str(out)])
     script("validate_probability.py").main()
-    rows = list(csv.DictReader(open(out)))
-    summary = next(csv.DictReader(open(str(out).replace(".csv", "_summary.csv"))))
+    rows = list(csv.DictReader(open(out, encoding="utf-8")))
+    summary = next(csv.DictReader(open(str(out).replace(".csv", "_summary.csv"), encoding="utf-8")))
     assert len(rows) == 24 and all(float(r["relative_difference"]) < 1e-12 for r in rows)
     assert summary["worlds"] == "12" and summary["same_winner"] == "12"
     assert float(summary["largest_relative_difference"]) < 1e-12

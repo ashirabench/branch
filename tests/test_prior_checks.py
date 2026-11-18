@@ -23,7 +23,7 @@ def factors():
             "factors": {k: {"impacts": {CAT: float(rng.uniform(0.01, 5))}} for k in keys}}
 
 
-ROWS = [r for r in csv.DictReader(open(os.path.join(ROOT, "data", "prior_checks.csv")))
+ROWS = [r for r in csv.DictReader(open(os.path.join(ROOT, "data", "prior_checks.csv"), encoding="utf-8"))
         if r["read_in_original"] == "yes" and r["comparable"] == "yes"]
 
 

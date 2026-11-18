@@ -45,7 +45,7 @@ def main():
     os.makedirs("results", exist_ok=True)
     out = f"results/latency_{name}.csv"
     rng = np.random.default_rng(0)
-    with open(out, "w", newline="") as fh:
+    with open(out, "w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
         w.writerow(["backend", "strategy", "J", "N", "median_s", "min_s"])
         for J in args.J:

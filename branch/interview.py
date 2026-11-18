@@ -143,7 +143,7 @@ def finish(s, outdir=None):
     pdf = os.path.join(outdir, "BRANCH_report.pdf")
     manager_pdf(r, s.model, pdf, public=getattr(s, "public", False))
     md = os.path.join(outdir, "BRANCH_technical_report.md")
-    with open(md, "w") as fh:
+    with open(md, "w", encoding="utf-8") as fh:
         fh.write(markdown_report(r, s.model))
     m = s.model
     (ma, _, _), (mb, _, _) = r["impacts"][m.label_a], r["impacts"][m.label_b]

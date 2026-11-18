@@ -162,10 +162,10 @@ def test_an_override_with_an_unknown_option_is_refused(tmp_path, monkeypatch):
 
     from branch import regions
     for code in ("GLO", "PT"):
-        (tmp_path / f"{code}.json").write_text(open(f"data/regions/{code}.json").read())
-    bad = json.loads((tmp_path / "PT.json").read_text())
+        (tmp_path / f"{code}.json").write_text(open(f"data/regions/{code}.json", encoding="utf-8").read(), encoding="utf-8")
+    bad = json.loads((tmp_path / "PT.json").read_text(encoding="utf-8"))
     bad["priors"]["glass.end_of_life"] = {"weights": {"reuse": 1.0}, "source": "SOURCE: x"}
-    (tmp_path / "PT.json").write_text(json.dumps(bad))
+    (tmp_path / "PT.json").write_text(json.dumps(bad), encoding="utf-8")
     monkeypatch.setattr(regions, "REGION_DIR", str(tmp_path))
     with pytest.raises(ValueError, match="unknown options"):
         build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CAT, all_region_factors())
@@ -205,7 +205,7 @@ def test_materials_can_be_added_as_data_files(tmp_path, monkeypatch):
                         "recycling_rate": ["beta", {"a": 6, "b": 4}, "ASSUMPTION: test"],
                         "incineration_share": ["uniform", {"low": 0, "high": 1}, "ASSUMPTION: test"],
                         "incineration": "disposal_polyethylene_terephthalate_incineration",
-                        "landfill": "disposal_plastics_mixture_landfill"}}))
+                        "landfill": "disposal_plastics_mixture_landfill"}}), encoding="utf-8")
     real = catalogue.load_materials
     monkeypatch.setattr(catalogue, "load_materials", lambda root=None: real(tmp_path))
     data = fake_factors()
@@ -236,7 +236,7 @@ def _cff_dir(tmp_path, A):
         p = {"A": A, "Qsin_Qp": 0.9, "Qsout_Qp": 0.8, "source": "TEST ONLY"}
         if mid in ("glass", "liquid_packaging_board", "ldpe", "hdpe"):
             p["recycling_eol_key"] = "tap_water_RER"          # any key: a stand in recycling process
-        (tmp_path / f"{mid}.json").write_text(json.dumps(p))
+        (tmp_path / f"{mid}.json").write_text(json.dumps(p), encoding="utf-8")
     return tmp_path
 
 

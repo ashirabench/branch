@@ -15,7 +15,7 @@ spec.loader.exec_module(reader)
 def _touch(*parts):
     path = os.path.join(*parts)
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    open(path, "w").close()
+    open(path, "w", encoding="utf-8").close()
     return path
 
 

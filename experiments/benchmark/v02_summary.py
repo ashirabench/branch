@@ -284,7 +284,7 @@ def sources_lines():
 def verdict_lines():
     """The verdict of every case under every model, written to verdicts.csv and as a table."""
     v, labels = verdicts()
-    with open(os.path.join(OUT, "verdicts.csv"), "w", newline="") as fh:
+    with open(os.path.join(OUT, "verdicts.csv"), "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=["region", "a", "b"] + labels)
         w.writeheader()
         w.writerows(v)
@@ -308,7 +308,7 @@ def main():
     if not os.path.isdir(OUT):
         sys.exit("no results/v02: run experiments/benchmark/run_v02_experiments.sh first")
     lines = HEAD + primary_lines() + second_database_lines() + review_lines() + sources_lines() + verdict_lines()
-    with open(os.path.join(OUT, "SUMMARY.md"), "w") as fh:
+    with open(os.path.join(OUT, "SUMMARY.md"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines) + "\n")
     print("\n".join(lines))
 

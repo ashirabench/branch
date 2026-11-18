@@ -41,7 +41,7 @@ def fail(step, why):
 
 
 def rows_of(example):
-    with open(os.path.join(ROOT, "data", "examples", example)) as fh:
+    with open(os.path.join(ROOT, "data", "examples", example), encoding="utf-8") as fh:
         spec = json.load(fh)
     rows = [[e["id"], e["stage"].replace("_", " "), e["process"], e["amount"][0], e["amount"][1]]
             for e in spec["exchanges"]]
@@ -77,12 +77,12 @@ def factors_for_the_check(offline):
     real = load_factors()
     work = tempfile.mkdtemp(prefix="branch_app_check_")
     copy = os.path.join(work, os.path.basename(real["path"]))
-    with open(real["path"]) as fh:
+    with open(real["path"], encoding="utf-8") as fh:
         data = json.load(fh)
     chosen = sorted(k for k in data["factors"] if k.startswith("proc:"))
     if not offline:
         data["factors"] = {k: v for k, v in data["factors"].items() if not k.startswith("proc:")}
-    with open(copy, "w") as fh:
+    with open(copy, "w", encoding="utf-8") as fh:
         json.dump(data, fh)
     os.environ["BRANCH_FACTORS"] = copy
     os.environ["BRANCH_HOME"] = work
@@ -142,7 +142,7 @@ def step_compare(app, copy, offline):
     said = texts(r)
     if any(t.startswith("**Please check:**") for t in said):
         fail(2, next(t for t in said if t.startswith("**Please check:**")))
-    with open(copy) as fh:
+    with open(copy, encoding="utf-8") as fh:
         now = json.load(fh)["factors"]
     needed = webapp.missing_process_keys(
         [webapp.spec_from_fields(name_a, 1, False, [], inputs=rows_a),
@@ -199,7 +199,7 @@ def step_reports(files, names):
     md = next((f for f in files if f.lower().endswith(".md")), None)
     if not pdf or not md or os.path.getsize(pdf) < 2000:
         fail(4, f"the reports are missing or empty: {files}")
-    with open(md) as fh:
+    with open(md, encoding="utf-8") as fh:
         report = fh.read()
     for needle in (*names, SERVICE, "material", "transport"):
         if needle not in report:

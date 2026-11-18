@@ -113,7 +113,7 @@ def load_spec(spec):
     ("pet_bottle_1l" -> data/benchmark/pet_bottle_1l.json). Validated."""
     if isinstance(spec, str):
         path = spec if os.path.exists(spec) else os.path.join(BENCHMARK_DIR, f"{spec}.json")
-        with open(path) as fh:
+        with open(path, encoding="utf-8") as fh:
             spec = json.load(fh)
     spec = dict(spec)
     spec.setdefault("id", re.sub(r"[^a-z0-9]+", "_", spec.get("name", "product").lower()).strip("_"))

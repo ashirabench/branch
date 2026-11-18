@@ -28,7 +28,7 @@ def load_factors(path: Optional[str] = None, root: Optional[str] = None) -> dict
             raise FileNotFoundError(
                 "No extracted factors found. Run experiments/openlca/extract_factors.py with openLCA open first.")
         path = files[-1]
-    with open(path) as fh:
+    with open(path, encoding="utf-8") as fh:
         data = json.load(fh)
     data["path"] = path
     year = re.search(r"(20\d\d)", str(data.get("database", ""))) or re.search(r"(20\d\d)", os.path.basename(path))

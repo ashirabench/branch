@@ -70,7 +70,7 @@ def main():
                      "validated_in_openLCA": key in covered, "problem": "; ".join(problem)})
     os.makedirs("results", exist_ok=True)
     out = os.path.join("results", "factor_audit.csv")
-    with open(out, "w", newline="") as fh:
+    with open(out, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)

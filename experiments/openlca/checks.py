@@ -40,7 +40,7 @@ def remove(c, sent):
 
 def save(rows, path, fields=None):
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-    with open(path, "w", newline="") as fh:
+    with open(path, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=fields or list(rows[0]))
         w.writeheader()
         w.writerows(rows)

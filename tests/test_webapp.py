@@ -54,7 +54,7 @@ def test_full_session_produces_both_reports(tmp_path):
         n += 1
     summary, pdf, md = webapp.finish(s, outdir=str(tmp_path))
     assert os.path.getsize(pdf) > 10_000 and "ISO 14044" in summary
-    assert "What would reverse the verdict" in open(md).read()
+    assert "What would reverse the verdict" in open(md, encoding="utf-8").read()
 
 
 def test_finish_now_closes_the_session_on_the_defaults(tmp_path):
@@ -114,7 +114,7 @@ def test_the_page_builds_and_offers_the_entry_points_the_checks_call():
     assert {"/on_start", "/answer", "/skip", "/on_finish", "/on_find", "/on_send", "/on_check", "/on_read"} <= offered
     root = os.path.join(os.path.dirname(__file__), "..")
     for script in (("packaging", "smoke_session.py"), ("experiments", "openlca", "check_app_with_openlca.py")):
-        called = set(re.findall(r'api_name="(/\w+)"', open(os.path.join(root, *script)).read()))
+        called = set(re.findall(r'api_name="(/\w+)"', open(os.path.join(root, *script), encoding="utf-8").read()))
         assert called and called <= offered, f"{script[-1]} calls {sorted(called - offered)}, which the page does not offer"
 
 

@@ -64,18 +64,18 @@ def test_every_european_country_builds_and_cites_eurostat(code):
 
 def test_prior_means_follow_the_table():
     """Plastic packaging: the prior mean is the mean of the last two years, within rounding."""
-    with open(os.path.join(ROOT, "data", "eurostat", "env_waspacr_2022_2024.csv")) as fh:
+    with open(os.path.join(ROOT, "data", "eurostat", "env_waspacr_2022_2024.csv"), encoding="utf-8") as fh:
         rows = {(r["geo"], r["waste"]): r for r in csv.DictReader(fh) if r["rule"] == "new"}
     for geo, (code, _) in eu.COUNTRIES.items():
         values = [float(rows[(geo, "W150102")][y]) for y in eu.YEARS if rows[(geo, "W150102")][y] != ""][-2:]
-        with open(os.path.join(ROOT, "data", "regions", f"{code}.json")) as fh:
+        with open(os.path.join(ROOT, "data", "regions", f"{code}.json"), encoding="utf-8") as fh:
             p = json.load(fh)["priors"]["pet.recycling_rate"][1]
         assert abs(p["a"] / (p["a"] + p["b"]) - sum(values) / len(values) / 100) < 0.005, code
 
 
 def test_the_cases_the_rules_name():
     def prior(code, key):
-        with open(os.path.join(ROOT, "data", "regions", f"{code}.json")) as fh:
+        with open(os.path.join(ROOT, "data", "regions", f"{code}.json"), encoding="utf-8") as fh:
             return json.load(fh)["priors"][key]
     steel = prior("CY", "steel.recycling_rate")             # reported above 200%
     assert steel[1] == {"a": 19.0, "b": 1.0} and "cut at 95%" in steel[2]
@@ -91,6 +91,6 @@ def test_the_real_factor_file_has_the_electricity_of_every_european_country():
     path = os.path.join(ROOT, "data", "factors", "bafu2026_EF_3_1_Method_adapted_.json")
     if not os.path.exists(path):
         pytest.skip("needs the factors extracted from BAFU:2026, which are not in the repository")
-    with open(path) as fh:
+    with open(path, encoding="utf-8") as fh:
         have = set(json.load(fh)["factors"])
     assert {load_region(c).electricity for c in CODES + ["EU"]} <= have

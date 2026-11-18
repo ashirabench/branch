@@ -63,14 +63,14 @@ def main():
     base = load_factors(args.base)
     if env:
         os.environ["BRANCH_FACTORS"] = env
-    with open(os.path.join(SECOND, "elcd32_factors.json")) as fh:
+    with open(os.path.join(SECOND, "elcd32_factors.json"), encoding="utf-8") as fh:
         elcd = json.load(fh)
     data = hybrid(base, elcd, args.replace, args.climate)
     name = "placebo_none" if args.replace == "none" else "hybrid_elcd32" + ("_ipcc2021" if args.climate == "ipcc2021" else "")
     out_dir = os.path.join(ROOT, "data", "factors_second")
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, f"{name}.json")
-    with open(path, "w") as fh:
+    with open(path, "w", encoding="utf-8") as fh:
         json.dump(data, fh, indent=1)
     print(f"wrote {path}: {len(data.get('replaced_by_elcd', []))} factors from ELCD 3.2, "
           f"{len(data['factors']) - len(data.get('replaced_by_elcd', []))} from the base file")

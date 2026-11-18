@@ -71,7 +71,7 @@ def boxplots(df, strategies, batches, path):
 
 def traces_by_strategy(path, batch):
     curves = defaultdict(list)
-    with open(path) as fh:
+    with open(path, encoding="utf-8") as fh:
         for line in fh:
             r = json.loads(line)
             if r["batch_size"] == batch:

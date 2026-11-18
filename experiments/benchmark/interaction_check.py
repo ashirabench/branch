@@ -69,7 +69,7 @@ def main(n=20000, seed=0):
                          "total": "", "interaction": ""})
     out = os.path.join(ROOT, "results", "interactions", "interaction_check.csv")
     os.makedirs(os.path.dirname(out), exist_ok=True)
-    with open(out, "w", newline="") as f:
+    with open(out, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)

@@ -81,7 +81,7 @@ class FakeOpenLCA:
 def test_every_name_of_the_map_is_read_and_the_file_says_what_was_not(tmp_path):
     client, path = FakeOpenLCA(), tmp_path / "factors.json"
     out = olca_extract.extract(client, str(path), all_grids=True, progress=lambda *a: None)
-    saved = json.loads(path.read_text())
+    saved = json.loads(path.read_text(encoding="utf-8"))
     assert saved == out and saved["database"] == "bafu2026" and saved["method"] == "EF 3.1 Method (adapted)"
     assert set(saved["factors"]) == set(olca_extract.PROCESSES) - {BROKEN} | {"electricity_mv_FR"}
     assert saved["unresolved"] == {BROKEN: ["calculation failed: openLCA could not solve this system"]}
@@ -121,7 +121,7 @@ def _command(monkeypatch, tmp_path, *argv):
 def test_the_command_writes_the_file_the_guides_describe(monkeypatch, tmp_path, capsys):
     _command(monkeypatch, tmp_path, "--method", "EF 3.1").main()
     text = capsys.readouterr().out
-    saved = json.loads((tmp_path / "data" / "factors" / "bafu2026_EF_3_1_Method_adapted_.json").read_text())
+    saved = json.loads((tmp_path / "data" / "factors" / "bafu2026_EF_3_1_Method_adapted_.json").read_text(encoding="utf-8"))
     n = len(olca_extract.PROCESSES) - 1
     assert f"saved data/factors/bafu2026_EF_3_1_Method_adapted_.json: {n} factors, 1 unresolved" in text
     assert len(saved["factors"]) == n and "electricity_mv_FR" not in saved["factors"]
@@ -129,7 +129,7 @@ def test_the_command_writes_the_file_the_guides_describe(monkeypatch, tmp_path, 
 
 def test_the_command_reads_what_two_products_need_and_stops_when_one_is_missing(monkeypatch, tmp_path, capsys):
     _command(monkeypatch, tmp_path, "--specs", "pet_bottle_1l", "aluminium_can_330ml", "--region", "PT").main()
-    saved = json.loads((tmp_path / "data" / "factors" / "bafu2026_EF_3_1_Method_adapted_.json").read_text())
+    saved = json.loads((tmp_path / "data" / "factors" / "bafu2026_EF_3_1_Method_adapted_.json").read_text(encoding="utf-8"))
     assert "0 unresolved" in capsys.readouterr().out
     assert TWICE in saved["factors"] and "glass_packaging_white" not in saved["factors"]
     with pytest.raises(SystemExit):
@@ -150,9 +150,9 @@ def test_the_command_reads_another_database_through_its_map(monkeypatch, tmp_pat
             "datasets": {"my_pet": {"names": [olca_extract.PROCESSES[TWICE][0]], "unit": "kg"},
                          "my_cotton": {"names": ["Cotton fibres, at farm"], "unit": "kg"}}}
     path = tmp_path / "mydb.json"
-    path.write_text(json.dumps(mine))
+    path.write_text(json.dumps(mine), encoding="utf-8")
     _command(monkeypatch, tmp_path, "--map", str(path), "--all-grids").main()
-    saved = json.loads((tmp_path / "data" / "factors" / "mydb_EF_3_1_Method_adapted_.json").read_text())
+    saved = json.loads((tmp_path / "data" / "factors" / "mydb_EF_3_1_Method_adapted_.json").read_text(encoding="utf-8"))
     assert saved["database"] == "mydb" and saved["citation"] == "My database, version 1"
     grids = {k for k in saved["factors"] if k.startswith("electricity_mv_")}
     assert set(saved["factors"]) - grids == {"my_pet", "my_cotton"} and "electricity_mv_FR" in grids

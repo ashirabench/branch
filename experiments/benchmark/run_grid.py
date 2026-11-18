@@ -173,8 +173,8 @@ def main():
     cols = ["case", "J", "case_seed", "strategy", "batch_size", "n_samples", "seed", "tau",
             "questions", "certified", "correct", "p_flip", "latency_mean_s", "latency_max_s", "wall_s"]
     t0 = time.perf_counter()
-    with open(f"results/{tag}_runs.csv", "w", newline="") as fc, \
-            open(f"results/{tag}_traces.jsonl", "w") as ft, \
+    with open(f"results/{tag}_runs.csv", "w", newline="", encoding="utf-8") as fc, \
+            open(f"results/{tag}_traces.jsonl", "w", encoding="utf-8") as ft, \
             ProcessPoolExecutor(max_workers=args.workers) as ex:
         w = csv.DictWriter(fc, fieldnames=cols, extrasaction="ignore")
         w.writeheader()

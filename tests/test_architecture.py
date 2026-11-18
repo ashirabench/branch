@@ -8,6 +8,8 @@
   5. The core of the agent depends on nothing but itself: no openLCA, no page, no report, no file.
   6. An error that is caught without knowing its kind is named and said, never swallowed.
   7. No code that nothing uses: a class, function or constant that no other code calls is removed.
+  8. Every text file is opened as UTF-8. Windows reads a file opened without it in another encoding,
+     and a source such as "Paraná" reaches the person garbled.
 """
 import ast
 import glob
@@ -141,3 +143,24 @@ def test_no_code_that_nothing_uses():
     paths = [os.path.join(ROOT, p) for p in ("branch", "experiments", "examples", "packaging", "app.py")]
     run = subprocess.run([sys.executable, "-m", "vulture", *paths], capture_output=True, text=True)
     assert run.returncode == 0, "code that nothing uses:\n" + run.stdout
+
+
+def test_every_text_file_is_opened_as_utf8():
+    """Rule 8, for the code and the tests alike."""
+    found = []
+    for path in EVERYTHING:
+        with open(path, encoding="utf-8") as fh:
+            tree = ast.parse(fh.read())
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            named = (isinstance(node.func, ast.Name) and node.func.id == "open") or \
+                    (isinstance(node.func, ast.Attribute) and node.func.attr in ("read_text", "write_text"))
+            if not named:
+                continue
+            words = {k.arg for k in node.keywords}
+            mode = node.args[1] if len(node.args) > 1 else next((k.value for k in node.keywords if k.arg == "mode"), None)
+            binary = isinstance(mode, ast.Constant) and "b" in str(mode.value)
+            if not binary and "encoding" not in words and None not in words:
+                found.append(f"{os.path.relpath(path, ROOT)}:{node.lineno}")
+    assert not found, "opened without encoding=\"utf-8\": " + ", ".join(found)

@@ -66,7 +66,7 @@ def test_the_numbers_file_of_the_paper_is_the_one_the_data_give(tmp_path, monkey
     assets = load("experiments", "benchmark", "paper_assets.py")
     monkeypatch.setattr(assets, "TABS", str(tmp_path))
     assets.numbers()
-    assert (tmp_path / "numbers.tex").read_text() == read("paper", "tables", "numbers.tex")
+    assert (tmp_path / "numbers.tex").read_text(encoding="utf-8") == read("paper", "tables", "numbers.tex")
 
 
 def test_the_third_ablation_as_written():

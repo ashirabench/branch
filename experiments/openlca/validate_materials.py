@@ -36,7 +36,7 @@ FIELDS = ["material", "dataset", "region", "example", "product", "openLCA", "BRA
 def variants(added):
     """(example file, spec, material id, dataset label): one per dataset option of each added material."""
     for path in sorted(glob.glob(os.path.join(ROOT, "data", "examples", "*.json"))):
-        with open(path) as fh:
+        with open(path, encoding="utf-8") as fh:
             spec = json.load(fh)
         # examples described only by processes of the database have no component: nothing to do here
         for mid in sorted({c["material"] for c in spec.get("components", [])} & set(added)):

@@ -17,7 +17,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def expected_version():
-    with open(os.path.join(ROOT, "pyproject.toml")) as fh:
+    with open(os.path.join(ROOT, "pyproject.toml"), encoding="utf-8") as fh:
         return re.search(r'^version = "([^"]+)"', fh.read(), re.M).group(1)
 
 

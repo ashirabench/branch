@@ -226,7 +226,7 @@ def load_materials(root=None):
     if os.path.isdir(root):
         for f in sorted(os.listdir(root)):
             if f.endswith(".json"):
-                with open(os.path.join(root, f)) as fh:
+                with open(os.path.join(root, f), encoding="utf-8") as fh:
                     m = json.load(fh)
                 mid = m.pop("id", f[:-5])
                 missing = {"label", "datasets", "end_of_life"} - set(m)
@@ -291,7 +291,7 @@ def load_energy_recovery(root=None):
     path = os.path.join(root, "energy_recovery.json")
     if not os.path.exists(path):
         return {}
-    with open(path) as fh:
+    with open(path, encoding="utf-8") as fh:
         return json.load(fh)["materials"]
 
 
@@ -310,7 +310,7 @@ def load_cff(root=None):
     if os.path.isdir(root):
         for f in sorted(os.listdir(root)):
             if f.endswith(".json") and f != "energy_recovery.json":
-                with open(os.path.join(root, f)) as fh:
+                with open(os.path.join(root, f), encoding="utf-8") as fh:
                     p = json.load(fh)
                 missing = {"A", "Qsin_Qp", "Qsout_Qp", "source"} - set(p)
                 if missing:

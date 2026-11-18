@@ -97,7 +97,7 @@ def _fake_factors(tmp_path):
             "disposal_plastics_mixture_landfill", "disposal_glass_incineration", "disposal_glass_landfill"]
     data = {"method": "test", "factors": {k: {"impacts": {"Climate change": 1.0}} for k in keys}}
     p = tmp_path / "f.json"
-    p.write_text(json.dumps(data))
+    p.write_text(json.dumps(data), encoding="utf-8")
     return p
 
 

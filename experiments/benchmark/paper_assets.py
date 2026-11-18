@@ -181,7 +181,7 @@ def tab_main():
         if s == "decision_flip":
             cells = [f"\\textbf{{{c}}}" if i in (1, 4) else c for i, c in enumerate(cells)]
         lines.append(" & ".join(cells) + " \\\\")
-    with open(os.path.join(TABS, "main.tex"), "w") as f:
+    with open(os.path.join(TABS, "main.tex"), "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
 
@@ -200,7 +200,7 @@ def tab_losses():
                 star = "^{*}" if (s != "decision_flip" and r.p_vs_decision_flip < 0.05) else ""
                 cells.append(f"${r.q_mean:.2f}{star}$")
         lines.append(" & ".join(cells) + " \\\\")
-    with open(os.path.join(TABS, "losses.tex"), "w") as f:
+    with open(os.path.join(TABS, "losses.tex"), "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
 
@@ -219,7 +219,7 @@ def numbers():
                 macro("nNoQLoose", int(row(p, "decision_flip", 1).cases_no_question)),
                 macro("nNoQStrict", int(row(c, "decision_flip", 1).cases_no_question))]
              + _agreement_with_openlca())
-    with open(os.path.join(TABS, "numbers.tex"), "w") as f:
+    with open(os.path.join(TABS, "numbers.tex"), "w", encoding="utf-8") as f:
         f.writelines(lines)
 
 
