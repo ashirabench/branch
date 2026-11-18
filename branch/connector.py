@@ -27,6 +27,17 @@ GET_BAFU = ("BRANCH needs the free BAFU:2026 database in openLCA (openLCA Nexus,
             "with the openLCA LCIA methods (EF 3.1).")
 
 
+HOSTED = ("**This page is served to other computers, so it never connects to an openLCA.** It compares with "
+          "the factor file of the server. To read factors or send a model to openLCA, run BRANCH on your own "
+          "computer.")
+
+
+def hosted():
+    """True when the page is served to other computers (app.py with BRANCH_HOST). A visitor must then never
+    reach an openLCA running on the server: neither read its database nor write into it."""
+    return os.environ.get("BRANCH_HOSTED") == "1"
+
+
 def port_open(port=PORT, timeout=1.0):
     s = socket.socket()
     s.settimeout(timeout)
@@ -37,12 +48,16 @@ def port_open(port=PORT, timeout=1.0):
 
 
 def client(port=PORT):
+    if hosted():
+        raise RuntimeError(HOSTED)
     import olca_ipc as ipc
     return ipc.Client(port)
 
 
 def status(port=PORT):
     """(ready: bool, message in Markdown)."""
+    if hosted():
+        return False, HOSTED
     if not port_open(port):
         return False, "**openLCA is not connected.**\n\n" + HOW_TO_START
     try:
@@ -73,7 +88,7 @@ SETUP_STEPS = (
 
 def probe(port=PORT, method="EF 3.1"):
     """What the open openLCA answers: {"port", "processes", "method", "marker"} (False where it fails)."""
-    out = {"port": port_open(port), "processes": 0, "method": False, "marker": False}
+    out = {"port": not hosted() and port_open(port), "processes": 0, "method": False, "marker": False}
     if not out["port"]:
         return out
     try:
@@ -201,5 +216,7 @@ def send(model, result, port=PORT, backup_confirmed=False):
                      f"{'n/a' if rel is None else f'{100 * rel:.3g}%'} |")
     lines += ["", "In openLCA: refresh the Navigation panel (F5) and open **Product systems > BRANCH**. Each "
               "process has one input parameter per choice, and the amounts are formulas of those parameters: "
-              "change a parameter there, or run openLCA's Monte Carlo simulation on the product system."]
+              "change a parameter there and calculate again. openLCA's Monte Carlo simulation would also draw "
+              "the uncertainty of every exchange of the database; in BAFU:2026 some waste outputs carry it "
+              "with the wrong sign, so read such a simulation with care."]
     return "\n".join(lines)

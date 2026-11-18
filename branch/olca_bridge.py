@@ -37,7 +37,7 @@ import olca_schema as o
 
 from .factors import factor
 from .formulas import trace
-from .olca_extract import linking_for
+from .olca_extract import linking_for, ready
 from .whatif import point_world
 
 CATEGORY = "BRANCH"
@@ -109,8 +109,9 @@ def uncertainty_of(choice):
     openLCA has uniform, triangular, normal and lognormal distributions. A beta prior (the recycling
     rates) has no counterpart there, so it gets none and the parameter says so: openLCA's simulation
     then keeps that parameter at its value. For a lognormal, openLCA takes the value entered as
-    geometric mean as the mean of its draws (experiments/openlca/openlca_lognormal), so the field receives
-    median x exp(sigma^2 / 2), which gives draws with the median of the prior."""
+    geometric mean as the mean of its draws (checked in openLCA 2.6.2, experiments/openlca/openlca_lognormal),
+    so the field receives median x exp(sigma^2 / 2), which gives draws with the median of the prior. Check
+    again with every new version of openLCA: if openLCA corrects this, the factor must go."""
     dist, p = choice.prior
     T = o.UncertaintyType
     if dist == "uniform":
@@ -319,8 +320,8 @@ def _method(c, model):
 def _impact(c, system, method, category):
     """What openLCA calculates for one product system and one impact category."""
     res = c.calculate(o.CalculationSetup(target=system, impact_method=method, amount=1.0))
-    res.wait_until_ready()
     try:
+        ready(res)
         return next(float(i.amount) for i in res.get_total_impacts() if i.impact_category.name == category)
     finally:
         res.dispose()

@@ -59,8 +59,9 @@ def main():
         for d in items:
             try:
                 c.delete(d)
-            except Exception:
+            except Exception as exc:    # openLCA refuses, for example, an object another one still uses
                 failed += 1
+                print(f"  not deleted: {d.name} ({exc})")
     left = sum(len(items) for _, items in find(c))
     print(f"Deleted {total - left} objects; {left} remain" + (f" ({failed} refused by openLCA)." if failed else "."))
 

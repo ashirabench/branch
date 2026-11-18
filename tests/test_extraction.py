@@ -23,10 +23,10 @@ TWICE = "pet_granulate_bottle_grade"        # two processes share this name
 
 class FakeResult:
     def __init__(self, impacts):
-        self.impacts, self.disposed = impacts, False
+        self.impacts, self.disposed, self.error = impacts, False, None
 
-    def wait_until_ready(self):
-        pass
+    def wait_until_ready(self):              # olca-ipc returns the state of the result
+        return SimpleNamespace(error=None)
 
     def get_total_impacts(self):
         return [SimpleNamespace(impact_category=SimpleNamespace(name=k), amount=v) for k, v in self.impacts.items()]
@@ -67,8 +67,10 @@ class FakeOpenLCA:
 
     def calculate(self, setup):
         _, value, key = self.processes[setup.target.id]
-        if key == BROKEN:
-            raise RuntimeError("openLCA could not solve this system")
+        if key == BROKEN:                       # olca-ipc does not raise: the error is on the result
+            failed = FakeResult({})
+            failed.error = SimpleNamespace(error="openLCA could not solve this system")
+            return failed
         self.calculated.append(key)
         return FakeResult({"Climate change": value, "Acidification": value / 10})
 
@@ -155,3 +157,16 @@ def test_the_command_reads_another_database_through_its_map(monkeypatch, tmp_pat
     grids = {k for k in saved["factors"] if k.startswith("electricity_mv_")}
     assert set(saved["factors"]) - grids == {"my_pet", "my_cotton"} and "electricity_mv_FR" in grids
     assert saved["factors"]["my_pet"]["location"] == "CH", "the preference of this map, not the one of BAFU"
+
+
+def test_a_failed_calculation_is_raised_with_the_message_of_openlca():
+    """olca-ipc does not raise when openLCA fails; it puts the message on the result or on its state."""
+    on_result = FakeResult({})
+    on_result.error = SimpleNamespace(error="no provider for the flow")
+    with pytest.raises(RuntimeError, match="no provider for the flow"):
+        olca_extract.ready(on_result)
+    on_state = FakeResult({})
+    on_state.wait_until_ready = lambda: SimpleNamespace(error="singular matrix")
+    with pytest.raises(RuntimeError, match="singular matrix"):
+        olca_extract.ready(on_state)
+    olca_extract.ready(FakeResult({"Climate change": 1.0}))      # a good result passes

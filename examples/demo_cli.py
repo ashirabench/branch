@@ -52,8 +52,8 @@ def connect(args):
     c = olca_bridge.client(args.port)
     try:
         c.get_descriptors(olca_bridge.o.UnitGroup)
-    except Exception:          # whatever the failure, it means the server is not on
-        sys.exit(f"openLCA is not answering on port {args.port}. In openLCA: open the database, then "
+    except Exception as exc:   # whatever the failure, it means the server is not on; the cause is shown
+        sys.exit(f"openLCA is not answering on port {args.port} ({exc}). In openLCA: open the database, then "
                  "Tools > Developer tools > IPC Server > Start. Then run this command again.")
     return c
 

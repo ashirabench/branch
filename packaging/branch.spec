@@ -45,10 +45,8 @@ a = Analysis(
     noarchive=False,
 )
 pyz = PYZ(a.pure)
-exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name=NAME, console=True,
-          icon=os.path.join(ROOT, "packaging", "icon.icns" if sys.platform == "darwin" else "icon.ico")
-          if os.path.exists(os.path.join(ROOT, "packaging", "icon.ico")) else None)
+exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name=NAME, console=True)
 coll = COLLECT(exe, a.binaries, a.datas, name=NAME)
 if sys.platform == "darwin":
-    app = BUNDLE(coll, name=f"{NAME}.app", bundle_identifier="org.branch.openlca",
+    app = BUNDLE(coll, name=f"{NAME}.app", bundle_identifier="io.github.ashirabench.branch",
                  info_plist={"CFBundleShortVersionString": "0.2.1", "NSHighResolutionCapable": True})

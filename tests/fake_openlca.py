@@ -17,8 +17,8 @@ class Result:
     def __init__(self, impacts):
         self.impacts = impacts
 
-    def wait_until_ready(self):
-        pass
+    def wait_until_ready(self):              # olca-ipc returns the state of the result
+        return SimpleNamespace(error=None)
 
     def get_total_impacts(self):
         return [SimpleNamespace(impact_category=SimpleNamespace(name=k), amount=v) for k, v in self.impacts.items()]

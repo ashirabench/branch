@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false        # each Python version reports its own result; one failure does not cancel the other
       matrix:
-        python-version: ["3.10", "3.12"]
+        python-version: ["3.12", "3.13"]
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6

@@ -96,7 +96,7 @@ To serve the page to other computers, use the same command with three variables,
 BRANCH_HOST=0.0.0.0 PORT=7860 BRANCH_FACTORS=<factor file> python app.py
 ```
 
-The factor file stays on the server: the page shows results and never offers the file, and every report cites the database. Before hosting, check that the terms of use of the database allow a hosted calculator, and keep a copy of them.
+The factor file stays on the server: the page shows results and never offers the file, and every report cites the database. A hosted page never connects to an openLCA, not even one running on the server: reading factors, searching the database and sending a model are refused there. Before hosting, check that the terms of use of the database allow a hosted calculator, and keep a copy of them.
 
 ## 6. Check BRANCH against openLCA
 

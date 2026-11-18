@@ -199,3 +199,15 @@ def test_a_later_step_never_counts_as_done_before_an_earlier_one():
     from branch import connector
     odd = {"port": False, "processes": 500, "method": True, "marker": True}
     assert [d for d, _, _ in connector.checklist(state=odd, factors=False)][:3] == [False, False, False]
+
+
+def test_a_hosted_page_never_reaches_an_openlca_on_the_server(monkeypatch):
+    """A visitor of a hosted page must not read or write the database of an openLCA running on the server."""
+    from branch import connector
+    monkeypatch.setenv("BRANCH_HOSTED", "1")
+    monkeypatch.setattr(connector, "port_open", lambda *a, **k: True)     # as if an openLCA were running there
+    ready, message = connector.status()
+    assert not ready and "never connects to an openLCA" in message
+    with pytest.raises(RuntimeError, match="never connects"):
+        connector.client()
+    assert connector.probe()["port"] is False

@@ -28,11 +28,12 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: "3.13"
       - name: Install
+        # the versions of constraints.txt, the ones every test and every check against openLCA ran with
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[app,olca,report]" pyinstaller
+          pip install -e ".[app,olca,report]" pyinstaller -c constraints.txt
       - name: Tests
         run: |
           pip install pytest

@@ -64,7 +64,7 @@ def find_jvm():
     try:
         import jdk4py
         homes.append(str(jdk4py.JAVA_HOME))
-    except Exception:
+    except ImportError:                 # no jdk4py: JAVA_HOME alone, and the message below says what to install
         pass
     for home in filter(None, homes):
         for name in ("libjvm.dylib", "libjvm.so", "jvm.dll"):
@@ -145,8 +145,8 @@ class Database:
         try:
             if self.conn is not None:
                 self.conn.close()
-        except Exception:
-            pass
+        except Exception as exc:        # the copy is removed below in any case; the failure is said
+            print(f"(the copy of the database did not close cleanly: {exc})", file=sys.stderr)
         shutil.rmtree(self.tmp, ignore_errors=True)
 
 

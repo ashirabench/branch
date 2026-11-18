@@ -118,8 +118,8 @@ def test_the_core_of_the_agent_depends_only_on_itself():
 
 def test_a_caught_error_of_unknown_kind_is_named_and_used():
     """`except Exception:` hides what happened. Every such handler binds the error and passes it on:
-    in a message to the person, in the log, or raised again."""
-    for path in PACKAGE:
+    in a message to the person, in the log, or raised again. This holds for the scripts too."""
+    for path in [p for p in EVERYTHING if os.sep + "tests" + os.sep not in p]:
         for n in ast.walk(tree(path)):
             if not isinstance(n, ast.ExceptHandler) or n.type is None:
                 assert not isinstance(n, ast.ExceptHandler), f"{rel(path)} line {n.lineno}: a bare except"

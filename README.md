@@ -5,7 +5,7 @@
 <a href="paper/main.pdf"><img src="https://img.shields.io/badge/Paper-PDF-b31b1b" alt="Paper"></a>
 <a href="https://github.com/ashirabench/branch/releases/latest"><img src="https://img.shields.io/badge/Download-BRANCH%20for%20openLCA-1f6feb" alt="Download"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MPL%202.0-brightgreen" alt="License: MPL 2.0"></a>
-<img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python 3.10+">
+<img src="https://img.shields.io/badge/python-3.12%2B-blue" alt="Python 3.12+">
 <img src="https://img.shields.io/badge/openLCA-2.6-2e7d32" alt="openLCA 2.6">
 <a href="https://github.com/ashirabench/branch/actions/workflows/tests.yml"><img src="https://github.com/ashirabench/branch/actions/workflows/tests.yml/badge.svg" alt="tests"></a>
 
@@ -27,7 +27,7 @@ BRANCH is a companion agent for openLCA for that person. From a bill of material
 Three things set it apart from other tools around openLCA:
 
 1. **It decides what to ask.** Choices are ranked by their power to reverse the verdict, and a stated rule says when to stop.
-2. **What it returns is a native openLCA model.** Every choice is an input parameter, the amounts are formulas of those parameters, and an open choice carries its prior as uncertainty. openLCA recalculates the model and its own Monte Carlo simulation runs on it. Nothing is locked inside BRANCH.
+2. **What it returns is a native openLCA model.** Every choice is an input parameter, the amounts are formulas of those parameters, and an open choice carries its prior as uncertainty. openLCA recalculates the model (checked to 10⁻⁸), and its own Monte Carlo simulation can draw those parameters; I have not run that simulation, because with BAFU:2026 it would also draw the wrong signs described below. Nothing is locked inside BRANCH.
 3. **It contains no language model.** Every number comes from a dataset or from a written rule, and every default is labelled with its source or with the word assumption.
 
 ## Try it in two minutes

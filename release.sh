@@ -151,7 +151,7 @@ PY
 echo "the same tests with the packages of the installer build"
 python3 -m venv "$TMP/env2"
 { "$TMP/env2/bin/python" -m pip install --quiet --upgrade pip &&
-  (cd "$TMP/copy" && "$TMP/env2/bin/python" -m pip install --quiet -e ".[app,olca,report]" pytest); } >"$TMP/install2.log" 2>&1 \
+  (cd "$TMP/copy" && "$TMP/env2/bin/python" -m pip install --quiet -e ".[app,olca,report]" pytest -c constraints.txt); } >"$TMP/install2.log" 2>&1 \
   || { cat "$TMP/install2.log"; stop "the installation of the installer build fails (the log is above)"; }
 (cd "$TMP/copy" && "$TMP/env2/bin/python" -m pytest -q) || stop "tests fail with the packages of the installer build (.github/workflows/installers.yml)"
 

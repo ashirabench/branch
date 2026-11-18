@@ -9,7 +9,7 @@ description = "BRANCH: a non-LLM BDI agent that completes an openLCA Life Cycle 
 readme = "README.md"
 license = { text = "MPL-2.0" }
 authors = [{ name = "Ashira Benchimol" }]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 keywords = ["life cycle assessment", "openLCA", "BDI agent", "active learning", "human-in-the-loop", "human-centered AI"]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -20,14 +20,13 @@ classifiers = [
 dependencies = ["numpy", "scipy"]
 
 [project.optional-dependencies]
-olca = ["olca-ipc>=2.0", "olca-schema>=2.0"]
+olca = ["olca-ipc>=2.6", "olca-schema>=2.6"]
 experiments = ["pandas", "matplotlib"]
 report = ["reportlab", "matplotlib"]
 app = ["gradio>=5", "reportlab", "matplotlib"]
 gpu = ["cupy-cuda12x"]
 database = ["JPype1", "jdk4py"]    # experiments/openlca/read_database.py
-# olca-ipc exists from Python 3.11 on: with 3.10 the tests that talk to the openLCA of the tests are skipped
-dev = ["pytest", "ruff", "mypy", "vulture", "olca-ipc>=2.0; python_version >= '3.11'", "olca-schema>=2.0", "reportlab", "matplotlib"]
+dev = ["pytest", "ruff", "mypy", "vulture", "olca-ipc>=2.6", "olca-schema>=2.6", "reportlab", "matplotlib"]
 all = ["branch-lca[olca,experiments,app,dev]"]
 
 [project.urls]

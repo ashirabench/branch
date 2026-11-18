@@ -59,6 +59,6 @@ With openLCA open on the same database and its IPC server started, add `--push` 
 
 *The process "BRANCH | PET single use" in openLCA 2.6.2, tab Parameters, sent with every choice left open (`--push --defaults`). The distance, the mass of the bottle and the burden of recycled PET carry their distributions. The three shares show "none" because their priors are beta distributions, which openLCA does not have.*
 
-Because the choices are parameters with uncertainty, openLCA's own Monte Carlo simulation runs on the model. Sending the same comparison again updates these objects; it does not add copies.
+Because the choices are parameters with uncertainty, openLCA's own Monte Carlo simulation can draw them. That simulation was not run in this project: with BAFU:2026 it would also draw the uncertainty of every exchange of the database, including the waste outputs whose lognormal has the wrong sign ([`CLAIMS.md`](CLAIMS.md), row 16). Sending the same comparison again updates these objects; it does not add copies.
 
 Two limits: openLCA has no beta distribution, which BRANCH uses for recycling rates, so those parameters have no uncertainty in openLCA and say so; and a choice between options (which dataset, which disposal route) is not a number, so it is fixed at the option of the model and listed in the description of the process.

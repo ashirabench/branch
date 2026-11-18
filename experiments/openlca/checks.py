@@ -18,8 +18,8 @@ def connect(port):
     c = olca_bridge.client(port)
     try:
         c.get_descriptors(o.UnitGroup)
-    except Exception:          # whatever the failure, it means the same to the person: the server is not on
-        sys.exit(NOT_ANSWERING)
+    except Exception as exc:   # whatever the failure, it means the same to the person: the server is not on
+        sys.exit(f"{NOT_ANSWERING} ({exc})")
     return c
 
 

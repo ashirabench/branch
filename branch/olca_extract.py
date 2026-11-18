@@ -152,6 +152,17 @@ def linking_for(process_types):
                                              else o.ProviderLinking.PREFER_DEFAULTS))
 
 
+def ready(result):
+    """Wait for a calculation of openLCA. olca-ipc does not raise when openLCA fails: it puts openLCA's
+    message on the result or on its state. This raises it, so a failure is never read as empty impacts."""
+    failed = getattr(result, "error", None)
+    if failed is not None and getattr(failed, "error", None):
+        raise RuntimeError(str(failed.error))
+    state = result.wait_until_ready()
+    if getattr(state, "error", None):
+        raise RuntimeError(str(state.error))
+
+
 def unit_impacts(client, proc_ref, method_ref):
     """Impacts per unit of the reference flow of one process."""
     proc = client.get(o.Process, proc_ref.id)
@@ -164,7 +175,7 @@ def unit_impacts(client, proc_ref, method_ref):
     try:                              # the product system is removed again whatever openLCA answers
         result = client.calculate(setup)
         try:
-            result.wait_until_ready()
+            ready(result)
             impacts = {i.impact_category.name: float(i.amount) for i in result.get_total_impacts()}
         finally:
             result.dispose()
@@ -194,14 +205,12 @@ def simulate_impacts(client, proc_ref, method_ref, runs, tick=None):
         raise
     out = {}
     try:
-        result.wait_until_ready()
-        if getattr(result, "error", None) is not None:
-            raise RuntimeError(result.error.error)
+        ready(result)
         for i in range(runs):
             state = result.simulate_next()
             if getattr(state, "error", None):
                 raise RuntimeError(state.error)
-            result.wait_until_ready()
+            ready(result)
             for imp in result.get_total_impacts():
                 out.setdefault(imp.impact_category.name, []).append(float(imp.amount))
             if tick:
