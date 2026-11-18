@@ -27,7 +27,8 @@ app = ["gradio>=5", "reportlab", "matplotlib"]
 gpu = ["cupy-cuda12x"]
 notebook = ["jupyter", "nbformat", "nbconvert", "ipykernel"]
 database = ["JPype1", "jdk4py"]    # experiments/openlca/read_database.py
-dev = ["pytest", "ruff", "mypy", "olca-ipc>=2.0", "olca-schema>=2.0", "reportlab", "matplotlib"]
+# olca-ipc exists from Python 3.11 on: with 3.10 the tests that talk to the openLCA of the tests are skipped
+dev = ["pytest", "ruff", "mypy", "olca-ipc>=2.0; python_version >= '3.11'", "olca-schema>=2.0", "reportlab", "matplotlib"]
 all = ["branch-lca[olca,experiments,app,dev]"]
 
 [project.urls]
