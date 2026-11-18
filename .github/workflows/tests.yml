@@ -22,6 +22,17 @@ jobs:
       - run: mypy
       - run: pytest -q
 
+  # Windows on every push: the installers are built for it, and its encodings and paths differ
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install -e ".[dev,experiments,app]" -c constraints.txt
+      - run: pytest -q
+
   # the versions of constraints.txt: the combination known to give the committed results
   pinned:
     runs-on: ubuntu-latest

@@ -141,7 +141,7 @@ def test_no_code_that_nothing_uses():
     import sys
     pytest.importorskip("vulture")
     paths = [os.path.join(ROOT, p) for p in ("branch", "experiments", "examples", "packaging", "app.py")]
-    run = subprocess.run([sys.executable, "-m", "vulture", *paths], capture_output=True, text=True)
+    run = subprocess.run([sys.executable, "-m", "vulture", *paths], capture_output=True, text=True, encoding="utf-8")
     assert run.returncode == 0, "code that nothing uses:\n" + run.stdout
 
 

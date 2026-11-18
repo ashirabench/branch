@@ -45,7 +45,8 @@ a = Analysis(
     noarchive=False,
 )
 pyz = PYZ(a.pure)
-exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name=NAME, console=True)
+# UTF-8 mode: on Windows the app then reads and prints every text as UTF-8, whatever the console uses
+exe = EXE(pyz, a.scripts, [("X utf8_mode=1", None, "OPTION")], exclude_binaries=True, name=NAME, console=True)
 coll = COLLECT(exe, a.binaries, a.datas, name=NAME)
 if sys.platform == "darwin":
     app = BUNDLE(coll, name=f"{NAME}.app", bundle_identifier="io.github.ashirabench.branch",

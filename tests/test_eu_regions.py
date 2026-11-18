@@ -37,7 +37,8 @@ def test_the_tables_are_the_ones_read_from_eurostat():
 
 def test_the_files_on_disk_are_what_the_tables_give():
     out = subprocess.run([sys.executable, os.path.join(ROOT, "experiments", "data", "make_eu_regions.py"), "--check"],
-                         capture_output=True, text=True)
+                         capture_output=True, text=True, encoding="utf-8",
+                         env={**os.environ, "PYTHONUTF8": "1"})    # the script prints in UTF-8 on Windows too
     assert out.returncode == 0, out.stdout + out.stderr
     assert len(CODES) == 27 and set(CODES) | {"EU"} <= set(list_regions())
 

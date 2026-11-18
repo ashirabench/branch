@@ -90,7 +90,7 @@ TWICE_SQL = ("select count(*) from (select f_flow from tbl_impact_factors where 
 
 
 def run(db, classpath, statements):
-    out = subprocess.run(["java", "-cp", classpath, "Query", db] + statements, capture_output=True, text=True,
+    out = subprocess.run(["java", "-cp", classpath, "Query", db] + statements, capture_output=True, text=True, encoding="utf-8",
                          cwd=os.path.dirname(db),          # Derby writes derby.log where it runs
                          env={k: v for k, v in os.environ.items() if k != "JAVA_TOOL_OPTIONS"})
     if out.returncode != 0:

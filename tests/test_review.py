@@ -41,7 +41,7 @@ def block(name, truth, strategy="decision_flip"):
 def tracked():
     """Files that git tracks; None when this is not a git checkout (an unpacked archive)."""
     try:
-        out = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True).stdout
+        out = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8", check=True).stdout
     except Exception:
         return None
     return [f for f in out.split("\n") if f]
