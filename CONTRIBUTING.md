@@ -9,7 +9,7 @@ Please open a GitHub issue with a short description, the command you ran, and th
 ## Pull requests
 
 1. Fork the repository and create a branch from `main`.
-2. Install in editable mode: `pip install -e ".[dev,experiments]"`.
+2. Install in editable mode: `pip install -e ".[dev,experiments,app]"`.
 3. Add or update tests in `tests/` and run the three checks GitHub runs: `ruff check .`, `mypy` and `pytest`.
 4. Keep the agent free of language models: every decision must be traceable to data, a codified rule or the human.
 5. Never commit LCA data (BAFU, ELCD or extracted factors). Their terms of use do not allow redistribution; see [`data/README.md`](data/README.md).

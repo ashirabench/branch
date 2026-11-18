@@ -1,5 +1,6 @@
 """Web app logic without a browser: form -> specs -> session -> reports."""
 import os
+import re
 
 import pytest
 
@@ -104,9 +105,17 @@ def test_answers_outside_the_possible_range_are_refused():
     assert webapp.parse_answer(s, c.name, "") is None
 
 
-def test_ui_builds():
+def test_the_page_builds_and_offers_the_entry_points_the_checks_call():
+    """The page is laid out by a dozen functions; an error in any of them shows only when the page is built.
+    Its entry points are a contract: packaging/smoke_session.py (run on every installer) and
+    experiments/openlca/check_app_with_openlca.py call them by these names."""
     pytest.importorskip("gradio")
-    assert webapp.build_ui() is not None
+    offered = set(webapp.build_ui().get_api_info()["named_endpoints"])
+    assert {"/on_start", "/answer", "/skip", "/on_finish", "/on_find", "/on_send", "/on_check", "/on_read"} <= offered
+    root = os.path.join(os.path.dirname(__file__), "..")
+    for script in (("packaging", "smoke_session.py"), ("experiments", "openlca", "check_app_with_openlca.py")):
+        called = set(re.findall(r'api_name="(/\w+)"', open(os.path.join(root, *script)).read()))
+        assert called and called <= offered, f"{script[-1]} calls {sorted(called - offered)}, which the page does not offer"
 
 
 def test_every_question_has_plain_help_and_shares_are_in_percent():

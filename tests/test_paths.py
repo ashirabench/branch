@@ -44,7 +44,5 @@ def test_no_module_finds_the_data_on_its_own():
             assert "os.path.dirname(os.path.dirname(" not in read("branch", name), name
 
 
-def test_the_installer_and_the_image_take_the_list_from_here():
+def test_the_installer_takes_the_list_from_here():
     assert "from branch.paths import RUNTIME_DATA" in read("packaging", "branch.spec")
-    docker = read("Dockerfile")
-    assert "COPY data ./data" in docker and not re.search(r"COPY data/\w+", docker)

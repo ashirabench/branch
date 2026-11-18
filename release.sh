@@ -129,7 +129,7 @@ git -c core.autocrlf=true clone --quiet . "$TMP/copy"
 set_version "$VERSION" "$TMP/copy"
 python3 -m venv "$TMP/env"
 { "$TMP/env/bin/python" -m pip install --quiet --upgrade pip &&
-  (cd "$TMP/copy" && "$TMP/env/bin/python" -m pip install --quiet -e ".[dev,experiments]"); } >"$TMP/install.log" 2>&1 \
+  (cd "$TMP/copy" && "$TMP/env/bin/python" -m pip install --quiet -e ".[dev,experiments,app]"); } >"$TMP/install.log" 2>&1 \
   || { cat "$TMP/install.log"; stop "the installation fails in a new environment (the log is above)"; }
 (cd "$TMP/copy" && "$TMP/env/bin/python" -m pytest -q) || stop "tests fail in a fresh copy (they may pass here because of files that are not in git)"
 echo "installed as a package, away from the repository: the data travels with it and a comparison runs"

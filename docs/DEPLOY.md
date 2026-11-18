@@ -23,15 +23,13 @@ python app.py     # newest file in data/factors/, http://127.0.0.1:7860
 BRANCH_DEMO=1 python app.py                                         # illustrative numbers, for showing the interface
 ```
 
-On a server (Docker): the image does not contain the factors; mount them read only.
+On a server, the command is the same. `BRANCH_HOST=0.0.0.0` makes the page answer to other computers, `PORT` chooses the port and `BRANCH_FACTORS` names the factor file, which stays on the server. Put the page behind HTTPS.
 
 ```bash
-docker build -t branch .
-docker run -p 7860:7860 -v $PWD/data/factors:/srv/factors:ro \
-  -e BRANCH_FACTORS=/srv/factors/<your factors file>.json branch
+BRANCH_HOST=0.0.0.0 PORT=7860 BRANCH_FACTORS=/srv/factors/<your factors file>.json python app.py
 ```
 
-Any host that runs a container works (a university VM, Render, Fly.io, a Hugging Face Space with the factors in a private dataset). Put it behind HTTPS.
+This repository does not ship a container image: an earlier version had a Dockerfile that no test ever built, and it was removed on 18 November 2026.
 
 ## 3. Rules for the factors file
 

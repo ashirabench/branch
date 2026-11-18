@@ -12,7 +12,7 @@ BRANCH_DEMO=1 python app.py                                          # interface
 python app.py                                                       # real factors: newest file in data/factors/
 ```
 
-Open http://127.0.0.1:7860. To host it for companies (Docker, factors mounted on the server and never served), see [`docs/DEPLOY.md`](DEPLOY.md).
+Open http://127.0.0.1:7860. To host it for companies (the factors stay on the server and are never served), see [`docs/DEPLOY.md`](DEPLOY.md).
 
 ## Quick Start
 
