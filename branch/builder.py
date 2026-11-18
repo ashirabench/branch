@@ -48,10 +48,10 @@ import numpy as np
 from . import catalogue as cat
 from .beliefs import Choice
 from .lca_model import Model, Term
+from .paths import data_path
 from .regions import load_region
 
-BENCHMARK_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                             "data", "benchmark")
+BENCHMARK_DIR = data_path("benchmark")
 
 
 # ---------------------------------------------------------------- inputs

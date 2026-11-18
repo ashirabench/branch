@@ -24,6 +24,7 @@ System model: attributional, ILCD Situation A, cut-off for recycling. Recycled
 material leaving the system carries no credit and no burden; recycled input
 carries only its own production burden.
 """
+from .paths import data_path
 
 # --------------------------------------------------------------------------
 # Materials
@@ -217,8 +218,7 @@ def load_materials(root=None):
     with the id of a built in material replaces it."""
     import json
     import os
-    root = root or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                "data", "materials")
+    root = root or data_path("materials")
     out = dict(MATERIALS)
     if os.path.isdir(root):
         for f in sorted(os.listdir(root)):
@@ -286,7 +286,7 @@ def load_energy_recovery(root=None):
     A material without an entry gets no credit."""
     import json
     import os
-    root = root or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "cff")
+    root = root or data_path("cff")
     path = os.path.join(root, "energy_recovery.json")
     if not os.path.exists(path):
         return {}
@@ -306,7 +306,7 @@ def load_cff(root=None):
     """
     import json
     import os
-    root = root or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "cff")
+    root = root or data_path("cff")
     out = {}
     if os.path.isdir(root):
         for f in sorted(os.listdir(root)):

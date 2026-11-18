@@ -114,6 +114,8 @@ bash reproduce.sh paper      # figures, tables and the PDF from the committed su
 QUICK=1 bash reproduce.sh    # 3 seeds and one question per round, to check the pipeline in minutes
 ```
 
+`pyproject.toml` names the packages without versions; [`constraints.txt`](constraints.txt) fixes the versions with which the committed results were checked (`pip install -e ".[all]" -c constraints.txt`).
+
 The numbers of the benchmark are generated into `paper/tables/numbers.tex`, and a test compares the table of the later experiments with the committed summaries, so prose and data cannot drift apart.
 
 ## Citation

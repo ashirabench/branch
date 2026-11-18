@@ -18,3 +18,14 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: pip install -e ".[dev,experiments]"
       - run: pytest -q
+
+  # the versions of constraints.txt: the combination known to give the committed results
+  pinned:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install -e ".[dev,experiments]" -c constraints.txt
+      - run: pytest -q

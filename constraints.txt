@@ -1,0 +1,18 @@
+# Versions with which BRANCH is known to give the committed results.
+#
+#   pip install -e ".[all]" -c constraints.txt
+#
+# pyproject.toml names the packages without versions, so that BRANCH installs beside other software.
+# This file fixes them for whoever wants to repeat a number: with Python 3.13 and these versions every
+# test passes, and the table of interactions (paper/data/interactions_2026-11-17.csv), computed again
+# on 18 November 2026 from the factor file, is identical byte for byte to the committed one.
+# GitHub tests this combination on every push.
+gradio==6.32.0
+matplotlib==3.11.2
+numpy==2.5.5
+olca-ipc==2.6.3
+olca-schema==2.6.2
+pandas==3.1.1
+pytest==9.2.0
+reportlab==5.1.0
+scipy==1.18.1

@@ -14,6 +14,8 @@ import time
 
 import olca_schema as o
 
+from .paths import data_path
+
 # Which process of the database stands for each thing BRANCH needs is not code: it is a file,
 # data/databases/<database>.json, one per database (docs/BRING_YOUR_DATABASE.md). This module reads
 # it into the names below, which the rest of the code uses.
@@ -21,7 +23,7 @@ import olca_schema as o
 #                        exactly one process wins.
 #   LOCATION_PREFERENCE  when several processes share the name and differ by location (see match()).
 #   GRID_PATTERN         how the database names the electricity of a country; group 1 is the code.
-MAP_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "databases")
+MAP_DIR = data_path("databases")
 DEFAULT_MAP = "bafu2026"
 REQUIRED = ("database", "citation", "location_preference", "grid_name_pattern", "datasets")
 

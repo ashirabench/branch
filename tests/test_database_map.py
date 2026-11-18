@@ -106,6 +106,6 @@ def test_a_map_with_a_gap_is_refused_in_words(tmp_path):
     assert "BRING_YOUR_DATABASE" in str(err.value)
 
 
-def test_the_desktop_application_carries_the_map():
-    spec = open(os.path.join(ROOT, "packaging", "branch.spec"), encoding="utf-8").read()
-    assert '"databases"' in spec, "without data/databases the installed application cannot start"
+def test_the_map_is_among_the_data_every_delivery_carries():
+    from branch.paths import RUNTIME_DATA
+    assert "databases" in RUNTIME_DATA, "without data/databases the installed application cannot start"

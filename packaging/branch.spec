@@ -23,7 +23,10 @@ for pkg in ("gradio", "gradio_client", "safehttpx", "groovy", "olca_schema", "ol
     except Exception:
         pass
 datas += collect_data_files("reportlab")
-for sub in ("regions", "materials", "benchmark", "cff", "databases"):
+sys.path.insert(0, ROOT)
+from branch.paths import RUNTIME_DATA  # noqa: E402  the one list of the data BRANCH reads at run time
+
+for sub in RUNTIME_DATA:
     src = os.path.join(ROOT, "data", sub)
     if os.path.isdir(src):
         datas.append((src, os.path.join("data", sub)))

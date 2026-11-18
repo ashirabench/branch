@@ -37,9 +37,10 @@ import json
 import os
 import re
 
-_DATA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+from .paths import data_path
+
 # BRANCH_REGIONS points at another folder of region files (same file names as data/regions).
-REGION_DIR = os.environ.get("BRANCH_REGIONS") or os.path.join(_DATA, "regions")
+REGION_DIR = os.environ.get("BRANCH_REGIONS") or data_path("regions")
 
 
 class Region:

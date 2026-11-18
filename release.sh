@@ -132,6 +132,22 @@ python3 -m venv "$TMP/env"
   (cd "$TMP/copy" && "$TMP/env/bin/python" -m pip install --quiet -e ".[dev,experiments]"); } >"$TMP/install.log" 2>&1 \
   || { cat "$TMP/install.log"; stop "the installation fails in a new environment (the log is above)"; }
 (cd "$TMP/copy" && "$TMP/env/bin/python" -m pytest -q) || stop "tests fail in a fresh copy (they may pass here because of files that are not in git)"
+echo "installed as a package, away from the repository: the data travels with it and a comparison runs"
+(cd "$TMP/copy" && "$TMP/env/bin/python" -m pip wheel --quiet --no-deps -w "$TMP/wheel" . >"$TMP/wheel.log" 2>&1) \
+  || { cat "$TMP/wheel.log"; stop "the package does not build"; }
+"$TMP/env/bin/python" -m pip install --quiet --no-deps --target "$TMP/site" "$TMP"/wheel/*.whl
+(cd "$TMP" && PYTHONPATH="$TMP/site" "$TMP/env/bin/python" - <<'PY'
+import os, branch
+from branch.paths import RUNTIME_DATA, data_path
+from branch.builder import build_model
+from branch.demo_factors import demo_factors
+assert "site" in branch.__file__ and "copy" not in branch.__file__, branch.__file__
+for sub in RUNTIME_DATA:
+    assert os.listdir(data_path(sub)), sub
+model = build_model("pet_bottle_1l", "glass_refillable_1l", "PT", factors=demo_factors())
+print(f"  {len(model.choices)} choices, {len(model.terms)} terms, data in {data_path()}")
+PY
+) || stop "the installed package does not find its data (branch/paths.py, pyproject.toml)"
 echo "the same tests with the packages of the installer build"
 python3 -m venv "$TMP/env2"
 { "$TMP/env2/bin/python" -m pip install --quiet --upgrade pip &&

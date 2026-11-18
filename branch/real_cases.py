@@ -21,6 +21,7 @@ import re
 import numpy as np
 
 from .builder import build_model, factor  # noqa: F401  (factor re-exported)
+from .paths import data_path
 
 DEFAULT_CATEGORY = "Climate change"
 CITATION = "Life Cycle Inventory database of the Swiss Federal Administration, BAFU:2026"
@@ -37,8 +38,7 @@ def load_factors(path=None, root=None):
             roots = [root]
         else:                       # the repository's data/factors, then the connector's user folder
             from .connector import factors_dir
-            roots = [os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "factors"),
-                     factors_dir()]
+            roots = [data_path("factors"), factors_dir()]
         files = sorted((f for r in roots for f in glob.glob(os.path.join(r, "*.json"))), key=os.path.getmtime)
         if not files:
             raise FileNotFoundError(

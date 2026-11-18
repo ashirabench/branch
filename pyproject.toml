@@ -33,8 +33,16 @@ all = ["branch-lca[olca,experiments,app,dev]"]
 [project.urls]
 Repository = "https://github.com/ashirabench/branch"
 
-[tool.setuptools.packages.find]
-include = ["branch*"]
+# The data BRANCH reads at run time travels inside the installed package, as branch/data/.
+# The folders are the list RUNTIME_DATA of branch/paths.py; a test keeps the two equal.
+[tool.setuptools]
+packages = ["branch", "branch.data"]
+
+[tool.setuptools.package-dir]
+"branch.data" = "data"
+
+[tool.setuptools.package-data]
+"branch.data" = ["regions/*.json", "materials/*.json", "benchmark/*.json", "cff/*.json", "cff/*.csv", "databases/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

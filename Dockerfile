@@ -6,9 +6,7 @@ FROM python:3.12-slim
 WORKDIR /app
 COPY pyproject.toml README.md LICENSE ./
 COPY branch ./branch
-COPY data/benchmark ./data/benchmark
-COPY data/regions ./data/regions
-COPY data/materials ./data/materials
+COPY data ./data
 COPY app.py ./
 RUN pip install --no-cache-dir ".[app]"
 ENV BRANCH_HOST=0.0.0.0 PORT=7860 GRADIO_ANALYTICS_ENABLED=False
