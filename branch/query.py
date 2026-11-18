@@ -51,7 +51,6 @@ def entropy(state, rng):
 
 
 def sobol(state, rng):
-    xp = state.model.xp
     var_total = float(state.delta.var())
     out = {}
     for n in state.open:

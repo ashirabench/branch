@@ -13,6 +13,8 @@ point_world  the single world written to openLCA: the human's answers, the
 import numpy as np
 
 from .backend import to_numpy
+from .builder import rebuild
+from .indicators import available, describe
 from .montecarlo import State, p_a_lower
 
 
@@ -104,8 +106,6 @@ def indicators(model, result):
     with the same products and region and sampled with the same seed, so the
     open choices see the same draws in every category.
     """
-    from .builder import rebuild
-    from .indicators import available, describe
     out = []
     for cat in available(model.factor_data):
         m = model if cat == model.meta.get("category") else rebuild(model, cat)

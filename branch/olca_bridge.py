@@ -31,6 +31,7 @@ import uuid
 
 import olca_schema as o
 
+from .factors import factor
 from .formulas import trace
 from .olca_extract import linking_for
 from .whatif import point_world
@@ -264,7 +265,6 @@ def _method(c, model):
 
 def verify_in_openlca(c, model, result, systems):
     """Calculate the pushed systems in openLCA and compare with BRANCH."""
-    from .builder import factor
     category = model.meta.get("category")
     method, method_name = _method(c, model)
     if method is None:
@@ -330,7 +330,6 @@ def diagnose_in_openlca(c, model, result, labels=None):
     objects are deleted afterwards.
 
     Returns {label: [(factor key, openLCA, BRANCH, relative difference), ...]}."""
-    from .builder import factor
     method, _ = _method(c, model)
     category = model.meta.get("category")
     out = {}

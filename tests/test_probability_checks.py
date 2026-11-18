@@ -6,7 +6,6 @@ import numpy as np
 from scipy import stats
 
 from branch.cases import toy_packaging
-from branch.montecarlo import State
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 

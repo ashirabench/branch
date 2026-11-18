@@ -10,7 +10,9 @@ Produces (in results/):
   <tag>_summary.csv             mean, median, certified %, accuracy %, latency,
                                 paired Wilcoxon vs decision_flip
 """
-import os as _os, sys as _sys
+import os as _os
+import sys as _sys
+
 _sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))
 
 import json
@@ -18,6 +20,7 @@ import sys
 from collections import defaultdict
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402

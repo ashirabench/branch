@@ -51,7 +51,7 @@ def main():
         print("Nothing deleted.")
         return
     failed = 0
-    for kind, items in found:
+    for _kind, items in found:
         for d in items:
             try:
                 c.delete(d)

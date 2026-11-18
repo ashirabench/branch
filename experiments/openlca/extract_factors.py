@@ -31,8 +31,18 @@ import olca_ipc as ipc  # noqa: E402
 import olca_schema as o  # noqa: E402
 
 from branch import olca_extract as extract_module  # noqa: E402
-from branch.olca_extract import (LOCATION_PREFERENCE, PROCESSES, all_processes, citation_for,  # noqa: E402,F401
-                                 find_method, loc, match, norm, resolve, unit_impacts)
+from branch.olca_extract import (  # noqa: E402,F401
+    LOCATION_PREFERENCE,
+    PROCESSES,
+    all_processes,
+    citation_for,
+    find_method,
+    loc,
+    match,
+    norm,
+    resolve,
+    unit_impacts,
+)
 
 
 def main():

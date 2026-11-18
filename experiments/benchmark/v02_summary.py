@@ -183,8 +183,9 @@ def compare_effect(block, base):
 
 def verdicts():
     """Sign of the verdict of each case under each model that could be built."""
-    from branch.real_cases import compare, load_factors
     from run_grid import PET_SSP, set_wash_kwh_high
+
+    from branch.real_cases import compare, load_factors
     bafu = load_factors()
     models = {"BAFU cut-off": dict(factors=bafu),
               "cut-off, washing up to 0.03 kWh": dict(factors=bafu, wash=0.03),
@@ -255,7 +256,8 @@ def main():
     if any(rows(b, "prior") is not None for b in SENSITIVITY):
         lines += ["## Sensitivity runs (reported, not read as statements)", ""]
         table(lines, SENSITIVITY)
-    from prior_sources import benchmark_counts, lines as source_lines
+    from prior_sources import benchmark_counts
+    from prior_sources import lines as source_lines
     lines += ["## How much of each prior has a source (benchmark, per region)", "",
               "The label SOURCE means that the centre has a source. The spread is my choice or my rule in the "
               "second column; no prior has an uncertainty that a source measured as such.", ""]

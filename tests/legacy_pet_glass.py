@@ -6,8 +6,8 @@ two benchmark product files, must give the same delta for every world.
 import numpy as np
 
 from branch.beliefs import Choice
-from branch.lca_model import Model, Term
 from branch.builder import factor as _factor
+from branch.lca_model import Model, Term
 
 CITATION = "Life Cycle Inventory database of the Swiss Federal Administration, BAFU:20XY"
 DEFAULT_CATEGORY = "Climate change"

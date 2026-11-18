@@ -29,14 +29,13 @@ interval is coarse, and it is the one the readings of the plan use. Hence
                                certified from the priors), which carry no paired information
 """
 import glob
+import itertools
 import os
 import re
 import sys
 
 import numpy as np
 import pandas as pd
-import itertools
-
 from scipy.stats import binomtest
 
 

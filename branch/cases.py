@@ -102,7 +102,8 @@ def synthetic(J, seed=0, xp=np, frac_cat=0.4):
         a, b = rng.choice(J, 2, replace=False)
         na, nb, coef = f"c{a}", f"c{b}", float(rng.normal(0, 0.02))
         terms.append(Term(f"x{i}", [na, nb], lambda xp_, v, na=na, nb=nb, c=coef: c * v[na] * v[nb]))
-    terms.append(Term("offset", [], lambda xp_, v, o=float(rng.normal(0, 0.05)): o))
+    offset = float(rng.normal(0, 0.05))
+    terms.append(Term("offset", [], lambda xp_, v, o=offset: o))
     return Model(choices, terms, xp)
 
 

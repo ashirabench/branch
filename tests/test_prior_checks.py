@@ -6,9 +6,8 @@ them would be wrong, so this test fails when a prior is narrowed past a publishe
 import csv
 import os
 
-import pytest
-
 import numpy as np
+import pytest
 
 from branch.builder import required_factor_keys
 from branch.real_cases import compare

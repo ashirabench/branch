@@ -11,7 +11,8 @@ IPC Server). Through it the connector:
 """
 import os
 import socket
-import sys
+
+from .paths import factors_dir, user_dir  # noqa: F401  (user_dir re-exported)
 
 PORT = int(os.environ.get("OLCA_PORT", "8080"))
 
@@ -22,26 +23,6 @@ HOW_TO_START = (
 
 GET_BAFU = ("BRANCH needs the free BAFU:2026 database in openLCA (openLCA Nexus, nexus.openlca.org), "
             "with the openLCA LCIA methods (EF 3.1).")
-
-
-def user_dir():
-    """Per user folder for factors and reports (never inside the app bundle)."""
-    if os.environ.get("BRANCH_HOME"):
-        d = os.environ["BRANCH_HOME"]
-    elif sys.platform == "darwin":
-        d = os.path.expanduser("~/Library/Application Support/BRANCH")
-    elif sys.platform.startswith("win"):
-        d = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "BRANCH")
-    else:
-        d = os.path.join(os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")), "branch")
-    os.makedirs(d, exist_ok=True)
-    return d
-
-
-def factors_dir():
-    d = os.path.join(user_dir(), "factors")
-    os.makedirs(d, exist_ok=True)
-    return d
 
 
 def port_open(port=PORT, timeout=1.0):
@@ -95,6 +76,7 @@ def probe(port=PORT, method="EF 3.1"):
         return out
     try:
         import olca_schema as o
+
         from .olca_extract import norm
         c = client(port)
         procs = c.get_descriptors(o.Process)
@@ -145,6 +127,7 @@ def search_processes(text, port=PORT, limit=15):
     [{"name", "location", "unit", "category"}], shortest names first. The unit is the one the
     amounts must be given in (reference flow of the process). Needs openLCA connected."""
     import olca_schema as o
+
     from .olca_extract import loc, norm
     words = norm(text).split()
     if not words:

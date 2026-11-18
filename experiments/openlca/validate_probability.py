@@ -63,6 +63,7 @@ def fixed_world(model, seed):
 
 def main():
     import olca_schema as o
+
     from branch import olca_bridge
     from branch.montecarlo import State
     from branch.real_cases import compare

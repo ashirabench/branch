@@ -13,11 +13,10 @@ def demo(monkeypatch):
 
 
 def test_no_factors_no_start(monkeypatch):
-    from branch import real_cases
 
     def no_file(*args, **kwargs):          # as on a computer with no file in data/factors/
         raise FileNotFoundError("no factor file")
-    monkeypatch.setattr(real_cases, "load_factors", no_file)
+    monkeypatch.setattr(webapp, "load_factors", no_file)
     monkeypatch.delenv("BRANCH_DEMO")
     with pytest.raises(RuntimeError, match="No impact factors"):
         webapp.load_server_factors()
@@ -195,6 +194,7 @@ def test_a_later_step_never_counts_as_done_before_an_earlier_one():
 
 def test_the_version_is_the_same_everywhere():
     import re
+
     import branch
     root = os.path.join(os.path.dirname(__file__), "..")
     read = lambda *p: open(os.path.join(root, *p)).read()  # noqa: E731

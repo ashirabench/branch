@@ -9,8 +9,10 @@ two product files + region            data/benchmark/*.json, data/examples/, dat
 unit impact factors (read once)       data/factors/*.json, never committed; found by the map data/databases/*.json
         |
         v
+spec.py         reads and checks the two product files
 builder.py      completes what the files leave out, from the rules of catalogue.py and regions.py
         |       every completed choice becomes a Choice with a prior and its source
+product_terms.py   writes the terms of each product, one small function per stage of the life cycle
         v
 lca_model.py    Model = choices + terms; the difference of impact is a sum of terms
         |
@@ -58,17 +60,25 @@ The proof of the identity is in [`lemma.md`](lemma.md) and its numerical check i
 
 | Idea of the paper | File | Name in the code |
 |---|---|---|
-| A product described by components, materials and masses; what is not stated becomes a choice | `branch/builder.py` | `load_spec`, `build_model` |
-| The life cycle of one product as terms (materials, conversion, transport, washing, disposal) | `branch/builder.py` | `_product_terms` |
-| A product described by processes of the database chosen by name | `branch/builder.py` | `process_key`, `_check_exchanges` |
+| The product file: components, materials and masses, read and checked | `branch/spec.py` | `load_spec` |
+| What the product file does not state becomes a choice; the model of the comparison | `branch/builder.py` | `build_model`, `_Builder` |
+| The life cycle of one product, a function per stage | `branch/product_terms.py` | `product_terms` |
+| Material, recycled content and conversion of a component | `branch/product_terms.py` | `_material_term`, `_recycled_content` |
+| End of life: a split by rates, or one fate among several | `branch/product_terms.py` | `_eol_split`, `_eol_options` |
+| Distribution, supply of the packaging, washing of a refillable container | `branch/product_terms.py` | `_distribution_term`, `_supply_terms`, `_washing_term` |
+| A product described by processes of the database chosen by name | `branch/spec.py` | `process_key`, `_check_exchanges` |
+| A quantity of a term: a constant or the value of a choice in a world | `branch/quantities.py` | `Param` |
 | The rules that complete a silent bill of materials, and the 15 materials | `branch/catalogue.py` | `MATERIALS`, `load_materials` |
 | What the location fixes and what it changes in the priors | `branch/regions.py` | `Region`, `load_region` |
-| The cut-off rule and the Circular Footprint Formula | `branch/builder.py` | `system_model` |
-| The uncertainty that the database states for its datasets (the third ablation) | `branch/builder.py` | `inventory_uncertainty`, `consistent_uncertainty` |
+| The cut-off rule and the Circular Footprint Formula | `branch/product_terms.py` | `_cff_content_term`, `_cff_end_of_life_term`, `_cff_energy_term` |
+| The uncertainty that the database states for its datasets (the third ablation) | `branch/builder.py` | `inventory_uncertainty` |
+| Which of those uncertainties agree with the value the database calculates | `branch/quantities.py` | `consistent_uncertainty` |
 | The 16 impact categories of EF 3.1 | `branch/indicators.py` | `EF31` |
 | Reading the unit factors from the open database, once | `branch/olca_extract.py` | `extract`, `unit_impacts` |
 | The names of the datasets BRANCH looks for in the database: a file per database, [`data/databases/`](../data/databases/) | `branch/olca_extract.py` | `load_database_map`, `PROCESSES` |
-| Loading the factor file; the list of assumptions of a model | `branch/real_cases.py` | `load_factors`, `assumptions` |
+| Loading the factor file; one factor out of it | `branch/factors.py` | `load_factors`, `factor` |
+| The list of assumptions of a model | `branch/real_cases.py` | `assumptions` |
+| Where the data files are, in a clone, an installed package and the desktop application | `branch/paths.py` | `data_path`, `RUNTIME_DATA` |
 
 ## What the person receives (paper, Sections "Outputs and safeguards" and "Validation of the product")
 

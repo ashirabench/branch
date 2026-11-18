@@ -19,11 +19,11 @@ from reportlab.lib import colors  # noqa: E402
 from reportlab.lib.pagesizes import A4  # noqa: E402
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet  # noqa: E402
 from reportlab.lib.units import cm  # noqa: E402
-from reportlab.platypus import (Image, KeepTogether, Paragraph, SimpleDocTemplate, Spacer,  # noqa: E402
-                                Table, TableStyle)
+from reportlab.platypus import Image, KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle  # noqa: E402
 
 from .agent import ISO_PUBLIC_NOTICE  # noqa: E402
 from .help import fmt_pct, is_percent, percent_question, plural  # noqa: E402
+from .indicators import unit
 from .whatif import indicators, reversals, stages  # noqa: E402
 
 GREEN, AMBER, INK, MUTED = "#2f6b4f", "#c17a2b", "#1f2328", "#5b636b"
@@ -49,7 +49,6 @@ def _stage_labels(meta):
 
 
 def _unit(category):
-    from .indicators import unit
     return unit(category)
 
 

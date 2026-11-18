@@ -16,7 +16,7 @@ import time
 
 import numpy as np
 
-from .backend import sync
+from .backend import sync, to_numpy
 from .montecarlo import State, p_a_lower
 from .query import STRATEGIES
 
@@ -120,7 +120,6 @@ class Session:
             raise RuntimeError("the session is not over: call next_question until it returns None")
         model, state, asked = self.model, self.state, self.asked
         final = self.trace[-1]
-        from .backend import to_numpy
         a_terms = [i for i, t in enumerate(model.terms) if t.sign > 0]
         b_terms = [i for i, t in enumerate(model.terms) if t.sign < 0]
         ia = to_numpy(sum(state.contrib[i] for i in a_terms)) if a_terms else np.zeros(1)

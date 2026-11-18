@@ -6,11 +6,12 @@ import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "experiments", "benchmark"))
 
+from run_grid import make_uniform, no_location_region  # noqa: E402
+
 from branch.agent import run_agent  # noqa: E402
 from branch.builder import required_factor_keys  # noqa: E402
 from branch.cases import draw_truth  # noqa: E402
 from branch.real_cases import compare  # noqa: E402
-from run_grid import make_uniform, no_location_region  # noqa: E402
 from tests.test_builder import BENCH, CAT  # noqa: E402
 
 PAIR = ("pet_bottle_1l", "glass_refillable_1l")

@@ -15,11 +15,18 @@ import tempfile
 
 import numpy as np
 
+from . import __version__, connector
 from . import catalogue as cat
 from . import help as qhelp
 from .agent import ISO_PUBLIC_NOTICE, Session
 from .builder import build_model, load_spec
+from .demo_factors import demo_factors
+from .factors import load_factors
+from .indicators import available, describe
+from .manager_report import manager_pdf
 from .regions import list_regions, load_region
+from .report import markdown_report
+from .spec import BENCHMARK_DIR, parse_process_key, process_key
 
 COLUMNS = ["component", "material", "mass (g)"]
 INPUT_COLUMNS = ["what it is for", "stage", "openLCA process (exact name)", "smallest amount", "largest amount"]
@@ -30,9 +37,7 @@ INPUT_COLUMNS = ["what it is for", "stage", "openLCA process (exact name)", "sma
 def load_server_factors():
     """(factors, is_demo). Raises a clear error when nothing is configured."""
     if os.environ.get("BRANCH_DEMO") == "1":
-        from .demo_factors import demo_factors
         return demo_factors(), True
-    from .real_cases import load_factors
     path = os.environ.get("BRANCH_FACTORS")
     if path and os.path.exists(path):
         return load_factors(path), False
@@ -99,7 +104,6 @@ def materials_waiting(factors):
 
 def templates():
     """{label: benchmark name} of the product files shipped in data/benchmark/."""
-    from .builder import BENCHMARK_DIR
     out = {}
     for f in sorted(os.listdir(BENCHMARK_DIR)):
         if f.endswith(".json"):
@@ -145,7 +149,6 @@ def inputs_from_table(name, table):
     """Rows of the "other inputs" table -> builder "exchanges". One row per input:
     what it is for, stage, openLCA process (exact name, " @CH" for a location), smallest and
     largest amount. The same number twice (or only one of the two) is a known amount."""
-    from .builder import process_key
     out = []
     for i, r in enumerate(_rows(table), 1):
         r = list(r) + [""] * (len(INPUT_COLUMNS) - len(r))
@@ -162,7 +165,7 @@ def inputs_from_table(name, table):
             lo = None if blank(r[3]) else _number(r[3])
             hi = None if blank(r[4]) else _number(r[4])
         except ValueError:
-            raise ValueError(f"{name}, input {i}: the amounts of {what or proc} must be numbers.")
+            raise ValueError(f"{name}, input {i}: the amounts of {what or proc} must be numbers.") from None
         if lo is None and hi is None:
             raise ValueError(f"{name}, input {i}: give the amount of {what or proc}, or the smallest and the "
                              "largest it could be if you do not know it.")
@@ -191,7 +194,7 @@ def spec_from_fields(name, volume_l, refillable, table, used_ids=(), inputs=None
     try:
         volume_l = float(volume_l)
     except (TypeError, ValueError):
-        raise ValueError(f"{name}: the volume must be a number of litres.")
+        raise ValueError(f"{name}: the volume must be a number of litres.") from None
     if volume_l <= 0:
         raise ValueError(f"{name}: the volume must be larger than zero.")
     mats = materials()
@@ -207,7 +210,7 @@ def spec_from_fields(name, volume_l, refillable, table, used_ids=(), inputs=None
         try:
             mass = float(str(r[2]).replace(",", "."))
         except (TypeError, ValueError):
-            raise ValueError(f"{name}, line {i}: the mass of {comp} must be a number of grams.")
+            raise ValueError(f"{name}, line {i}: the mass of {comp} must be a number of grams.") from None
         if mass <= 0:
             raise ValueError(f"{name}, line {i}: the mass of {comp} must be larger than zero.")
         cid = re.sub(r"[^a-z0-9]+", "_", comp.lower()).strip("_") or f"part_{i}"
@@ -222,7 +225,7 @@ def spec_from_fields(name, volume_l, refillable, table, used_ids=(), inputs=None
     try:
         units = 1.0 if units in (None, "") else float(units)
     except (TypeError, ValueError):
-        raise ValueError(f"{name}: how many are needed for the same use must be a number.")
+        raise ValueError(f"{name}: how many are needed for the same use must be a number.") from None
     if units <= 0:
         raise ValueError(f"{name}: how many are needed for the same use must be larger than zero.")
     pid = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_") or "product"
@@ -243,7 +246,6 @@ def missing_process_keys(specs, factors):
 
 def explain_unresolved(bad):
     """Plain words for the processes BRANCH could not read (connector.read_process_factors)."""
-    from .builder import parse_process_key
     parts = []
     for key, why in sorted(bad.items()):
         name = (parse_process_key(key) or (key, None))[0]
@@ -360,7 +362,7 @@ def parse_answer(s, name, raw):
     try:
         v = float(str(raw).strip().rstrip("%").strip().replace(",", "."))
     except ValueError:
-        raise ValueError("Type a number.")
+        raise ValueError("Type a number.") from None
     k = 100.0 if pct else 1.0
     a, b = c._frozen().support()
     if not (k * a <= v <= k * b):
@@ -371,8 +373,6 @@ def parse_answer(s, name, raw):
 
 def finish(s, outdir=None):
     """(markdown summary, path of the manager PDF, path of the technical markdown)."""
-    from .manager_report import manager_pdf
-    from .report import markdown_report
     r = s.result()
     outdir = outdir or tempfile.mkdtemp(prefix="branch_")
     pdf = os.path.join(outdir, "BRANCH_report.pdf")
@@ -400,7 +400,6 @@ def finish(s, outdir=None):
 def build_ui():
     import gradio as gr
 
-    from .indicators import available, describe
     try:
         server_factors, demo = load_server_factors()
         factors_error = None
@@ -414,7 +413,6 @@ def build_ui():
     waiting = materials_waiting(server_factors)
     names = list(tmpl)
 
-    from . import __version__
     with gr.Blocks(title="BRANCH: compare two products", analytics_enabled=False) as ui:
         gr.Markdown("# BRANCH for openLCA\nCompare two products from their bill of materials, or from processes "
                     "of the openLCA database. BRANCH fills in what you do not know, asks only the questions that "
@@ -430,7 +428,6 @@ def build_ui():
                         "(once, about 15 minutes).")
         state = gr.State(None)
 
-        from . import connector
         ok0, msg0 = connector.status()
         with gr.Accordion("openLCA connection", open=bool(factors_error) or not ok0):
             have = server_factors is not None and not demo     # demo numbers are not the user's factors

@@ -11,7 +11,9 @@ CPU runs are spread over processes (ProcessPoolExecutor). With
 BRANCH_BACKEND=cupy use --workers 1 (one GPU, one process).
 Writes results/<tag>_runs.csv and results/<tag>_traces.jsonl
 """
-import os as _os, sys as _sys
+import os as _os
+import sys as _sys
+
 _sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))
 
 import argparse
@@ -26,7 +28,6 @@ from branch.agent import run_agent
 from branch.backend import get_xp
 from branch.cases import draw_truth, draw_truth_adverse, draw_truth_tails, synthetic, synthetic_lca, toy_packaging
 from branch.query import STRATEGIES
-
 
 ABLATIONS = ("none", "no_location", "uniform")
 

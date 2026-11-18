@@ -9,7 +9,9 @@ open choices J and Monte Carlo samples N grow?
 
 Writes results/latency_<backend>.csv
 """
-import os as _os, sys as _sys
+import os as _os
+import sys as _sys
+
 _sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))
 
 import argparse

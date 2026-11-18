@@ -168,6 +168,7 @@ def test_a_region_can_override_a_categorical_prior():
 
 def test_an_override_with_an_unknown_option_is_refused(tmp_path, monkeypatch):
     import json
+
     from branch import regions
     for code in ("GLO", "PT"):
         (tmp_path / f"{code}.json").write_text(open(f"data/regions/{code}.json").read())
@@ -180,9 +181,10 @@ def test_an_override_with_an_unknown_option_is_refused(tmp_path, monkeypatch):
 
 
 def test_every_region_needs_only_known_factor_keys():
-    import re
-    from branch.regions import list_regions
     import json
+    import re
+
+    from branch.regions import list_regions
     known = set(json.load(open("data/databases/bafu2026.json", encoding="utf-8"))["datasets"])
     for code in list_regions():
         if code == "GLO":
@@ -204,6 +206,7 @@ def test_refillable_supply_is_spread_over_trips():
 
 def test_materials_can_be_added_as_data_files(tmp_path, monkeypatch):
     import json
+
     from branch import catalogue
     (tmp_path / "steel.json").write_text(json.dumps({
         "label": "tinplate", "datasets": {"tinplate": ["tinplate", 1.0]},

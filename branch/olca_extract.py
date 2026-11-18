@@ -15,6 +15,7 @@ import time
 import olca_schema as o
 
 from .paths import data_path
+from .spec import parse_process_key
 
 # Which process of the database stands for each thing BRANCH needs is not code: it is a file,
 # data/databases/<database>.json, one per database (docs/BRING_YOUR_DATABASE.md). This module reads
@@ -112,7 +113,6 @@ def resolve(descs, key, procs=None):
     """(process descriptor or None, candidates) for a factor key: a catalogue key
     (name patterns in PROCESSES) or any process chosen by its exact name ("proc:<name>",
     builder.process_key), with " @<location>" when several locations share the name."""
-    from .builder import parse_process_key
     chosen = parse_process_key(key)
     if chosen is None:
         return match(descs, (procs or PROCESSES).get(key, [key]))

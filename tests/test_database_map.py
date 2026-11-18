@@ -52,9 +52,10 @@ def test_the_units_of_the_map_are_the_ones_the_audit_expects():
 
 
 def test_every_material_and_region_finds_its_keys_in_the_map():
+    import re
+
     from branch.builder import required_factor_keys
     from branch.regions import list_regions
-    import re
     known = set(x.DATABASE_MAP["datasets"])
     bench = ["pet_bottle_1l", "glass_refillable_1l", "aluminium_can_330ml", "beverage_carton_1l"]
     for code in list_regions():

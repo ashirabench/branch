@@ -7,6 +7,7 @@ The installer, the package build and the tests take the list from here, so a new
 is added in this file and nowhere else.
 """
 import os
+import sys
 
 RUNTIME_DATA = ("regions", "materials", "benchmark", "cff", "databases")
 
@@ -26,3 +27,24 @@ def data_root() -> str:
 def data_path(*parts: str) -> str:
     """The path of a folder or file of data, for example data_path("regions", "PT.json")."""
     return os.path.join(data_root(), *parts)
+
+
+def user_dir() -> str:
+    """Per user folder for factors and reports (never inside the application bundle)."""
+    if os.environ.get("BRANCH_HOME"):
+        d = os.environ["BRANCH_HOME"]
+    elif sys.platform == "darwin":
+        d = os.path.expanduser("~/Library/Application Support/BRANCH")
+    elif sys.platform.startswith("win"):
+        d = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "BRANCH")
+    else:
+        d = os.path.join(os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")), "branch")
+    os.makedirs(d, exist_ok=True)
+    return d
+
+
+def factors_dir() -> str:
+    """Where the desktop application keeps the factors it read from the user's database."""
+    d = os.path.join(user_dir(), "factors")
+    os.makedirs(d, exist_ok=True)
+    return d

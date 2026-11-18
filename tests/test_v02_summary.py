@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(HERE), "experiments", "benchmark
 import prior_sources  # noqa: E402
 import summarize_benchmark as sb  # noqa: E402
 import v02_summary  # noqa: E402
+
 from branch.beliefs import Choice  # noqa: E402
 
 
@@ -112,7 +113,6 @@ def test_equivalence_reading_needs_the_interval_inside_the_margin(tmp_path, monk
 def test_table_of_the_paper_matches_the_committed_summaries():
     """The numbers of the table "Experiments after the audit" are typed by hand: they must be the ones
     of paper/data/v02_2026-11-16/."""
-    import re
     root = os.path.dirname(HERE)
     tex = open(os.path.join(root, "paper", "main.tex")).read()
     rows = {"Other product families": "families", "Beverage packages, cut-off": "cutoff",
