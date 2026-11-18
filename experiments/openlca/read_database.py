@@ -183,7 +183,8 @@ def exchanges_sql(where):
 
 def write_tsv(path, rows):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    head = ["process", "location", "flow", "flow_type", "is_input", "amount", "distribution", "parameter1", "parameter2", "pedigree"]
+    head = ["process", "location", "flow", "flow_type", "is_input", "amount", "distribution", "parameter1", "parameter2",
+            "pedigree"]
     with open(path, "w", encoding="utf-8") as fh:
         fh.write("\t".join(head) + "\n")
         for r in rows:
@@ -215,7 +216,7 @@ def report_process(db, name):
     print(f"{len(rows)} exchanges written to {out}")
 
 
-def main():
+def parse_args():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--db", required=True, help="database folder of openLCA, or a .zolca file")
     ap.add_argument("--libs", default=None, help="folder with the Derby jars of openLCA")
@@ -225,6 +226,11 @@ def main():
     args = ap.parse_args()
     if args.report in ("process", "sql") and not args.argument:
         ap.error(f"`{args.report}` needs an argument")
+    return args
+
+
+def main():
+    args = parse_args()
     db = Database(args.db, args.libs)
     try:
         if args.report == "counts":

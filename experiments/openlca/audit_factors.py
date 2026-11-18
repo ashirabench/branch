@@ -82,7 +82,8 @@ def main():
             print(f"  !! {r['key']}: {r['problem']}")
     print(f"Not yet covered by an openLCA check: "
           f"{', '.join(r['key'] for r in rows if not r['validated_in_openLCA'] and not r['key'].startswith('electricity_mv_'))}"
-          f" and {sum(1 for r in rows if not r['validated_in_openLCA'] and r['key'].startswith('electricity_mv_'))} national grids.")
+          f" and {sum(1 for r in rows if not r['validated_in_openLCA'] and r['key'].startswith('electricity_mv_'))}"
+          " national grids.")
     print(f"Saved {os.path.abspath(out)}")
 
 

@@ -74,7 +74,8 @@ def boot_ratio(num, den, idx, members=None):
     return num[idx].sum(1) / np.maximum(den[idx].sum(1), 1)
 
 
-def main(folder):
+def load_runs(folder):
+    """Every *_runs.csv of the folder in one table, with the case and the wrong certificates marked."""
     frames = []
     for f in sorted(glob.glob(os.path.join(folder, "*_runs.csv"))):
         df = pd.read_csv(f)
@@ -84,52 +85,81 @@ def main(folder):
         raise SystemExit(f"no *_runs.csv in {folder}")
     df = pd.concat(frames, ignore_index=True)
     df["wrong"] = (df.certified & ~df.correct.astype(bool)).astype(int)
-    cases = sorted(df.case.unique())
-    idx = np.random.default_rng(0).integers(0, len(cases), size=(10_000, len(cases)))
-    pidx, members = pair_index(cases)
-    ones = np.ones(len(cases))
+    return df
+
+
+class Resamples:
+    """The bootstrap draws every row shares: over cases, and over pairs of products."""
+
+    def __init__(self, cases):
+        self.cases = cases
+        self.idx = np.random.default_rng(0).integers(0, len(cases), size=(10_000, len(cases)))
+        self.pidx, self.members = pair_index(cases)
+        self.ones = np.ones(len(cases))
+
+
+def wrong_certificates(h, rs):
+    """Wrong certificates of one strategy: the count, the certificates, and three intervals for the rate."""
+    W, N = h.w.to_numpy(), h.n.to_numpy()
+    wrong, ncert = int(W.sum()), int(N.sum())
+    binom = binomtest(wrong, ncert).proportion_ci() if ncert else None
+    if wrong and ncert:
+        lo, hi = np.percentile(boot_ratio(W, N, rs.idx), [2.5, 97.5])
+        plo, phi = np.percentile(boot_ratio(W, N, rs.pidx, rs.members), [2.5, 97.5])
+    elif binom:
+        lo, hi = plo, phi = binom.low, binom.high
+    else:
+        lo = hi = plo = phi = float("nan")
+    return dict(wrong_when_certified_pct=100 * wrong / ncert if ncert else float("nan"),
+                wrong_ci95=f"{100 * lo:.1f} to {100 * hi:.1f}",
+                wrong_ci95_pair=f"{100 * plo:.1f} to {100 * phi:.1f}", pairs=len(rs.members),
+                binom_ci95=f"{100 * binom.low:.1f} to {100 * binom.high:.1f}" if binom else "")
+
+
+def difference_in_questions(h, ref, rs):
+    """Mean questions of one strategy minus decision flip, per case: the mean, its intervals and its tests."""
+    diff = h.q.to_numpy() - ref.q.to_numpy()
+    bd = diff[rs.idx].mean(1)
+    return dict(dq_vs_decision_flip=diff.mean(),
+                dq_ci95="{:.2f} to {:.2f}".format(*np.percentile(bd, [2.5, 97.5])),
+                dq_ci95_pair="{:.2f} to {:.2f}".format(
+                    *np.percentile(boot_ratio(diff, rs.ones, rs.pidx, rs.members), [2.5, 97.5])),
+                p_pair=sign_flip_p([diff[m].mean() for m in rs.members]),
+                p_raw=sign_flip_p(diff))
+
+
+def strategy_row(s, b, g, per, ref, rs):
+    """One line of the summary: one strategy at one number of questions per round."""
+    h = per[per.strategy == s].set_index("case").reindex(rs.cases)
+    row = dict(strategy=s, batch_size=b, runs=len(g), cases=g.case.nunique(),
+               q_mean=g.questions.mean(), q_median=g.questions.median(),
+               certified_pct=100 * g.certified.mean())
+    row.update(wrong_certificates(h, rs))
+    row["cases_no_question"] = int((g.groupby("case").questions.max() == 0).sum())
+    if s != "decision_flip" and ref.q.notna().all():
+        row.update(difference_in_questions(h, ref, rs))
+    return row
+
+
+def holm(block):
+    """Holm step down over the raw p values of one block of rows, written into the rows."""
+    raw = [(i, r["p_raw"]) for i, r in enumerate(block) if "p_raw" in r]
+    running = 0.0
+    for k, (i, pv) in enumerate(sorted(raw, key=lambda t: t[1])):
+        running = max(running, min(1.0, (len(raw) - k) * pv))
+        block[i]["p_vs_decision_flip"] = running
+    return block
+
+
+def main(folder):
+    df = load_runs(folder)
+    rs = Resamples(sorted(df.case.unique()))
     rows = []
     for b, gb in df.groupby("batch_size"):
         per = gb.groupby(["strategy", "case"]).agg(q=("questions", "mean"), w=("wrong", "sum"),
                                                    n=("certified", "sum")).reset_index()
-        ref = per[per.strategy == "decision_flip"].set_index("case").reindex(cases)
-        block = []
-        for s, g in gb.groupby("strategy"):
-            h = per[per.strategy == s].set_index("case").reindex(cases)
-            W, N = h.w.to_numpy(), h.n.to_numpy()
-            wrong, ncert = int(W.sum()), int(N.sum())
-            binom = binomtest(wrong, ncert).proportion_ci() if ncert else None
-            if wrong and ncert:
-                lo, hi = np.percentile(boot_ratio(W, N, idx), [2.5, 97.5])
-                plo, phi = np.percentile(boot_ratio(W, N, pidx, members), [2.5, 97.5])
-            elif binom:
-                lo, hi = plo, phi = binom.low, binom.high
-            else:
-                lo = hi = plo = phi = float("nan")
-            row = dict(strategy=s, batch_size=b, runs=len(g), cases=g.case.nunique(),
-                       q_mean=g.questions.mean(), q_median=g.questions.median(),
-                       certified_pct=100 * g.certified.mean(),
-                       wrong_when_certified_pct=100 * wrong / ncert if ncert else float("nan"),
-                       wrong_ci95=f"{100 * lo:.1f} to {100 * hi:.1f}",
-                       wrong_ci95_pair=f"{100 * plo:.1f} to {100 * phi:.1f}", pairs=len(members),
-                       binom_ci95=f"{100 * binom.low:.1f} to {100 * binom.high:.1f}" if binom else "",
-                       cases_no_question=int((g.groupby("case").questions.max() == 0).sum()))
-            if s != "decision_flip" and ref.q.notna().all():
-                diff = h.q.to_numpy() - ref.q.to_numpy()
-                bd = diff[idx].mean(1)
-                row["dq_vs_decision_flip"] = diff.mean()
-                row["dq_ci95"] = "{:.2f} to {:.2f}".format(*np.percentile(bd, [2.5, 97.5]))
-                row["dq_ci95_pair"] = "{:.2f} to {:.2f}".format(
-                    *np.percentile(boot_ratio(diff, ones, pidx, members), [2.5, 97.5]))
-                row["p_pair"] = sign_flip_p([diff[m].mean() for m in members])
-                row["p_raw"] = sign_flip_p(diff)
-            block.append(row)
-        raw = [(i, r["p_raw"]) for i, r in enumerate(block) if "p_raw" in r]
-        running = 0.0
-        for k, (i, pv) in enumerate(sorted(raw, key=lambda t: t[1])):   # Holm step down
-            running = max(running, min(1.0, (len(raw) - k) * pv))
-            block[i]["p_vs_decision_flip"] = running
-        rows += block
+        ref = per[per.strategy == "decision_flip"].set_index("case").reindex(rs.cases)
+        rows += holm([strategy_row(s, b, g, per, ref, rs) for s, g in gb.groupby("strategy")])
     out = pd.DataFrame(rows).sort_values(["batch_size", "q_mean"])
     out.to_csv(os.path.join(folder, "ALL_summary.csv"), index=False)
     print(out.to_string(index=False, float_format=lambda v: f"{v:.3g}"))

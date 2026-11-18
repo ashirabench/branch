@@ -10,7 +10,7 @@ factors come from openLCA ONCE (olca_bridge); the agent never calls openLCA
 inside the Monte Carlo loop.
 """
 from dataclasses import dataclass
-from typing import Callable, Sequence
+from typing import Any, Callable, Optional, Sequence
 
 import numpy as np
 
@@ -32,13 +32,18 @@ class Term:
     deps: Sequence[str]
     fn: Callable
     sign: float = 1.0
-    inventory: Callable = None
+    inventory: Optional[Callable] = None
 
 
 class Model:
     """Choices (beliefs.Choice) + Terms, on a NumPy or CuPy backend."""
 
-    def __init__(self, choices, terms, xp=np, label_a="A", label_b="B"):
+    meta: dict                     # set by builder.build_model; absent in a model written by hand
+    factor_data: dict
+    build_args: dict
+
+    def __init__(self, choices: Any, terms: Sequence[Term], xp: Any = np, label_a: str = "A",
+                 label_b: str = "B") -> None:
         self.choices = list(choices.list() if hasattr(choices, "list") else choices)
         self.terms = list(terms)
         self.xp = xp
@@ -52,7 +57,7 @@ class Model:
                 if d not in self.idx:
                     raise KeyError(f"Term {t.name} depends on unknown choice {d}")
 
-    def sample(self, n, seed):
+    def sample(self, n: int, seed: int) -> Any:
         """Common random numbers: CPU draw from a SeedSequence, one transfer to
         the device, so CPU and GPU runs see identical samples. Choices already
         fixed (Choice.fixed) enter as constants."""
@@ -63,7 +68,7 @@ class Model:
             cols.append(np.full(n, c.encode(c.fixed)) if not c.is_open() else c.ppf(u[:, j]))
         return self.xp.asarray(np.column_stack(cols), dtype=self.xp.float64)
 
-    def term_value(self, m, S, override=None):
+    def term_value(self, m: int, S: Any, override: Optional[tuple] = None) -> Any:
         """Term m for every sample row of S. override=(name, V) with V of shape
         (K, 1) evaluates every candidate answer at once, giving (K, N)."""
         t = self.terms[m]
@@ -75,11 +80,11 @@ class Model:
             out = out + self.xp.zeros(S.shape[0])
         return out
 
-    def inventory(self, point):
+    def inventory(self, point: dict) -> dict:
         """Exchanges per functional unit for one world {name: engine number}:
         {label_a: {factor key: amount}, label_b: {...}}. Needs Terms built
         with an inventory function (builder.py)."""
-        out = {self.label_a: {}, self.label_b: {}}
+        out: dict = {self.label_a: {}, self.label_b: {}}
         for t in self.terms:
             if t.inventory is None:
                 raise ValueError(f"Term {t.name} has no inventory; build the model with builder.py")
@@ -88,7 +93,7 @@ class Model:
                 side[key] = side.get(key, 0.0) + float(amount)
         return out
 
-    def delta_at(self, point):
+    def delta_at(self, point: dict) -> float:
         """Exact delta for one fully specified world {name: engine number}."""
         S = self.xp.asarray([[float(point[c.name]) for c in self.choices]], dtype=self.xp.float64)
         return float(sum(self.term_value(m, S)[0] for m in range(len(self.terms))))

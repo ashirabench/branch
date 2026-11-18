@@ -36,7 +36,8 @@ def test_summary_gives_both_intervals(tmp_path):
     rng = np.random.default_rng(0)
     for region in ("PT", "DE"):
         for pair, extra in (("a_vs_b", 1), ("c_vs_d", 3)):
-            rows = [dict(strategy=s, batch_size=3, seed=sd, questions=3 + (extra if s == "entropy" else 0) + int(rng.integers(0, 2)),
+            rows = [dict(strategy=s, batch_size=3, seed=sd,
+                         questions=3 + (extra if s == "entropy" else 0) + int(rng.integers(0, 2)),
                          certified=True, correct=sd != 0)
                     for s in ("decision_flip", "entropy") for sd in range(6)]
             pd.DataFrame(rows).to_csv(tmp_path / f"{region}_{pair}_runs.csv", index=False)
@@ -69,7 +70,8 @@ def test_a_source_for_the_centre_is_not_a_source_for_the_spread():
     assert prior_sources.group(c("continuous", u, "SOURCE: 39.5% recycled (Eurostat)")) == "centre only"
     assert prior_sources.group(c("continuous", u, "SOURCE: 4.9 g and 5.8 g (X); both bounds come from the source")) == "whole"
     assert prior_sources.group(c("categorical", {"a": 1, "b": 2}, "SOURCE: shares of 2023 (Eurostat)")) == "whole"
-    assert prior_sources.group(c("categorical", {"a": 1, "b": 1}, "SOURCE: BAFU datasets; ASSUMPTION on the weights")) == "centre only"
+    weights_assumed = c("categorical", {"a": 1, "b": 1}, "SOURCE: BAFU datasets; ASSUMPTION on the weights")
+    assert prior_sources.group(weights_assumed) == "centre only"
 
 
 def test_adverse_expert_is_wrong_on_the_side_against_the_verdict():

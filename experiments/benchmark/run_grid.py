@@ -114,7 +114,7 @@ def one_run(cfg):
     return r
 
 
-def main():
+def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--case", default="lca", choices=["toy", "lca", "sym", "real"])
     ap.add_argument("--a", default="pet_bottle_1l", help="--case real: product A")
@@ -152,7 +152,11 @@ def main():
                     help="--system-model cff: quality ratios of PET 1 and 1 (SSP recycling) instead of 0.9")
     ap.add_argument("--wash-kwh-high", dest="wash_kwh_high", type=float, default=None,
                     help="--case real: another upper bound for the washing electricity (sensitivity run)")
-    args = ap.parse_args()
+    return ap.parse_args()
+
+
+def main():
+    args = parse_args()
 
     tag = args.tag or (f"real_{args.a}_vs_{args.b}_{args.region}" if args.case == "real"
                        else f"{args.case}_J{args.J}")

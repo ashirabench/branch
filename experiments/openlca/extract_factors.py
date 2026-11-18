@@ -66,13 +66,13 @@ def list_matching(descs, text):
             print(f"  {d.name}   [{getattr(d, 'location', '') or ''}]")
 
 
-def wanted_keys(args, descs):
+def wanted_keys(args, descs, database_map):
     """The keys to read: the ones named, the ones the products need, or None for all of the map."""
     if not args.specs:
         return args.only or None
-    known = set(olca_extract.PROCESSES)
+    known = set(database_map["datasets"])
     if args.all_grids:
-        known |= set(olca_extract.grid_processes(descs))
+        known |= set(olca_extract.grid_processes(descs, re.compile(database_map["grid_name_pattern"])))
     needed = required_factor_keys(args.specs, args.region)
     unknown = [k for k in needed if k not in known and not k.startswith("proc:")]
     if unknown:
@@ -101,9 +101,8 @@ def report(path, out, strict):
 
 def main():
     args = parse_args()
-    if args.map:
-        olca_extract.use_database_map(args.map)
-    database = args.database or olca_extract.DATABASE_MAP["database"]
+    database_map = olca_extract.load_database_map(args.map)
+    database = args.database or database_map["database"]
     client = ipc.Client(args.port)
     if args.methods:
         return list_methods(client)
@@ -115,8 +114,8 @@ def main():
     print(f"LCIA method: {method.name}")
     path = f"data/factors/{database}_{re.sub(r'[^A-Za-z0-9]+', '_', method.name)}.json"
     out = olca_extract.extract(client, path, method=args.method, database=database, all_grids=args.all_grids,
-                               keys=wanted_keys(args, descs), update=args.update, progress=show,
-                               keep_chosen=not (args.only or args.specs))
+                               keys=wanted_keys(args, descs, database_map), update=args.update, progress=show,
+                               keep_chosen=not (args.only or args.specs), database_map=database_map)
     report(path, out, strict=bool(args.specs or args.only))
 
 

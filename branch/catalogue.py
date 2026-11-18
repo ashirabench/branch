@@ -24,6 +24,9 @@ System model: attributional, ILCD Situation A, cut-off for recycling. Recycled
 material leaving the system carries no credit and no burden; recycled input
 carries only its own production burden.
 """
+import json
+import os
+
 from .paths import data_path
 
 # --------------------------------------------------------------------------
@@ -216,8 +219,6 @@ def load_materials(root=None):
     """Built in MATERIALS plus every data/materials/<id>.json (same fields as
     above; priors as [dist, params, source], options as [key, weight]). A file
     with the id of a built in material replaces it."""
-    import json
-    import os
     root = root or data_path("materials")
     out = dict(MATERIALS)
     if os.path.isdir(root):
@@ -284,8 +285,6 @@ def load_energy_recovery(root=None):
     what a waste-to-energy plant delivers per kg of the material burnt. Used only by the Circular
     Footprint Formula, whose energy term credits the electricity and heat that this energy replaces.
     A material without an entry gets no credit."""
-    import json
-    import os
     root = root or data_path("cff")
     path = os.path.join(root, "energy_recovery.json")
     if not os.path.exists(path):
@@ -304,8 +303,6 @@ def load_cff(root=None):
     Only values copied from the official Annex C are allowed here; materials
     without a file cannot be assessed with the CFF (builder raises).
     """
-    import json
-    import os
     root = root or data_path("cff")
     out = {}
     if os.path.isdir(root):

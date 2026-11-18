@@ -7,11 +7,12 @@ import glob
 import json
 import os
 import re
+from typing import Optional
 
 from .paths import data_path, factors_dir
 
 
-def load_factors(path=None, root=None):
+def load_factors(path: Optional[str] = None, root: Optional[str] = None) -> dict:
     """The file in BRANCH_FACTORS if that is set, else the newest data/factors/*.json, unless a
     path is given. BRANCH_FACTORS lets every command run on another factor file, such as the
     hybrid of the second database test (experiments/data/make_hybrid_factors.py)."""
@@ -36,7 +37,7 @@ def load_factors(path=None, root=None):
     return data
 
 
-def factor(data, key, category):
+def factor(data: dict, key: str, category: str) -> float:
     """Unit impact factor from an extract_factors.py file."""
     try:
         return float(data["factors"][key]["impacts"][category])

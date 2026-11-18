@@ -204,10 +204,27 @@ def tab_losses():
         f.write("\n".join(lines) + "\n")
 
 
+def macro(name, text):
+    return f"\\newcommand{{\\{name}}}{{{text}}}\n"
+
+
 def numbers():
     """Values quoted in the text, as LaTeX macros, so prose and tables never disagree."""
     p, pt = t("benchmark.csv"), t("benchmark_tails.csv")
     c, ct = t("benchmark_tau0.025.csv"), t("benchmark_tails_tau0.025.csv")
+    h = t("benchmark_tails_tau0.025_confirm.csv")     # the chosen setting with new seeds (1000 to 1029)
+    chosen = row(c, "decision_flip", CHOSEN_B)
+    lines = (_questions_and_wrong(p, pt, c, ct, h) + _intervals(p, pt, ct, h) + _p_values(p, c)
+             + [macro("nRuns", int(chosen.runs)), macro("nCases", int(chosen.cases)),
+                macro("nNoQLoose", int(row(p, "decision_flip", 1).cases_no_question)),
+                macro("nNoQStrict", int(row(c, "decision_flip", 1).cases_no_question))]
+             + _agreement_with_openlca())
+    with open(os.path.join(TABS, "numbers.tex"), "w") as f:
+        f.writelines(lines)
+
+
+def _questions_and_wrong(p, pt, c, ct, h):
+    """Mean questions (two decimals) and wrong certificates (per cent, one decimal)."""
     m = {
         "qFlipPriorOne": row(p, "decision_flip", 1).q_mean, "qSobolPriorOne": row(p, "sobol", 1).q_mean,
         "qEntPriorOne": row(p, "entropy", 1).q_mean, "qRandPriorOne": row(p, "random", 1).q_mean,
@@ -225,55 +242,47 @@ def numbers():
         "wSobolTailsStrictOne": row(ct, "sobol", 1).wrong_when_certified_pct,
         "wRandTailsOne": row(pt, "random", 1).wrong_when_certified_pct,
         "wFlipPriorOne": row(p, "decision_flip", 1).wrong_when_certified_pct,
+        "wFlipHoldThree": row(h, "decision_flip", 3).wrong_when_certified_pct,
+        "wFlipHoldTwo": row(h, "decision_flip", 2).wrong_when_certified_pct,
+        "qFlipHoldThree": row(h, "decision_flip", 3).q_mean,
     }
+    return [macro(k, f"{v:.2f}" if k.startswith("q") else f"{v:.1f}\\%") for k, v in m.items()]
+
+
+def _intervals(p, pt, ct, h):
     ci = {"ciFlipTailsOne": row(pt, "decision_flip", 1).wrong_ci95,
           "ciFlipChosenTails": row(ct, "decision_flip", CHOSEN_B).wrong_ci95,
           "ciFlipStrictTwo": row(ct, "decision_flip", 2).wrong_ci95,
-          "ciFlipPriorOne": row(p, "decision_flip", 1).wrong_ci95}
+          "ciFlipPriorOne": row(p, "decision_flip", 1).wrong_ci95,
+          "ciFlipHoldThree": row(h, "decision_flip", 3).wrong_ci95,
+          "ciFlipHoldTwo": row(h, "decision_flip", 2).wrong_ci95}
+    return [macro(k, v.replace(" to ", "--") + "\\%") for k, v in ci.items()]
+
+
+def _p_values(p, c):
     pv = {"pSobolPriorOne": row(p, "sobol", 1).p_vs_decision_flip,
           "pSobolChosen": row(c, "sobol", CHOSEN_B).p_vs_decision_flip}
-    # check of the chosen setting with new seeds (CONFIRM=1: fresh seeds 1000 to 1029, same cases)
-    h = t("benchmark_tails_tau0.025_confirm.csv")
-    m.update({"wFlipHoldThree": row(h, "decision_flip", 3).wrong_when_certified_pct,
-              "wFlipHoldTwo": row(h, "decision_flip", 2).wrong_when_certified_pct,
-              "qFlipHoldThree": row(h, "decision_flip", 3).q_mean})
-    ci.update({"ciFlipHoldThree": row(h, "decision_flip", 3).wrong_ci95,
-               "ciFlipHoldTwo": row(h, "decision_flip", 2).wrong_ci95})
-    extra = {"nNoQLoose": int(row(p, "decision_flip", 1).cases_no_question),
-             "nNoQStrict": int(row(c, "decision_flip", 1).cases_no_question)}
-    # agreement with openLCA: the 36 benchmark products and one comparison in every grid
+    return [macro(k, f"{v:.3f}") for k, v in pv.items()]
+
+
+def _agreement_with_openlca():
+    """The 36 benchmark products and one comparison in every grid: counts, largest differences, impacts."""
     v, g = t("validation_openlca.csv"), t("validation_all_grids.csv")
     g = g[g["product"].notna() & (g["product"].astype(str) != "")]
-    gv = g.relative_difference.astype(float)
     imp = v.groupby(["product", "region"]).openLCA.mean()
     glass = g[g["product"] == "Refillable glass"].set_index("region").openLCA.astype(float)
-    extra.update({"nGridProducts": len(g), "nGridRegions": g.region.nunique(),
-                  "nGrids": int((~g.region.drop_duplicates().str.startswith("BR-")).sum())})
-    sci = {"maxDiffBench": v.relative_difference.max(), "maxDiffGrids": gv.max()}
+    lines = [macro("nGridProducts", len(g)), macro("nGridRegions", g.region.nunique()),
+             macro("nGrids", int((~g.region.drop_duplicates().str.startswith("BR-")).sum()))]
+    for k, value in (("maxDiffBench", v.relative_difference.max()),
+                     ("maxDiffGrids", g.relative_difference.astype(float).max())):
+        mant, exp = f"{value:.1e}".split("e")
+        lines.append(macro(k, f"${mant}\\times10^{{{int(exp)}}}$"))
     short = {"Beverage carton 1 L": "Carton", "PET single use": "PET", "Aluminium can 330 ml": "Can",
              "Refillable glass": "Glass"}
-    kg = {f"imp{short[p]}{r}": imp.loc[(p, r)] for p in short for r in ("PT", "DE", "BR")}
-    kg["impGlassAM"] = glass["BR-AM"]
-    drop = round(100 * (1 - glass["BR-AM"] / glass["BR"]))
-    runs = int(row(c, "decision_flip", CHOSEN_B).runs)
-    cases = int(row(c, "decision_flip", CHOSEN_B).cases)
-    with open(os.path.join(TABS, "numbers.tex"), "w") as f:
-        for k, v in m.items():
-            f.write(f"\\newcommand{{\\{k}}}{{{v:.2f}}}\n" if k.startswith("q") else
-                    f"\\newcommand{{\\{k}}}{{{v:.1f}\\%}}\n")
-        for k, v in ci.items():
-            f.write(f"\\newcommand{{\\{k}}}{{{v.replace(' to ', '--')}\\%}}\n")
-        for k, v in pv.items():
-            f.write(f"\\newcommand{{\\{k}}}{{{v:.3f}}}\n" if v >= 0.01 else f"\\newcommand{{\\{k}}}{{{v:.3f}}}\n")
-        f.write(f"\\newcommand{{\\nRuns}}{{{runs}}}\n\\newcommand{{\\nCases}}{{{cases}}}\n")
-        for k, v in extra.items():
-            f.write(f"\\newcommand{{\\{k}}}{{{v}}}\n")
-        for k, v in sci.items():
-            mant, exp = f"{v:.1e}".split("e")
-            f.write(f"\\newcommand{{\\{k}}}{{${mant}\\times10^{{{int(exp)}}}$}}\n")
-        for k, v in kg.items():
-            f.write(f"\\newcommand{{\\{k}}}{{{v:.3f}}}\n")
-        f.write(f"\\newcommand{{\\dropAM}}{{{drop}\\%}}\n")
+    lines += [macro(f"imp{short[prod]}{r}", f"{imp.loc[(prod, r)]:.3f}") for prod in short for r in ("PT", "DE", "BR")]
+    lines.append(macro("impGlassAM", f"{glass['BR-AM']:.3f}"))
+    lines.append(macro("dropAM", f"{round(100 * (1 - glass['BR-AM'] / glass['BR']))}\\%"))
+    return lines
 
 
 if __name__ == "__main__":

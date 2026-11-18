@@ -140,3 +140,18 @@ def test_the_command_lists_methods_and_finds_processes(monkeypatch, tmp_path, ca
     assert "EF 3.1 Method (adapted)" in capsys.readouterr().out
     _command(monkeypatch, tmp_path, "--find", "cotton").main()
     assert "Cotton fibres, at farm   [GLO]" in capsys.readouterr().out
+
+
+def test_the_command_reads_another_database_through_its_map(monkeypatch, tmp_path, capsys):
+    mine = {"database": "mydb", "citation": "My database, version 1", "location_preference": ["CH"],
+            "grid_name_pattern": "^Electricity, medium voltage, production ([A-Za-z-]+), at grid$",
+            "datasets": {"my_pet": {"names": [olca_extract.PROCESSES[TWICE][0]], "unit": "kg"},
+                         "my_cotton": {"names": ["Cotton fibres, at farm"], "unit": "kg"}}}
+    path = tmp_path / "mydb.json"
+    path.write_text(json.dumps(mine))
+    _command(monkeypatch, tmp_path, "--map", str(path), "--all-grids").main()
+    saved = json.loads((tmp_path / "data" / "factors" / "mydb_EF_3_1_Method_adapted_.json").read_text())
+    assert saved["database"] == "mydb" and saved["citation"] == "My database, version 1"
+    grids = {k for k in saved["factors"] if k.startswith("electricity_mv_")}
+    assert set(saved["factors"]) - grids == {"my_pet", "my_cotton"} and "electricity_mv_FR" in grids
+    assert saved["factors"]["my_pet"]["location"] == "CH", "the preference of this map, not the one of BAFU"

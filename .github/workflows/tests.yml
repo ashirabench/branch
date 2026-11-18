@@ -17,6 +17,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install -e ".[dev,experiments]"
+      - run: ruff check .
+      - run: mypy
       - run: pytest -q
 
   # the versions of constraints.txt: the combination known to give the committed results

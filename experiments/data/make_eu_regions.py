@@ -142,7 +142,8 @@ def region(geo, code, name, rates, muni, parent, electricity, needed):
             continue
         mean, weight, text, notes = got
         tail = "; ".join([n for n in [note] + notes if n])
-        priors[key] = ["beta", beta(mean, weight), f"SOURCE: {text.format(place=place)} ({TABLE})" + (f"; {tail}" if tail else "")]
+        source = f"SOURCE: {text.format(place=place)} ({TABLE})" + (f"; {tail}" if tail else "")
+        priors[key] = ["beta", beta(mean, weight), source]
     share = incinerated_share(muni, geo)
     if share is not None:
         s, year, inc, land = share
@@ -192,10 +193,14 @@ def dump(data):
     return json.dumps(data, indent=2, ensure_ascii=False) + "\n"
 
 
-def main():
+def parse_args():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--check", action="store_true")
-    args = ap.parse_args()
+    return ap.parse_args()
+
+
+def main():
+    args = parse_args()
     bad = []
     for code, data in sorted(build().items()):
         path, text = os.path.join(OUT, f"{code}.json"), dump(data)

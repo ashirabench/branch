@@ -8,6 +8,7 @@ its Monte Carlo loop. The factors stay on the user's computer: the BAFU terms of
 not allow redistributing them.
 """
 import json
+import math
 import os
 import re
 import time
@@ -49,24 +50,17 @@ def load_database_map(name=None):
     return m
 
 
+def names_of(database_map):
+    """{key: names tried in order} of a map."""
+    return {k: list(v["names"]) for k, v in database_map["datasets"].items()}
+
+
+# The map of the default database, read once and never changed. A function that works for another
+# database takes its map as an argument (extract(..., database_map=...)); nothing is switched globally.
 DATABASE_MAP = load_database_map()
-PROCESSES = {k: list(v["names"]) for k, v in DATABASE_MAP["datasets"].items()}
-LOCATION_PREFERENCE = list(DATABASE_MAP["location_preference"])
+PROCESSES = names_of(DATABASE_MAP)
+LOCATION_PREFERENCE = tuple(DATABASE_MAP["location_preference"])
 GRID_PATTERN = re.compile(DATABASE_MAP["grid_name_pattern"])
-
-
-def use_database_map(name):
-    """Switch to the map of another database. The names above change in place, so every module that
-    imported them sees the new ones."""
-    global GRID_PATTERN
-    m = load_database_map(name)
-    DATABASE_MAP.clear()
-    DATABASE_MAP.update(m)
-    PROCESSES.clear()
-    PROCESSES.update({k: list(v["names"]) for k, v in m["datasets"].items()})
-    LOCATION_PREFERENCE[:] = m["location_preference"]
-    GRID_PATTERN = re.compile(m["grid_name_pattern"])
-    return m
 
 
 def norm(s):
@@ -81,18 +75,18 @@ def loc(d):
     return getattr(d, "location", None) or ""
 
 
-def by_location(cands):
-    """Same name, different locations: pick by LOCATION_PREFERENCE."""
+def by_location(cands, preference=LOCATION_PREFERENCE):
+    """Same name, different locations: the first location of the preference that exactly one has."""
     if len({norm(c.name) for c in cands}) != 1:
         return None
-    for pref in LOCATION_PREFERENCE:
+    for pref in preference:
         hit = [c for c in cands if norm(loc(c)) == norm(pref)]
         if len(hit) == 1:
             return hit[0]
     return None
 
 
-def match(descs, patterns):
+def match(descs, patterns, preference=LOCATION_PREFERENCE):
     """Alternatives tried in order; then all fragments AND-ed."""
     for p in patterns:
         hits = [d for d in descs if norm(p) in norm(d.name)]
@@ -101,7 +95,7 @@ def match(descs, patterns):
         exact = [d for d in hits if norm(d.name) == norm(p)] or hits
         if len(exact) == 1:
             return exact[0], hits
-        chosen = by_location(exact)
+        chosen = by_location(exact, preference)
         if chosen is not None:
             return chosen, hits
     # all fragments together
@@ -109,20 +103,20 @@ def match(descs, patterns):
     return (hits[0] if len(hits) == 1 else None), hits
 
 
-def resolve(descs, key, procs=None):
+def resolve(descs, key, procs=None, preference=LOCATION_PREFERENCE):
     """(process descriptor or None, candidates) for a factor key: a catalogue key
     (name patterns in PROCESSES) or any process chosen by its exact name ("proc:<name>",
     builder.process_key), with " @<location>" when several locations share the name."""
     chosen = parse_process_key(key)
     if chosen is None:
-        return match(descs, (procs or PROCESSES).get(key, [key]))
+        return match(descs, (procs or PROCESSES).get(key, [key]), preference)
     name, location = chosen
     hits = [d for d in descs if norm(d.name) == norm(name)]
     if location:
         hits = [d for d in hits if norm(loc(d)) == norm(location)]
     if len(hits) == 1:
         return hits[0], hits
-    return (by_location(hits) if hits else None), hits
+    return (by_location(hits, preference) if hits else None), hits
 
 
 def find_method(client, name):
@@ -222,7 +216,6 @@ def spread(values, central):
     """Summary of the runs of one category: geometric standard deviation and how the runs sit
     around the value BRANCH uses. No geometric standard deviation when more than 5% of the runs
     have the other sign or are zero: a lognormal multiplier cannot describe such a factor."""
-    import math
     n = len(values)
     if n < 2 or not central:
         return {"gsd": None, "n": n, "note": "too few runs or a factor of zero"}
@@ -237,33 +230,34 @@ def spread(values, central):
     return dict(out, gsd=math.exp(sd), median_ratio=ordered[len(ordered) // 2], mean_ratio=sum(same) / len(same))
 
 
-def citation_for(database):
+def citation_for(database, database_map=DATABASE_MAP):
     """How every report credits the database: the text of its map, when the map is of this database."""
-    if database == DATABASE_MAP["database"]:
-        return DATABASE_MAP["citation"]
+    if database == database_map["database"]:
+        return database_map["citation"]
     year = re.search(r"20\d\d", database or "")
     return ("Life Cycle Inventory database of the Swiss Federal Administration, BAFU:"
             + (year.group(0) if year else "20XY"))
 
 
-def grid_processes(descs):
+def grid_processes(descs, pattern=GRID_PATTERN):
     """{electricity_mv_<country code>: [name]} for every process the database names as a national grid."""
     out = {}
     for d in descs:
-        mm = GRID_PATTERN.match((d.name or "").strip())
+        mm = pattern.match((d.name or "").strip())
         if mm:
             out.setdefault(f"electricity_mv_{mm.group(1)}", [d.name])
     return out
 
 
 def extract(client, path, method="EF 3.1", database="bafu2026", all_grids=True, keys=None,
-            update=False, progress=print, keep_chosen=True):
+            update=False, progress=print, keep_chosen=True, database_map=DATABASE_MAP):
     """Extract factors into the JSON file at path. Returns the saved dict.
 
     progress(done, total, message) is called after every dataset when it accepts three
     arguments; a one argument callable (print) receives the message only.
     keep_chosen: read again the processes that people chose by name (keys "proc:...") and that the
-    file already holds, so that a full extraction does not lose them."""
+    file already holds, so that a full extraction does not lose them.
+    database_map: the map of the open database (load_database_map), when it is not the default one."""
     def say(i, n, msg):
         try:
             progress(i, n, msg)
@@ -272,7 +266,7 @@ def extract(client, path, method="EF 3.1", database="bafu2026", all_grids=True, 
 
     descs = all_processes(client)
     m = find_method(client, method)
-    out = {"database": database, "method": m.name, "method_id": m.id, "citation": citation_for(database),
+    out = {"database": database, "method": m.name, "method_id": m.id, "citation": citation_for(database, database_map),
            "extracted": time.strftime("%Y-%m-%d"), "factors": {}, "unresolved": {}}
     chosen = []                      # processes people chose by name stay in the file across extractions
     if os.path.exists(path):
@@ -282,14 +276,15 @@ def extract(client, path, method="EF 3.1", database="bafu2026", all_grids=True, 
             out["factors"] = old
         elif keep_chosen:
             chosen = [k for k in old if k.startswith("proc:")]
-    procs = dict(PROCESSES)
+    procs = names_of(database_map)
+    preference = database_map["location_preference"]
     if all_grids:
-        for key, names in grid_processes(descs).items():
+        for key, names in grid_processes(descs, re.compile(database_map["grid_name_pattern"])).items():
             procs.setdefault(key, names)
     todo = [k for k in list(keys or procs) + chosen if k not in out["factors"]]
     todo = list(dict.fromkeys(todo))
     for i, key in enumerate(todo, 1):
-        ref, hits = resolve(descs, key, procs)
+        ref, hits = resolve(descs, key, procs, preference)
         if ref is None:
             out["unresolved"][key] = [f"{h.name} [{loc(h)}]" for h in hits[:15]]
             say(i, len(todo), f"?  {key}: {len(hits)} candidates")

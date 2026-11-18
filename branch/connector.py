@@ -9,12 +9,14 @@ IPC Server). Through it the connector:
   3. sends a finished comparison back to openLCA, where openLCA builds the product systems,
      calculates them and the result is compared with BRANCH's.
 """
+import logging
 import os
 import socket
 
 from .paths import factors_dir, user_dir  # noqa: F401  (user_dir re-exported)
 
 PORT = int(os.environ.get("OLCA_PORT", "8080"))
+log = logging.getLogger(__name__)
 
 HOW_TO_START = (
     "1. Open **openLCA** and double click your database (BAFU:2026) in the Navigation panel.\n"
@@ -83,8 +85,8 @@ def probe(port=PORT, method="EF 3.1"):
         out["processes"] = len(procs)
         out["marker"] = any(norm(MARKER_PROCESS) in norm(d.name) for d in procs)
         out["method"] = any(norm(method) in norm(d.name) for d in c.get_descriptors(o.ImpactMethod))
-    except Exception:
-        pass
+    except Exception as exc:             # the list then shows the steps as not done, which is true
+        log.debug("openLCA did not answer the questions about the open database: %s", exc)
     return out
 
 
@@ -142,8 +144,8 @@ def search_processes(text, port=PORT, limit=15):
             proc = c.get(o.Process, d.id)
             ref = next((e for e in proc.exchanges or [] if e.is_quantitative_reference), None)
             unit = ref.unit.name if ref and ref.unit else ""
-        except Exception:
-            pass
+        except Exception as exc:         # the process is still listed, without its unit
+            log.debug("the unit of %s could not be read: %s", d.name, exc)
         out.append({"name": d.name, "location": loc(d), "unit": unit, "category": d.category or ""})
     return out
 

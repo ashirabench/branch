@@ -45,13 +45,17 @@ def group(name):
     return "materials and other"
 
 
-def main():
+def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8080)
     ap.add_argument("--grep", nargs="+", help="keep only names containing any of these texts")
     ap.add_argument("--full", action="store_true", help="read every process for its reference flow")
     ap.add_argument("--database", default="open_database")
-    args = ap.parse_args()
+    return ap.parse_args()
+
+
+def main():
+    args = parse_args()
 
     client = ipc.Client(args.port)
     descs = client.get_descriptors(o.Process)

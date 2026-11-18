@@ -27,6 +27,7 @@ Requires openLCA 2.x with the IPC server running (Tools > Developer tools >
 IPC Server, port 8080) and the database the factors were extracted from.
 """
 import logging
+import math
 import re
 import uuid
 from dataclasses import dataclass
@@ -110,7 +111,6 @@ def uncertainty_of(choice):
     then keeps that parameter at its value. For a lognormal, openLCA takes the value entered as
     geometric mean as the mean of its draws (experiments/openlca/openlca_lognormal), so the field receives
     median x exp(sigma^2 / 2), which gives draws with the median of the prior."""
-    import math
     dist, p = choice.prior
     T = o.UncertaintyType
     if dist == "uniform":
@@ -262,7 +262,8 @@ def _drop_old_systems(c, process):
     """Delete the product systems that an earlier send built on this same process."""
     try:
         old = [d for d in c.get_descriptors(o.ProductSystem) if d.name == process.name]
-    except Exception:
+    except Exception as exc:
+        log.warning("the product systems of an earlier send could not be listed, so none was removed: %s", exc)
         return 0
     n = 0
     for d in old:
@@ -271,8 +272,8 @@ def _drop_old_systems(c, process):
             if system is not None and system.ref_process is not None and system.ref_process.id == process.id:
                 c.delete(d)
                 n += 1
-        except Exception:
-            pass
+        except Exception as exc:
+            log.warning("the product system %s of an earlier send was not removed: %s", d.name, exc)
     return n
 
 
@@ -307,7 +308,8 @@ def _method(c, model):
         try:
             got = c.get(o.ImpactMethod, mid)
             method = o.Ref(ref_type=o.RefType.ImpactMethod, id=got.id, name=got.name) if got is not None else None
-        except Exception:
+        except Exception as exc:         # looked for by name below
+            log.debug("the impact method %s was not found by its identifier: %s", mid, exc)
             method = None
     if method is None and name:
         method = c.find(o.ImpactMethod, name)

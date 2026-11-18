@@ -34,11 +34,15 @@ def find(c):
             for kind, need_folder in ((o.ProductSystem, False), (o.Process, True), (o.Flow, True))]
 
 
-def main():
+def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--delete", action="store_true")
     ap.add_argument("--port", type=int, default=8080)
-    args = ap.parse_args()
+    return ap.parse_args()
+
+
+def main():
+    args = parse_args()
     c = olca_bridge.client(args.port)
     found = find(c)
     for kind, items in found:

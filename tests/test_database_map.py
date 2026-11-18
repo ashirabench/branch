@@ -2,6 +2,7 @@
 import importlib.util
 import json
 import os
+import re
 from types import SimpleNamespace
 
 import pytest
@@ -21,17 +22,11 @@ def _audit():
     return mod
 
 
-@pytest.fixture
-def default_map():
-    yield
-    x.use_database_map(x.DEFAULT_MAP)
-
-
 def test_the_map_of_bafu_is_complete_and_holds_names_only():
     m = x.load_database_map("bafu2026")
     assert m["database"] == "bafu2026" and "BAFU:2026" in m["citation"]
     assert x.PROCESSES == {k: v["names"] for k, v in m["datasets"].items()}
-    assert x.LOCATION_PREFERENCE == m["location_preference"]
+    assert list(x.LOCATION_PREFERENCE) == m["location_preference"]
 
     def leaves(node):
         if isinstance(node, dict):
@@ -52,7 +47,6 @@ def test_the_units_of_the_map_are_the_ones_the_audit_expects():
 
 
 def test_every_material_and_region_finds_its_keys_in_the_map():
-    import re
 
     from branch.builder import required_factor_keys
     from branch.regions import list_regions
@@ -66,8 +60,9 @@ def test_every_material_and_region_finds_its_keys_in_the_map():
         assert not missing, (code, missing)
 
 
-def test_another_database_needs_only_another_map(tmp_path, default_map):
-    """A second map with other names: the same code then finds the processes of that database."""
+def test_another_database_needs_only_another_map(tmp_path):
+    """A second map with other names: the same code then finds the processes of that database, and the
+    map of the default database is not touched."""
     other = {"database": "mydb", "citation": "My database, version 1",
              "location_preference": ["EU-27", "GLO"],
              "grid_name_pattern": r"^Electricity grid mix, (\w+)$",
@@ -75,20 +70,21 @@ def test_another_database_needs_only_another_map(tmp_path, default_map):
                           "lorry_16_32t": {"names": ["Lorry transport, 16 to 32 t"], "unit": "t*km"}}}
     path = tmp_path / "mydb.json"
     path.write_text(json.dumps(other))
-    before = x.PROCESSES                       # other modules hold this very object
-    x.use_database_map(str(path))
-    assert before is x.PROCESSES and set(x.PROCESSES) == {"pet_granulate_bottle_grade", "lorry_16_32t"}
-    assert x.citation_for("mydb") == "My database, version 1"
-    assert x.GRID_PATTERN.match("Electricity grid mix, DE").group(1) == "DE"
+    before = json.dumps(x.DATABASE_MAP, sort_keys=True)
+    m = x.load_database_map(str(path))
+    names, preference = x.names_of(m), m["location_preference"]
+    assert set(names) == {"pet_granulate_bottle_grade", "lorry_16_32t"}
+    assert x.citation_for("mydb", m) == "My database, version 1"
     database = [SimpleNamespace(name="PET granulate, bottle grade", location="EU-27"),
                 SimpleNamespace(name="PET granulate, bottle grade", location="GLO"),
                 SimpleNamespace(name="Lorry transport, 16 to 32 t", location="GLO"),
+                SimpleNamespace(name="Electricity grid mix, DE", location="DE"),
                 SimpleNamespace(name="Something else", location="GLO")]
-    found, _ = x.resolve(database, "pet_granulate_bottle_grade")
+    found, _ = x.resolve(database, "pet_granulate_bottle_grade", names, preference)
     assert found.location == "EU-27", "same name twice: the preferred location wins"
-    assert x.resolve(database, "lorry_16_32t")[0].name == "Lorry transport, 16 to 32 t"
-    x.use_database_map(x.DEFAULT_MAP)
-    assert "glass_packaging_white" in x.PROCESSES and x.citation_for("bafu2026").endswith("BAFU:2026")
+    assert x.resolve(database, "lorry_16_32t", names, preference)[0].name == "Lorry transport, 16 to 32 t"
+    assert list(x.grid_processes(database, re.compile(m["grid_name_pattern"]))) == ["electricity_mv_DE"]
+    assert json.dumps(x.DATABASE_MAP, sort_keys=True) == before and "glass_packaging_white" in x.PROCESSES
 
 
 def test_a_map_with_a_gap_is_refused_in_words(tmp_path):

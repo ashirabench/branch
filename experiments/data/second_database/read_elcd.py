@@ -105,61 +105,75 @@ def run(db, classpath, statements):
     return blocks
 
 
-def main():
+def parse_args():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--zolca", required=True)
     ap.add_argument("--derby", required=True, help="path of the Apache Derby jar")
     ap.add_argument("--out", default=os.path.join(OUT_DIR, "elcd32_factors.json"))
-    args = ap.parse_args()
-    with open(os.path.join(OUT_DIR, "elcd32_map.json")) as fh:
-        mapping = json.load(fh)
+    return ap.parse_args()
+
+
+def category_ids(cats):
+    """{label: identifier in the file} of the impact categories BRANCH reads; exactly one hit each."""
+    ids = {}
+    for label, (method, category) in CATEGORIES.items():
+        hit = [r[0] for r in cats if r[1] == method and r[2] == category]
+        if len(hit) != 1:
+            sys.exit(f"category {method} / {category}: found {len(hit)}")
+        ids[label] = hit[0]
+    return ids
+
+
+def query_file(zolca, derby):
+    """Unpack the file, run the checks and the queries: (processes, energy rows, {category: {process: impact}})."""
     with tempfile.TemporaryDirectory() as tmp:
         db = os.path.join(tmp, "db")
-        with zipfile.ZipFile(args.zolca) as z:
+        with zipfile.ZipFile(zolca) as z:
             z.extractall(db)
         subprocess.run(["javac", "-d", tmp, os.path.join(HERE, "Query.java")], check=True)
-        cp = os.pathsep.join([tmp, os.path.abspath(args.derby)])
+        cp = os.pathsep.join([tmp, os.path.abspath(derby)])
         cats, procs, energy_rows, *checks = run(db, cp, [CATEGORY_SQL, PROCESS_SQL, ENERGY_SQL] + CHECK_SQL)
         for sql, rows in zip(CHECK_SQL, checks):
             if rows[0][0] != "0":
                 sys.exit(f"check failed ({rows[0][0]} rows): {sql}")
-        ids = {}
-        for label, (method, category) in CATEGORIES.items():
-            hit = [r[0] for r in cats if r[1] == method and r[2] == category]
-            if len(hit) != 1:
-                sys.exit(f"category {method} / {category}: found {len(hit)}")
-            ids[label] = hit[0]
+        ids = category_ids(cats)
         for label, rows in zip(ids, run(db, cp, [TWICE_SQL.format(cat=i) for i in ids.values()])):
             if rows[0][0] != "0":
                 sys.exit(f"{label}: {rows[0][0]} flows have two different factors")
         impacts = {label: {r[0]: float(r[1]) for r in rows} for label, rows in
                    zip(ids, run(db, cp, [IMPACT_SQL.format(cat=i) for i in ids.values()]))}
+    return procs, energy_rows, impacts
+
+
+def factor_of(key, m, record, impacts):
+    """One BRANCH factor from one aggregated process of the file, per the unit BRANCH uses."""
+    ref_id, name, loc, amount, unit, owner, valid_from, valid_until = record
+    amount = float(amount)
+    if name != m["process"] or loc != m["location"]:
+        sys.exit(f"{key}: the file has {name!r} [{loc}], the map says {m['process']!r} [{m['location']}]")
+    per = 1.0 if (unit == "MJ" and abs(amount - 3.6) < 1e-9 and m["unit"] == "kWh") else abs(amount)
+    expected = {"kWh": "MJ", "kg": "kg", "MJ": "MJ", "t*km": "t*km"}[m["unit"]]
+    if unit != expected:
+        sys.exit(f"{key}: reference unit {unit}, BRANCH unit {m['unit']}")
+    return {"process": name, "id": ref_id, "location": loc, "unit": m["unit"],
+            "reference": f"{amount:g} {unit}", "owner": owner,
+            "valid": f"{valid_from[:4]} to {valid_until[:4]}", "note": m.get("note", ""),
+            "impacts": {label: impacts[label][ref_id] / per for label in CATEGORIES}}
+
+
+def factor_file(mapping, procs, impacts):
     by_ref = {r[0]: r for r in procs}
-    factors = {}
-    for key, m in mapping["mapped"].items():
-        ref_id, name, loc, amount, unit, owner, valid_from, valid_until = by_ref[m["ref_id"]]
-        amount = float(amount)
-        if name != m["process"] or loc != m["location"]:
-            sys.exit(f"{key}: the file has {name!r} [{loc}], the map says {m['process']!r} [{m['location']}]")
-        per = 1.0 if (unit == "MJ" and abs(amount - 3.6) < 1e-9 and m["unit"] == "kWh") else abs(amount)
-        expected = {"kWh": "MJ", "kg": "kg", "MJ": "MJ", "t*km": "t*km"}[m["unit"]]
-        if unit != expected:
-            sys.exit(f"{key}: reference unit {unit}, BRANCH unit {m['unit']}")
-        factors[key] = {"process": name, "id": ref_id, "location": loc, "unit": m["unit"],
-                        "reference": f"{amount:g} {unit}", "owner": owner,
-                        "valid": f"{valid_from[:4]} to {valid_until[:4]}", "note": m.get("note", ""),
-                        "impacts": {label: impacts[label][ref_id] / per for label in CATEGORIES}}
-    data = {"database": "ELCD 3.2 (openLCA Nexus file elcd_3_2_greendelta_v2_18_correction_20220908)",
+    factors = {key: factor_of(key, m, by_ref[m["ref_id"]], impacts) for key, m in mapping["mapped"].items()}
+    return {"database": "ELCD 3.2 (openLCA Nexus file elcd_3_2_greendelta_v2_18_correction_20220908)",
             "method": "EF 3.0 Method (adapted); IPCC 2021 AR6 for the second reading of climate change",
             "citation": "European Commission, Joint Research Centre, European Reference Life Cycle Database "
                         "(ELCD), version 3.2; each factor names the owner of its data set",
             "computed": datetime.date.today().isoformat(), "computed_by": "experiments/data/second_database/read_elcd.py",
             "aggregated_processes_in_the_file": len(procs), "factors": factors, "not_in_elcd": mapping["gaps"]}
-    with open(args.out, "w") as fh:
-        json.dump(data, fh, indent=1)
-        fh.write("\n")
-    print(f"wrote {len(factors)} factors from {len(procs)} aggregated processes to {args.out}")
 
+
+def energy_recovery(energy_rows):
+    """{material: MJ of electricity and of steam per kg burnt, with the data set and its owner}."""
     plants = {}
     for ref_id, name, ref_amount, flow, amount, unit, owner in energy_rows:
         if unit != "MJ" or abs(float(ref_amount) + 1000.0) > 1e-6:
@@ -172,14 +186,30 @@ def main():
         if len(hit) != 1 or len(hit[0][1]) != 4:
             sys.exit(f"energy recovery of {material}: {len(hit)} data sets start with {start!r}")
         recovery[material] = dict(hit[0][1], process=hit[0][0])
-    out2 = os.path.join(os.path.dirname(args.out), "elcd32_energy_recovery.json")
-    with open(out2, "w") as fh:
-        json.dump({"database": data["database"], "citation": data["citation"], "computed": data["computed"],
-                   "about": "MJ of electricity and of process steam delivered per kg of waste burnt in the average "
-                            "European waste-to-energy plant of ELCD 3.2 (product outputs of the incineration data "
-                            "sets without energy credit). Net of the plant's own use, as the data sets state them.",
-                   "materials": recovery, "no_data_set": ["aluminium", "pla"]}, fh, indent=1)
+    return recovery
+
+
+def write_json(path, data):
+    with open(path, "w") as fh:
+        json.dump(data, fh, indent=1)
         fh.write("\n")
+
+
+def main():
+    args = parse_args()
+    with open(os.path.join(OUT_DIR, "elcd32_map.json")) as fh:
+        mapping = json.load(fh)
+    procs, energy_rows, impacts = query_file(args.zolca, args.derby)
+    data = factor_file(mapping, procs, impacts)
+    write_json(args.out, data)
+    print(f"wrote {len(data['factors'])} factors from {len(procs)} aggregated processes to {args.out}")
+    recovery = energy_recovery(energy_rows)
+    out2 = os.path.join(os.path.dirname(args.out), "elcd32_energy_recovery.json")
+    write_json(out2, {"database": data["database"], "citation": data["citation"], "computed": data["computed"],
+                      "about": "MJ of electricity and of process steam delivered per kg of waste burnt in the average "
+                               "European waste-to-energy plant of ELCD 3.2 (product outputs of the incineration data "
+                               "sets without energy credit). Net of the plant's own use, as the data sets state them.",
+                      "materials": recovery, "no_data_set": ["aluminium", "pla"]})
     print(f"wrote the energy recovered for {len(recovery)} materials to {out2}")
 
 

@@ -92,7 +92,8 @@ cells = [
     md("## 4. Figures and tables of the paper\n\n"
        "Built from `results/` when the benchmark was rerun, else from the summaries committed in `paper/data/`."),
     code("import subprocess\n"
-         "print(subprocess.run([sys.executable, 'experiments/benchmark/paper_assets.py'], capture_output=True, text=True).stdout)\n"
+         "print(subprocess.run([sys.executable, 'experiments/benchmark/paper_assets.py'], "
+         "capture_output=True, text=True).stdout)\n"
          "pd.read_csv('paper/data/benchmark_tau0.025.csv').query('batch_size == 3')"
          "[['strategy', 'q_mean', 'wrong_when_certified_pct', 'p_vs_decision_flip']]"),
     code("import matplotlib.pyplot as plt\n"

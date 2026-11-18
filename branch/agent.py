@@ -13,10 +13,12 @@ The human may answer "I don't know" (oracle returns None): the choice keeps
 its prior distribution and is not asked again.
 """
 import time
+from typing import Optional
 
 import numpy as np
 
 from .backend import sync, to_numpy
+from .lca_model import Model
 from .montecarlo import State, p_a_lower
 from .query import STRATEGIES
 
@@ -27,7 +29,7 @@ ISO_PUBLIC_NOTICE = (
     "study for that review, but it does not replace the panel of reviewers.")
 
 
-def verdict_label(a_lower, model):
+def verdict_label(a_lower: bool, model: Model) -> str:
     return f"{model.label_a} < {model.label_b}" if a_lower else f"{model.label_b} < {model.label_a}"
 
 
@@ -62,7 +64,7 @@ class Session:
                         if value_laden_first else [])
         self.done = False
 
-    def p_a_lower(self):
+    def p_a_lower(self) -> float:
         return float(p_a_lower(self.state.delta))
 
     def _record(self):
@@ -74,7 +76,7 @@ class Session:
                            else bool((pl >= 0.5) == self.expert_a_lower)})
         return pf
 
-    def next_question(self):
+    def next_question(self) -> Optional[str]:
         """Name of the next choice to ask, or None when the session is over."""
         if self.pending:
             return self.pending[0]
@@ -92,7 +94,7 @@ class Session:
         self.pending = sorted(self.state.open, key=lambda n: scores[n], reverse=True)[:k]
         return self.pending[0]
 
-    def answer(self, name, value):
+    def answer(self, name: str, value: Optional[float]) -> None:
         """Engine number for the answer, or None for "I don't know"."""
         if name not in self.pending:
             raise ValueError(f"{name} is not the question being asked")
@@ -103,7 +105,7 @@ class Session:
         else:
             self.state.fix(name, value)
 
-    def finish_early(self):
+    def finish_early(self) -> None:
         """Stop asking now, at the person's request.
 
         Every open choice keeps its prior, the questions already answered keep
@@ -115,7 +117,7 @@ class Session:
         self._record()
         self.done = True
 
-    def result(self):
+    def result(self) -> dict:
         if not self.done:
             raise RuntimeError("the session is not over: call next_question until it returns None")
         model, state, asked = self.model, self.state, self.asked
@@ -212,7 +214,7 @@ def ask_human_cli(model, inp=input, out=print):
     return oracle
 
 
-def ask_public_comparison():
+def ask_public_comparison() -> bool:
     raw = input("Will this comparison be disclosed to the public (for example in marketing)? [y/N] ")
     public = raw.strip().lower().startswith(("y", "s"))
     if public:

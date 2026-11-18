@@ -125,6 +125,21 @@ Which file of results supports which sentence is in [`CLAIMS.md`](CLAIMS.md); th
 4. The three best choices are asked. `Session.answer` passes each answer to `State.fix`, which replaces one column of the draws, or to `State.mark_unknown`, which keeps the prior.
 5. The loop returns to step 1 with the revised beliefs.
 
+## The rules the code keeps
+
+Each is a test in [`tests/test_architecture.py`](../tests/test_architecture.py) or beside it, so none depends on anyone remembering it.
+
+| Rule | Why |
+|---|---|
+| No function longer than 50 lines, no module of the package longer than 600 | A long function hides errors: the builder had one of 320 lines, and the errors of the model were found there |
+| The core of the agent imports nothing but itself | The agent can be read, tested and reused without openLCA, a page or a file |
+| No circular imports; an import inside a function only for what is optional | The order of the modules is the order of the ideas |
+| A caught error is named and said | What fails against openLCA must reach the person |
+| One module locates the data; no state is kept between calls | The same code runs from a clone, an installed package and the desktop application |
+| The models the builder gives are compared with a file written by the code before it was divided (`tests/test_builder_golden.py`) | The order in which choices are created is the order of the draws, so it is part of the result |
+| The scripts that need openLCA run in the tests against an openLCA made for them (`tests/fake_openlca.py`) | A check that can only be run by hand is run rarely |
+| Style and types on every push: `ruff check .`, and `mypy` on the core | The cheap errors are found by a machine |
+
 ## Where to change what
 
 | To | Change | Then |

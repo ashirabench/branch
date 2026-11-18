@@ -27,14 +27,18 @@ from branch.montecarlo import State
 from branch.query import STRATEGIES
 
 
-def main():
+def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--J", type=int, nargs="+", default=[10, 20, 40, 80, 160])
     ap.add_argument("--N", type=int, nargs="+", default=[1_000, 10_000, 100_000, 1_000_000])
     ap.add_argument("--strategy", default="decision_flip")
     ap.add_argument("--repeats", type=int, default=5)
     ap.add_argument("--backend", default=None)
-    args = ap.parse_args()
+    return ap.parse_args()
+
+
+def main():
+    args = parse_args()
 
     xp = get_xp(args.backend)
     name = xp.__name__

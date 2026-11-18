@@ -98,7 +98,8 @@ def test_the_interactions_as_written():
         first += s[0] == t[0]
         three += set(s[:3]) == set(t[:3])
     n = asks.case.nunique()
-    assert f"in the {n} cases where the agent asks, the first order indices of the verdict sum to {total.min():.2f}--{total.max():.2f}" in TEX
+    assert (f"in the {n} cases where the agent asks, the first order indices of the verdict sum to "
+            f"{total.min():.2f}--{total.max():.2f}") in TEX
     assert f"the same first question in {first} of them and the same three in {three}" in TEX
     row = next(x for x in CLAIMS.split("\n") if x.startswith("| 18 |"))
     assert f"In the {n} cases" in row and f"sum to {total.min():.2f} to {total.max():.2f}" in row
@@ -188,7 +189,8 @@ def test_every_file_named_as_evidence_exists():
 
 def test_every_script_named_in_the_documents_exists():
     for doc in documents():
-        for name in re.findall(r"((?:experiments|branch|tests|examples|packaging|docs|data|paper)/[\w./\-]+\.(?:py|sh|md|json|csv|tex))", read(doc)):
+        named = r"((?:experiments|branch|tests|examples|packaging|docs|data|paper)/[\w./\-]+\.(?:py|sh|md|json|csv|tex))"
+        for name in re.findall(named, read(doc)):
             if "<" in name or "*" in name or name.startswith("data/factors") or "mydb" in name:
                 continue                      # patterns, local files, and the example name of the database guide
             assert os.path.exists(os.path.join(ROOT, name)), f"{doc} names {name}, which does not exist"

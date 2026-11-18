@@ -213,7 +213,8 @@ def test_materials_can_be_added_as_data_files(tmp_path, monkeypatch):
         "end_of_life": {"model": "split",
                         "recycling_rate": ["beta", {"a": 6, "b": 4}, "ASSUMPTION: test"],
                         "incineration_share": ["uniform", {"low": 0, "high": 1}, "ASSUMPTION: test"],
-                        "incineration": "disposal_polyethylene_terephthalate_incineration", "landfill": "disposal_plastics_mixture_landfill"}}))
+                        "incineration": "disposal_polyethylene_terephthalate_incineration",
+                        "landfill": "disposal_plastics_mixture_landfill"}}))
     real = catalogue.load_materials
     monkeypatch.setattr(catalogue, "load_materials", lambda root=None: real(tmp_path))
     data = fake_factors()

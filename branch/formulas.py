@@ -10,7 +10,10 @@ stays fixed at the option of the world that is sent, because an openLCA paramete
 Only + - * / are traced: an amount that needs anything else keeps its number, and `trace`
 reports it.
 """
+import logging
 from decimal import Decimal
+
+log = logging.getLogger(__name__)
 
 
 def number(x):
@@ -72,8 +75,9 @@ def _holds_elsewhere(term, traced, plain, names):
     moved = {d: (v * 1.07 if d in names else v) for d, v in plain.items()}
     try:
         numbers = term.inventory(moved)
-    except Exception:
-        return True                      # the moved world is not valid for this term: nothing to compare
+    except Exception as exc:             # a term may refuse a world for any reason of its own
+        log.debug("%s cannot be evaluated at the moved world, so nothing is compared there: %s", term.name, exc)
+        return True
     env = {names[d]: moved[d] for d in moved if d in names}
     values = {k: (eval(a.text, {"__builtins__": {}}, env) if isinstance(a, Sym) else float(a)) for k, a in traced.items()}
     return _agree(values, numbers)
@@ -98,7 +102,8 @@ def trace(model, world, names):
         try:
             traced = t.inventory(symbolic)
             ok = _agree(traced, numbers) and _holds_elsewhere(t, traced, plain, names)
-        except Exception:
+        except Exception as exc:         # an operation the symbols do not have: the amount stays a number
+            log.debug("the formula of %s could not be written: %s", t.name, exc)
             ok = False
         if not ok:
             failed.update(d for d in t.deps if d in names)

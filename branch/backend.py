@@ -5,11 +5,12 @@ BRANCH_BACKEND=numpy|cupy or by passing a name to get_xp().
 """
 import os
 import time
+from typing import Any, Optional
 
 import numpy as np
 
 
-def get_xp(name=None):
+def get_xp(name: Optional[str] = None) -> Any:
     name = (name or os.environ.get("BRANCH_BACKEND", "numpy")).lower()
     if name == "cupy":
         import cupy as cp  # noqa: WPS433
@@ -19,15 +20,15 @@ def get_xp(name=None):
     return np
 
 
-def is_gpu(xp):
+def is_gpu(xp: Any) -> bool:
     return xp.__name__ == "cupy"
 
 
-def to_numpy(a):
+def to_numpy(a: Any) -> Any:
     return a.get() if hasattr(a, "get") else np.asarray(a)
 
 
-def sync(xp):
+def sync(xp: Any) -> None:
     """Block until queued GPU work finishes, so timings are honest."""
     if is_gpu(xp):
         xp.cuda.Stream.null.synchronize()

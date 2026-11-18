@@ -46,21 +46,26 @@ def benchmark_keys(regions):
     return list(dict.fromkeys(keys))
 
 
-def main():
+def parse_args():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--port", type=int, default=8080)
     ap.add_argument("--runs", type=int, default=200)
     ap.add_argument("--regions", nargs="+", default=["PT", "DE", "BR"])
     ap.add_argument("--only", nargs="*", help="only these factor keys")
     ap.add_argument("--time-only", action="store_true", help="three runs of the first factor, print the time, save nothing")
-    args = ap.parse_args()
+    return ap.parse_args()
 
-    data = load_factors()
-    path = data.pop("path")
+
+def keys_to_simulate(args, data, path):
     keys = args.only or benchmark_keys(args.regions)
     missing = [k for k in keys if k not in data["factors"]]
     if missing:
         sys.exit(f"not in {path}: {missing}. Extract them first with experiments/openlca/extract_factors.py")
+    return keys
+
+
+def open_database(args, data, path, keys):
+    """(client, {process id: descriptor}, method), after checking that the open database is the one of the file."""
     client = ipc.Client(args.port)
     descs = {d.id: d for d in client.get_descriptors(o.Process)}
     method = find_method(client, data["method"])
@@ -68,41 +73,71 @@ def main():
     gone = [k for k in keys if data["factors"][k]["id"] not in descs]
     if gone:
         sys.exit(f"the open database is not the one of {os.path.basename(path)}: {gone[:3]} not found")
+    return client, descs, method
 
-    if args.time_only:
-        t0 = time.time()
-        simulate_impacts(client, descs[data["factors"][keys[0]]["id"]], method, 3)
-        per = (time.time() - t0) / 3
-        print(f"{per:.1f} s per run for {keys[0]}; {args.runs} runs of {len(keys)} factors: about "
-              f"{per * args.runs * len(keys) / 3600:.1f} hours (other datasets can be faster or slower)")
-        return
 
+def time_three_runs(client, descs, method, data, keys, runs):
+    t0 = time.time()
+    simulate_impacts(client, descs[data["factors"][keys[0]]["id"]], method, 3)
+    per = (time.time() - t0) / 3
+    print(f"{per:.1f} s per run for {keys[0]}; {runs} runs of {len(keys)} factors: about "
+          f"{per * runs * len(keys) / 3600:.1f} hours (other datasets can be faster or slower)")
+
+
+def backup(path):
+    """One copy of the factor file per day, before the first uncertainty is written into it."""
     os.makedirs("outputs", exist_ok=True)
-    backup = os.path.join("outputs", "factors_before_uncertainty_" + time.strftime("%Y-%m-%d") + ".json")
-    if not os.path.exists(backup):
-        shutil.copy(path, backup)
-    todo = [k for k in keys if min((u.get("n", 0) for u in (data["factors"][k].get("uncertainty") or {}).values()),
-                                   default=0) < args.runs]
+    copy = os.path.join("outputs", "factors_before_uncertainty_" + time.strftime("%Y-%m-%d") + ".json")
+    if not os.path.exists(copy):
+        shutil.copy(path, copy)
+
+
+def runs_done(factor):
+    return min((u.get("n", 0) for u in (factor.get("uncertainty") or {}).values()), default=0)
+
+
+def simulate_one(client, descs, method, factor, runs):
+    """Run the simulation of one factor and write its spread into the factor. False when openLCA fails."""
+    t0 = time.time()
+    try:
+        values = simulate_impacts(client, descs[factor["id"]], method, runs)
+    except Exception as exc:  # keep going; the factor stays without uncertainty and is listed at the end
+        print(f"!! {factor.get('process')}: {exc}")
+        return False
+    factor["uncertainty"] = {c: spread(v, factor["impacts"].get(c)) for c, v in values.items() if c in factor["impacts"]}
+    factor["uncertainty_runs"] = time.strftime("%Y-%m-%d")
+    factor["uncertainty_seconds"] = round(time.time() - t0, 1)
+    return True
+
+
+def save(data, path):
+    """Written after every factor, through a temporary file: an interrupted run loses one factor at most."""
+    with open(path + ".tmp", "w") as fh:
+        json.dump(data, fh, indent=2)
+    os.replace(path + ".tmp", path)
+
+
+def main():
+    args = parse_args()
+    data = load_factors()
+    path = data.pop("path")
+    keys = keys_to_simulate(args, data, path)
+    client, descs, method = open_database(args, data, path, keys)
+    if args.time_only:
+        return time_three_runs(client, descs, method, data, keys, args.runs)
+    backup(path)
+    todo = [k for k in keys if runs_done(data["factors"][k]) < args.runs]
     print(f"{len(keys) - len(todo)} already done, {len(todo)} to do")
     start = time.time()
     for i, key in enumerate(todo, 1):
         f = data["factors"][key]
-        t0 = time.time()
-        try:
-            runs = simulate_impacts(client, descs[f["id"]], method, args.runs)
-        except Exception as exc:  # keep going; the factor stays without uncertainty and is listed at the end
-            print(f"!! {key}: {exc}")
+        if not simulate_one(client, descs, method, f, args.runs):
             continue
-        f["uncertainty"] = {c: spread(v, f["impacts"].get(c)) for c, v in runs.items() if c in f["impacts"]}
-        f["uncertainty_runs"] = time.strftime("%Y-%m-%d")
-        f["uncertainty_seconds"] = round(time.time() - t0, 1)
-        with open(path + ".tmp", "w") as fh:
-            json.dump(data, fh, indent=2)
-        os.replace(path + ".tmp", path)
+        save(data, path)
         cc = f["uncertainty"].get("Climate change", {})
         left = (time.time() - start) / i * (len(todo) - i)
         print(f"ok {i}/{len(todo)} {key}: climate change gsd {cc.get('gsd')}, median/central {cc.get('median_ratio')} "
-              f"({time.time() - t0:.0f} s; about {left / 60:.0f} min left)")
+              f"({f['uncertainty_seconds']:.0f} s; about {left / 60:.0f} min left)")
     without = [k for k in keys if not (data["factors"][k].get("uncertainty") or {}).get("Climate change", {}).get("gsd")]
     print(f"done. Factors without a usable uncertainty for Climate change: {without or 'none'}")
     report(data, keys, os.path.join("outputs", "uncertainty_report.md"))

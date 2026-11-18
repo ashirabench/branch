@@ -27,7 +27,7 @@ app = ["gradio>=5", "reportlab", "matplotlib"]
 gpu = ["cupy-cuda12x"]
 notebook = ["jupyter", "nbformat", "nbconvert", "ipykernel"]
 database = ["JPype1", "jdk4py"]    # experiments/openlca/read_database.py
-dev = ["pytest", "ruff", "olca-ipc>=2.0", "olca-schema>=2.0", "reportlab", "matplotlib"]
+dev = ["pytest", "ruff", "mypy", "olca-ipc>=2.0", "olca-schema>=2.0", "reportlab", "matplotlib"]
 all = ["branch-lca[olca,experiments,app,dev]"]
 
 [project.urls]
@@ -68,3 +68,12 @@ max-statements = 40
 [tool.ruff.lint.per-file-ignores]
 "branch/__init__.py" = ["F401"]     # the public names of the package
 "tests/*" = ["B", "C90", "PLR0915"]
+
+# Types are checked where an error costs most: the core of the agent and the small modules everything
+# else builds on. The other modules are read by the checker only as far as these use them.
+[tool.mypy]
+files = ["branch/beliefs.py", "branch/lca_model.py", "branch/montecarlo.py", "branch/query.py", "branch/agent.py",
+         "branch/backend.py", "branch/quantities.py", "branch/factors.py", "branch/paths.py"]
+ignore_missing_imports = true
+follow_imports = "silent"
+check_untyped_defs = true

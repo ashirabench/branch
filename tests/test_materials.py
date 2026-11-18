@@ -154,7 +154,8 @@ def test_the_materials_validation_reads_every_example_file():
     import importlib.util
     import os
     pytest.importorskip("olca_schema")
-    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "experiments", "openlca", "validate_materials.py")
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    path = os.path.join(root, "experiments", "openlca", "validate_materials.py")
     spec = importlib.util.spec_from_file_location("validate_materials", path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)

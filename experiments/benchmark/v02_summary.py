@@ -27,6 +27,8 @@ import pandas as pd
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from prior_sources import benchmark_counts  # noqa: E402
+from prior_sources import lines as source_lines  # noqa: E402
 from summarize_benchmark import boot_ratio, pair_index  # noqa: E402
 
 OUT = os.path.join(ROOT, "results", "v02")
@@ -134,7 +136,8 @@ def synthetic_lines():
     out = ["## Illustration on synthetic models (not evidence about real products)", "",
            f"{df.case_seed.nunique()} synthetic models of 40 choices, {df.seed.nunique()} sessions each, experts from the "
            "priors, tau 2.5%. Intervals: bootstrap over models.", "",
-           "| Questions per round | Decision flip | Sobol of the impact | entropy | Sobol minus decision flip | 95% over models | "
+           "| Questions per round | Decision flip | Sobol of the impact | entropy | Sobol minus decision flip "
+           "| 95% over models | "
            "Models where the two differ | Wrong certified: decision flip | Sobol |", "|---|---|---|---|---|---|---|---|---|"]
     rng = np.random.default_rng(0)
     for b, g in df.groupby("batch_size"):
@@ -219,22 +222,27 @@ def verdicts():
     return out, list(models)
 
 
-def main():
-    if not os.path.isdir(OUT):
-        sys.exit("no results/v02: run experiments/benchmark/run_v02_experiments.sh first")
-    lines = ["# Experiments of version 0.2", "",
-             "Chosen setting: tau 2.5%, three questions per round. Readings as fixed in experiments/record/PLAN_2026-11-15.md, "
-             "section \"Changes of 16 November 2026\": intervals over pairs of products decide, intervals over cases are "
-             "shown beside them.", ""]
+HEAD = ["# Experiments of version 0.2", "",
+        "Chosen setting: tau 2.5%, three questions per round. Readings as fixed in experiments/record/PLAN_2026-11-15.md, "
+        "section \"Changes of 16 November 2026\": intervals over pairs of products decide, intervals over cases are "
+        "shown beside them.", ""]
+
+
+def primary_lines():
     q = reading_questions(PRIMARY)
-    lines += ["## Primary reading", "",
-              "Other product families, expert drawn from the priors, fewer questions than entropy: "
-              + (q if q is not None else "not run yet") + ".", "", "## All blocks (secondary readings)", ""]
+    lines = ["## Primary reading", "",
+             "Other product families, expert drawn from the priors, fewer questions than entropy: "
+             + (q if q is not None else "not run yet") + ".", "", "## All blocks (secondary readings)", ""]
     table(lines, READ)
     for title, block in (("B2, other product families", "families"), ("A3, uncertainty of the datasets", "uncertainty")):
         q, c = reading_questions(block), reading_certificate(block)
         if q is not None:
             lines += [f"**{title}.** Fewer questions than entropy: {q}. Certificate with tail experts: {c}.", ""]
+    return lines
+
+
+def second_database_lines():
+    lines = []
     for title, block in (("B3, second database (ELCD hybrid)", "elcd"), ("B3, ELCD hybrid with IPCC 2021", "elcd_ipcc2021")):
         e = compare_effect(block, "bafu12")
         if e is not None:
@@ -244,6 +252,13 @@ def main():
                       f"{e[3]:.2f} to {e[4]:.2f}): {e[5]}. Compatible means that no difference was detected, "
                       f"not that the two are equal. Certificate with tail experts, for description: "
                       f"{reading_certificate(block)}.", ""]
+    return lines
+
+
+def review_lines():
+    """The blocks added by the review of the plan: equivalence, a second wrong expert, the synthetic models,
+    the sensitivity runs."""
+    lines = []
     eq = [(t, reading_equivalence(b)) for t, b in EQUIVALENCE]
     if any(r for _, r in eq):
         lines += ["## Equivalence with the Sobol index of the impact (new seeds 300 to 329)", ""]
@@ -256,20 +271,26 @@ def main():
     if any(rows(b, "prior") is not None for b in SENSITIVITY):
         lines += ["## Sensitivity runs (reported, not read as statements)", ""]
         table(lines, SENSITIVITY)
-    from prior_sources import benchmark_counts
-    from prior_sources import lines as source_lines
-    lines += ["## How much of each prior has a source (benchmark, per region)", "",
-              "The label SOURCE means that the centre has a source. The spread is my choice or my rule in the "
-              "second column; no prior has an uncertainty that a source measured as such.", ""]
-    lines += source_lines(benchmark_counts()) + [""]
+    return lines
+
+
+def sources_lines():
+    return (["## How much of each prior has a source (benchmark, per region)", "",
+             "The label SOURCE means that the centre has a source. The spread is my choice or my rule in the "
+             "second column; no prior has an uncertainty that a source measured as such.", ""]
+            + source_lines(benchmark_counts()) + [""])
+
+
+def verdict_lines():
+    """The verdict of every case under every model, written to verdicts.csv and as a table."""
     v, labels = verdicts()
     with open(os.path.join(OUT, "verdicts.csv"), "w", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=["region", "a", "b"] + labels)
         w.writeheader()
         w.writerows(v)
-    lines += ["## Verdict of each case under each model", "",
-              "Lower product at the central value of every choice (A or B), and the share of prior draws in which A is lower.", "",
-              "| Region | A | B | " + " | ".join(labels) + " |", "|---|---|---|" + "---|" * len(labels)]
+    lines = ["## Verdict of each case under each model", "",
+             "Lower product at the central value of every choice (A or B), and the share of prior draws in which A is lower.", "",
+             "| Region | A | B | " + " | ".join(labels) + " |", "|---|---|---|" + "---|" * len(labels)]
     changed = {x: [] for x in labels[1:]}
     for r in v:
         lines.append(f"| {r['region']} | {r['a']} | {r['b']} | " + " | ".join(r.get(x, "") for x in labels) + " |")
@@ -280,6 +301,13 @@ def main():
     for x, cases in changed.items():
         lines.append(f"Central verdict different from {labels[0]} under {x}: {len(cases)} case(s)"
                      + (": " + "; ".join(cases) if cases else "") + ".")
+    return lines
+
+
+def main():
+    if not os.path.isdir(OUT):
+        sys.exit("no results/v02: run experiments/benchmark/run_v02_experiments.sh first")
+    lines = HEAD + primary_lines() + second_database_lines() + review_lines() + sources_lines() + verdict_lines()
     with open(os.path.join(OUT, "SUMMARY.md"), "w") as fh:
         fh.write("\n".join(lines) + "\n")
     print("\n".join(lines))

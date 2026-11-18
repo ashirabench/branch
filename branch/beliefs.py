@@ -11,6 +11,7 @@ engine goes through `ppf` (inverse CDF of shared uniforms), so every
 candidate question sees the same Monte Carlo draws (common random numbers).
 """
 from dataclasses import dataclass, field
+from typing import Any
 
 import numpy as np
 from scipy import stats
@@ -20,11 +21,11 @@ from scipy import stats
 class Choice:
     name: str
     kind: str                      # "categorical" or "continuous"
-    prior: object                  # categorical: {option: prob}; continuous: (dist, params), see _frozen
+    prior: Any                     # categorical: {option: prob}; continuous: (dist, params), see _frozen
     source: str                    # e.g. "ILCD 2010, sec. 6.9", "Eurostat env_waspac 2024"
     value_laden: bool = False      # value laden choices stay with the human
     question: str = ""             # the question shown to the human
-    fixed: object = None           # set when the human answers
+    fixed: Any = None              # set when the human answers
     n_answers: int = 5             # continuous: answers represented by this many quantile points
     askable: bool = True           # False: uncertainty nobody can answer (the database's own), never asked
 

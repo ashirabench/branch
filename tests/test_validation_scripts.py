@@ -14,10 +14,9 @@ import pytest
 
 pytest.importorskip("olca_schema")
 pytest.importorskip("olca_ipc")
+from branch import olca_bridge  # noqa: E402
 from tests.fake_openlca import FakeOpenLCA  # noqa: E402
 from tests.test_builder import fake_factors  # noqa: E402
-
-from branch import olca_bridge  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -101,3 +100,28 @@ def test_the_check_of_the_probability_world_by_world(openlca, monkeypatch, tmp_p
     text = capsys.readouterr().out
     assert "12 worlds: largest relative difference" in text and "P(A lower) from openLCA on these worlds" in text
     assert openlca.left_behind() == [], "200 worlds must not leave 400 processes in the database"
+
+
+def _demo(monkeypatch, *argv):
+    from tests.test_builder import CAT
+    path = os.path.join(ROOT, "examples", "demo_cli.py")
+    spec = importlib.util.spec_from_file_location("demo_cli", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    monkeypatch.setattr(sys, "argv", ["demo_cli.py", "--defaults", "--category", CAT, *argv])
+    module.main()
+
+
+def test_the_command_line_demo_sends_checks_and_explains(openlca, monkeypatch, tmp_path, capsys):
+    _demo(monkeypatch, "--push", "--backup-confirmed", "--diagnose")
+    text = capsys.readouterr().out
+    assert "Sent to openLCA (category BRANCH)" in text and "Per exchange check in openLCA" in text
+    assert "<-- differs" not in text
+    assert (tmp_path / "outputs" / "report.md").exists()
+
+
+def test_the_command_line_demo_writes_the_file_to_import(openlca, monkeypatch, tmp_path, capsys):
+    target = tmp_path / "branch.zip"
+    _demo(monkeypatch, "--jsonld", str(target))
+    assert target.exists() and f"Saved {target}" in capsys.readouterr().out
+    assert not [k for k in openlca.left_behind() if str(k).startswith("system-")], "writing a file sends nothing"
