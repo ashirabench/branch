@@ -19,14 +19,21 @@ would also draw the uncertainty of every exchange of the database):
 Needs openLCA open with its IPC server started. Writes one line per world and product, and a summary.
 """
 import argparse
-import csv
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path[:0] = [os.path.dirname(os.path.dirname(HERE)), HERE]
 
 import numpy as np  # noqa: E402
+from checks import connect, remove, save  # noqa: E402
 from scipy import stats  # noqa: E402
+
+from branch import olca_bridge  # noqa: E402
+from branch.agent import run_agent  # noqa: E402
+from branch.cases import draw_truth  # noqa: E402
+from branch.montecarlo import State  # noqa: E402
+from branch.real_cases import compare  # noqa: E402
 
 FIRST_SEED = 7000   # worlds 7000, 7001, ...: used by nothing else
 
@@ -55,19 +62,11 @@ def summarise(worlds, p_branch):
 
 def fixed_world(model, seed):
     """Run the agent with an expert who answers everything, so every askable choice is fixed."""
-    from branch.agent import run_agent
-    from branch.cases import draw_truth
     truth = draw_truth(model, seed)
     return run_agent(model, lambda name: truth[name], tau=0.0, n_samples=2000, truth=truth), truth
 
 
-def main():
-    import olca_schema as o
-
-    from branch import olca_bridge
-    from branch.montecarlo import State
-    from branch.real_cases import compare
-
+def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--a", default="pet_bottle_1l")
     ap.add_argument("--b", default="glass_refillable_1l")
@@ -77,49 +76,52 @@ def main():
     ap.add_argument("--n", type=int, default=20000, help="draws of BRANCH for its own probability")
     ap.add_argument("--port", type=int, default=8080)
     ap.add_argument("--out", default=os.path.join("results", "validation_probability.csv"))
-    args = ap.parse_args()
+    return ap.parse_args()
 
-    c = olca_bridge.client(args.port)
-    try:
-        c.get_descriptors(o.UnitGroup)
-    except Exception:
-        sys.exit("openLCA is not answering. In openLCA: open the database, then "
-                 "Tools > Developer tools > IPC Server > Start.")
+
+def probability_of_branch(args):
+    """P(A lower) from BRANCH's own draws of the priors."""
     prior = compare(args.a, args.b, args.region)
-    p_branch = float((np.asarray(State(prior, prior.sample(args.n, 0)).delta) < 0).mean())
-    print(f"BRANCH, {args.n} draws: P(A lower) = {p_branch:.4f}")
-    rows, worlds = [], []
-    for seed in range(args.first_seed, args.first_seed + args.worlds):
-        model = compare(args.a, args.b, args.region)
-        result, _ = fixed_world(model, seed)
-        out = olca_bridge.push_comparison(c, model, result)
-        (la, ca), (lb, cb) = list(out["check"].items())[:2]
-        worlds.append({"olca_a": ca["openLCA"], "olca_b": cb["openLCA"], "branch_a": ca["BRANCH"], "branch_b": cb["BRANCH"]})
-        for label, chk in ((la, ca), (lb, cb)):
-            rows.append({"seed": seed, "product": label, "openLCA": chk["openLCA"], "BRANCH": chk["BRANCH"],
-                         "relative_difference": chk["relative_difference"]})
-        for ref in out["systems"] + out["processes"] + out.get("flows", []):
-            try:
-                c.delete(ref)
-            except Exception:
-                pass
-        if (seed - args.first_seed + 1) % 10 == 0:
-            print(f"  {seed - args.first_seed + 1} worlds")
-    os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
-    with open(args.out, "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
-        w.writeheader()
-        w.writerows(rows)
-    s = summarise(worlds, p_branch)
-    with open(args.out.replace(".csv", "_summary.csv"), "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=["case"] + list(s))
-        w.writeheader()
-        w.writerow({"case": f"{args.a} vs {args.b}, {args.region}", **s})
+    return float((np.asarray(State(prior, prior.sample(args.n, 0)).delta) < 0).mean())
+
+
+def one_world(c, args, seed):
+    """One world in openLCA: (the two products as openLCA and BRANCH see them, the rows of the table)."""
+    model = compare(args.a, args.b, args.region)
+    result, _ = fixed_world(model, seed)
+    out = olca_bridge.push_comparison(c, model, result)
+    (la, ca), (lb, cb) = list(out["check"].items())[:2]
+    remove(c, out)
+    world = {"olca_a": ca["openLCA"], "olca_b": cb["openLCA"], "branch_a": ca["BRANCH"], "branch_b": cb["BRANCH"]}
+    rows = [{"seed": seed, "product": label, "openLCA": chk["openLCA"], "BRANCH": chk["BRANCH"],
+             "relative_difference": chk["relative_difference"]} for label, chk in ((la, ca), (lb, cb))]
+    return world, rows
+
+
+def report(s, p_branch):
     print(f"{s['worlds']} worlds: largest relative difference {s['largest_relative_difference']:.2g}; "
           f"same winner in {s['same_winner']} of {s['worlds']}")
     print(f"P(A lower) from openLCA on these worlds: {s['p_openlca_worlds']:.3f} "
           f"(exact 95% interval {s['p_openlca_low']:.3f} to {s['p_openlca_high']:.3f}); BRANCH {p_branch:.3f}; "
           + ("inside" if s["branch_inside_interval"] else "OUTSIDE"))
+
+
+def main():
+    args = parse_args()
+    c = connect(args.port)
+    p_branch = probability_of_branch(args)
+    print(f"BRANCH, {args.n} draws: P(A lower) = {p_branch:.4f}")
+    rows, worlds = [], []
+    for done, seed in enumerate(range(args.first_seed, args.first_seed + args.worlds), 1):
+        world, new = one_world(c, args, seed)
+        worlds.append(world)
+        rows += new
+        if done % 10 == 0:
+            print(f"  {done} worlds")
+    save(rows, args.out)
+    s = summarise(worlds, p_branch)
+    save([{"case": f"{args.a} vs {args.b}, {args.region}", **s}], args.out.replace(".csv", "_summary.csv"))
+    report(s, p_branch)
     print("Saved", args.out)
 
 

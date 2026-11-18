@@ -27,7 +27,7 @@ app = ["gradio>=5", "reportlab", "matplotlib"]
 gpu = ["cupy-cuda12x"]
 notebook = ["jupyter", "nbformat", "nbconvert", "ipykernel"]
 database = ["JPype1", "jdk4py"]    # experiments/openlca/read_database.py
-dev = ["pytest", "olca-schema>=2.0", "reportlab", "matplotlib"]
+dev = ["pytest", "ruff", "olca-ipc>=2.0", "olca-schema>=2.0", "reportlab", "matplotlib"]
 all = ["branch-lca[olca,experiments,app,dev]"]
 
 [project.urls]

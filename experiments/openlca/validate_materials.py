@@ -12,16 +12,16 @@ A material whose factors are not in the factor file yet is reported and skipped.
 Writes paper/data/validation_new_materials.csv. Needs openLCA open with the IPC server on 8080.
 """
 import argparse
-import csv
 import glob
 import json
 import os
 import sys
 
-ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
-sys.path.insert(0, ROOT)
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.join(HERE, "..", "..")
+sys.path[:0] = [ROOT, HERE]
 
-import olca_schema as o  # noqa: E402
+from checks import DIFFERENT, cause_of, connect, remove, save  # noqa: E402
 
 from branch import catalogue as cat  # noqa: E402
 from branch import olca_bridge  # noqa: E402
@@ -46,62 +46,55 @@ def variants(added):
                 yield os.path.basename(path), v, mid, label
 
 
-def main():
+def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--regions", nargs="+", default=["PT", "DE", "BR"])
     ap.add_argument("--port", type=int, default=8080)
     ap.add_argument("--keep", action="store_true", help="keep the pushed processes in openLCA")
-    args = ap.parse_args()
+    return ap.parse_args()
+
+
+def unchecked(base, region, cause):
+    return {**base, "region": region, "product": "", "openLCA": "", "BRANCH": "", "relative_difference": "",
+            "cause": cause}
+
+
+def check_variant(c, spec, base, region, keep):
+    """The row of one example with one dataset in one region, against the reference bottle."""
+    tag = f"{base['material']:18s} {base['dataset']:38s} {region}"
+    try:
+        model = compare(spec, REFERENCE, region)
+        result = run_agent(model, lambda name: None, n_samples=5000)
+        out = olca_bridge.push_comparison(c, model, result)
+    except Exception as exc:       # keep going: one example that fails must not stop the others
+        print(f"{tag}  ERROR {exc}")
+        return [unchecked(base, region, f"error: {exc}")]
+    product, chk = model.label_a, out["check"][model.label_a]     # the PET bottle is already in the benchmark table
+    rel = chk["relative_difference"]
+    cause = cause_of(c, model, result, product) if rel and rel > DIFFERENT else ""
+    print(f"{tag}  openLCA {chk['openLCA']:.6g}  BRANCH {chk['BRANCH']:.6g}  rel {rel:.2g}  {cause}")
+    if not keep:
+        remove(c, out)
+    return [{**base, "region": region, "product": product, "openLCA": chk["openLCA"],
+             "BRANCH": chk["BRANCH"], "relative_difference": rel, "cause": cause}]
+
+
+def main():
+    args = parse_args()
     added = {k: v for k, v in cat.load_materials().items() if k not in cat.MATERIALS}
     ready = cat.split_by_factors(load_factors())[0]
-    c = olca_bridge.client(args.port)
-    try:
-        c.get_descriptors(o.UnitGroup)
-    except Exception:
-        sys.exit("openLCA is not answering. In openLCA: open the database, then "
-                 "Tools > Developer tools > IPC Server > Start.")
-    rows, worst = [], 0.0
+    c = connect(args.port)
+    rows = []
     for example, spec, mid, label in variants(added):
         base = {"material": mid, "dataset": label, "example": example}
         if mid not in ready:
-            rows.append({**base, "region": "", "product": "", "openLCA": "", "BRANCH": "",
-                         "relative_difference": "", "cause": "skipped: factors not extracted"})
+            rows.append(unchecked(base, "", "skipped: factors not extracted"))
             print(f"{mid:18s} {label:38s} SKIPPED, factors not extracted")
             continue
         for region in args.regions:
-            try:
-                model = compare(spec, REFERENCE, region)
-                result = run_agent(model, lambda name: None, n_samples=5000)
-                out = olca_bridge.push_comparison(c, model, result)
-            except Exception as exc:
-                rows.append({**base, "region": region, "product": "", "openLCA": "", "BRANCH": "",
-                             "relative_difference": "", "cause": f"error: {exc}"})
-                print(f"{mid:18s} {label:38s} {region}  ERROR {exc}")
-                continue
-            for product, chk in out["check"].items():
-                if product != model.label_a:          # the PET bottle is already in the benchmark table
-                    continue
-                rel = chk["relative_difference"]
-                worst = max(worst, rel or 0.0)
-                cause = ""
-                if rel and rel > 1e-4:
-                    diag = olca_bridge.diagnose_in_openlca(c, model, result, labels=[product])
-                    cause = "; ".join(f"{k} x{ol / br:.3g}" for k, ol, br, r in diag.get(product, [])
-                                      if r and r > 1e-4 and br)
-                rows.append({**base, "region": region, "product": product, "openLCA": chk["openLCA"],
-                             "BRANCH": chk["BRANCH"], "relative_difference": rel, "cause": cause})
-                print(f"{mid:18s} {label:38s} {region}  openLCA {chk['openLCA']:.6g}  BRANCH {chk['BRANCH']:.6g}  "
-                      f"rel {rel:.2g}  {cause}")
-            if not args.keep:
-                for ref in out["systems"] + out["processes"]:
-                    try:
-                        c.delete(ref)
-                    except Exception:
-                        pass
-    with open(OUT, "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=FIELDS)
-        w.writeheader()
-        w.writerows(rows)
+            rows += check_variant(c, spec, base, region, args.keep)
+    save(rows, OUT, FIELDS)
+    worst = max((r["relative_difference"] or 0.0 for r in rows if r["product"]), default=0.0)
     print(f"\n{len(rows)} rows, largest relative difference {worst:.2g}. Saved {os.path.abspath(OUT)}")
     bad = [r for r in rows if str(r["cause"]).startswith(("error", "skipped"))]
     if bad:

@@ -16,24 +16,28 @@ deleted afterwards (use --keep to leave them in the BRANCH folder).
 Writes paper/data/validation_openlca.csv. Needs openLCA open with the IPC server on 8080.
 """
 import argparse
-import csv
 import itertools
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path[:0] = [os.path.dirname(os.path.dirname(HERE)), HERE]
 
-import olca_schema as o  # noqa: E402
+from checks import DIFFERENT, cause_of, connect, remove, save  # noqa: E402
 
 from branch import olca_bridge  # noqa: E402
 from branch.agent import run_agent  # noqa: E402
+from branch.factors import load_factors  # noqa: E402
 from branch.real_cases import compare  # noqa: E402
 
 PRODUCTS = ["pet_bottle_1l", "glass_refillable_1l", "aluminium_can_330ml", "beverage_carton_1l"]
 OUT = os.path.join(os.path.dirname(__file__), "..", "..", "paper", "data", "validation_openlca.csv")
 
 
-def main():
+FIRST_PAIR = ("glass_refillable_1l", "aluminium_can_330ml")    # it uses the most factors: glass, aluminium, washing, transport
+
+
+def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--regions", nargs="+", default=["PT", "DE", "BR"])
     ap.add_argument("--port", type=int, default=8080)
@@ -45,68 +49,67 @@ def main():
     ap.add_argument("--specs", nargs=2, metavar=("A", "B"), default=None,
                     help="check this pair instead of the benchmark pairs: two product files or benchmark names")
     args = ap.parse_args()
-    out_path = args.out or (os.path.join("results", "validation_all_grids.csv") if args.all_grids else OUT)
-    pairs = list(itertools.combinations(PRODUCTS, 2))
-    if args.pairs < 6:   # glass vs can first: it uses the most factors (glass, aluminium, washing, transport)
-        pairs = [("glass_refillable_1l", "aluminium_can_330ml")] + [p for p in pairs if p != (
-            "glass_refillable_1l", "aluminium_can_330ml")]
-        pairs = pairs[:args.pairs]
+    if args.specs and not args.out:
+        sys.exit("--specs needs --out, so the benchmark table is not overwritten")
+    return args
+
+
+def pairs_to_check(args):
     if args.specs:
-        pairs = [tuple(args.specs)]
-        if not args.out:
-            sys.exit("--specs needs --out, so the benchmark table is not overwritten")
-    if args.all_grids:
-        from branch.real_cases import load_factors
-        keys = load_factors()["factors"]
-        args.regions = sorted(k[len("electricity_mv_"):] for k in keys
-                              if k.startswith("electricity_mv_") and k != "electricity_mv_GLO")
-        args.regions += ["BR-AM", "BR-N"]
-        print(f"{len(args.regions)} regions x {len(pairs)} pairs")
-    c = olca_bridge.client(args.port)
+        return [tuple(args.specs)]
+    pairs = list(itertools.combinations(PRODUCTS, 2))
+    if args.pairs < 6:
+        pairs = ([FIRST_PAIR] + [p for p in pairs if p != FIRST_PAIR])[:args.pairs]
+    return pairs
+
+
+def regions_to_check(args):
+    """The regions asked for, or every region whose grid is in the factor file."""
+    if not args.all_grids:
+        return args.regions
+    keys = load_factors()["factors"]
+    regions = sorted(k[len("electricity_mv_"):] for k in keys
+                     if k.startswith("electricity_mv_") and k != "electricity_mv_GLO")
+    return regions + ["BR-AM", "BR-N"]
+
+
+def check_pair(c, region, a, b, keep):
+    """The rows of one comparison: one per product, or one that says why it could not be checked."""
     try:
-        c.get_descriptors(o.UnitGroup)
-    except Exception:
-        sys.exit("openLCA is not answering. In openLCA: open the database, then "
-                 "Tools > Developer tools > IPC Server > Start.")
-    rows, worst = [], 0.0
-    for region in args.regions:
-        for a, b in pairs:
-            try:
-                model = compare(a, b, region)
-                result = run_agent(model, lambda name: None, n_samples=5000)
-                out = olca_bridge.push_comparison(c, model, result)
-            except Exception as exc:   # keep going: one broken region must not stop the audit
-                rows.append({"region": region, "pair": f"{a} vs {b}", "product": "", "openLCA": "",
-                             "BRANCH": "", "relative_difference": "", "cause": f"error: {exc}"})
-                print(f"{region}  ERROR {exc}")
-                continue
-            for label, chk in out["check"].items():
-                rel = chk["relative_difference"]
-                worst = max(worst, rel or 0.0)
-                cause = ""
-                if rel and rel > 1e-4:
-                    diag = olca_bridge.diagnose_in_openlca(c, model, result, labels=[label])
-                    cause = "; ".join(f"{k} x{ol / br:.3g}" for k, ol, br, r in diag.get(label, [])
-                                      if r and r > 1e-4 and br)
-                rows.append({"region": region, "pair": f"{a} vs {b}", "product": label,
-                             "openLCA": chk["openLCA"], "BRANCH": chk["BRANCH"],
-                             "relative_difference": rel, "cause": cause})
-                print(f"{region}  {label:28s} openLCA {chk['openLCA']:.6g}  BRANCH {chk['BRANCH']:.6g}  "
-                      f"rel {rel:.2g}  {cause}")
-            if not args.keep:
-                for ref in out["systems"] + out["processes"] + out.get("flows", []):
-                    try:
-                        c.delete(ref)
-                    except Exception:
-                        pass
-    os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
-    with open(out_path, "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
-        w.writeheader()
-        w.writerows(rows)
+        model = compare(a, b, region)
+        result = run_agent(model, lambda name: None, n_samples=5000)
+        out = olca_bridge.push_comparison(c, model, result)
+    except Exception as exc:   # keep going: one broken region must not stop the audit
+        print(f"{region}  ERROR {exc}")
+        return [{"region": region, "pair": f"{a} vs {b}", "product": "", "openLCA": "",
+                 "BRANCH": "", "relative_difference": "", "cause": f"error: {exc}"}]
+    rows = []
+    for label, chk in out["check"].items():
+        rel = chk["relative_difference"]
+        cause = cause_of(c, model, result, label) if rel and rel > DIFFERENT else ""
+        rows.append({"region": region, "pair": f"{a} vs {b}", "product": label,
+                     "openLCA": chk["openLCA"], "BRANCH": chk["BRANCH"],
+                     "relative_difference": rel, "cause": cause})
+        print(f"{region}  {label:28s} openLCA {chk['openLCA']:.6g}  BRANCH {chk['BRANCH']:.6g}  "
+              f"rel {rel:.2g}  {cause}")
+    if not keep:
+        remove(c, out)
+    return rows
+
+
+def main():
+    args = parse_args()
+    out_path = args.out or (os.path.join("results", "validation_all_grids.csv") if args.all_grids else OUT)
+    pairs, regions = pairs_to_check(args), regions_to_check(args)
+    if args.all_grids:
+        print(f"{len(regions)} regions x {len(pairs)} pairs")
+    c = connect(args.port)
+    rows = [row for region in regions for a, b in pairs for row in check_pair(c, region, a, b, args.keep)]
+    save(rows, out_path)
     errors = [r for r in rows if str(r["cause"]).startswith("error")]
-    checked = len(rows) - len(errors)
-    print(f"\n{checked} products checked, largest relative difference {worst:.2g}. Saved {os.path.abspath(out_path)}")
+    worst = max((r["relative_difference"] or 0.0 for r in rows if r not in errors), default=0.0)
+    print(f"\n{len(rows) - len(errors)} products checked, largest relative difference {worst:.2g}. "
+          f"Saved {os.path.abspath(out_path)}")
     if errors:
         sys.exit(f"{len(errors)} comparison(s) could not be checked: see the rows marked error in the table.")
 

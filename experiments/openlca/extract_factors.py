@@ -19,33 +19,21 @@ Source to cite: "Life Cycle Inventory database of the Swiss Federal
 Administration, BAFU:20XY".
 """
 import argparse
-import json
 import os
 import re
 import sys
-import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import olca_ipc as ipc  # noqa: E402
 import olca_schema as o  # noqa: E402
 
-from branch import olca_extract as extract_module  # noqa: E402
-from branch.olca_extract import (  # noqa: E402,F401
-    LOCATION_PREFERENCE,
-    PROCESSES,
-    all_processes,
-    citation_for,
-    find_method,
-    loc,
-    match,
-    norm,
-    resolve,
-    unit_impacts,
-)
+from branch import olca_extract  # noqa: E402
+from branch.builder import required_factor_keys  # noqa: E402
+from branch.olca_extract import all_processes, norm  # noqa: E402
 
 
-def main():
+def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8080)
     ap.add_argument("--methods", action="store_true", help="list LCIA methods and exit")
@@ -64,78 +52,72 @@ def main():
                     help="region code for --specs (data/regions/)")
     ap.add_argument("--update", action="store_true",
                     help="keep factors already in the output file and add the new ones")
-    args = ap.parse_args()
-    if args.map:
-        extract_module.use_database_map(args.map)
-    args.database = args.database or extract_module.DATABASE_MAP["database"]
+    return ap.parse_args()
 
-    client = ipc.Client(args.port)
-    if args.methods:
-        for d in sorted(client.get_descriptors(o.ImpactMethod), key=lambda d: d.name):
-            print(d.name)
-        return
-    descs = all_processes(client)
-    print(f"{len(descs)} processes in the open database")
-    if args.find:
-        for d in sorted(descs, key=lambda d: d.name):
-            if norm(args.find) in norm(d.name):
-                print(f"  {d.name}   [{getattr(d, 'location', '') or ''}]")
-        return
 
-    method = find_method(client, args.method)
-    print(f"LCIA method: {method.name}")
-    out = {"database": args.database, "method": method.name, "citation": citation_for(args.database),
-           "extracted": time.strftime("%Y-%m-%d"), "factors": {}, "unresolved": {}}
-    path = f"data/factors/{args.database}_{re.sub(r'[^A-Za-z0-9]+', '_', method.name)}.json"
-    chosen = []                  # processes people chose by name stay in the file across full extractions
-    if os.path.exists(path):
-        with open(path) as fh:
-            old = json.load(fh)
-        if args.update:
-            out["factors"] = old.get("factors", {})
-        elif not (args.only or args.specs):
-            chosen = [k for k in old.get("factors", {}) if k.startswith("proc:")]
+def list_methods(client):
+    for d in sorted(client.get_descriptors(o.ImpactMethod), key=lambda d: d.name):
+        print(d.name)
+
+
+def list_matching(descs, text):
+    for d in sorted(descs, key=lambda d: d.name):
+        if norm(text) in norm(d.name):
+            print(f"  {d.name}   [{getattr(d, 'location', '') or ''}]")
+
+
+def wanted_keys(args, descs):
+    """The keys to read: the ones named, the ones the products need, or None for all of the map."""
+    if not args.specs:
+        return args.only or None
+    known = set(olca_extract.PROCESSES)
     if args.all_grids:
-        for d in descs:
-            mm = extract_module.GRID_PATTERN.match((d.name or "").strip())
-            if mm:
-                PROCESSES.setdefault(f"electricity_mv_{mm.group(1)}", [d.name])
-        print(f"{sum(k.startswith('electricity_mv_') for k in PROCESSES)} national grids found")
-    if args.specs:
-        from branch.builder import required_factor_keys
-        needed = required_factor_keys(args.specs, args.region)
-        unknown = [k for k in needed if k not in PROCESSES and not k.startswith("proc:")]
-        if unknown:
-            raise SystemExit(f"The map of the database (data/databases/) has no names for: {unknown}")
-        keys = [k for k in needed if k not in out["factors"]]
-    else:
-        keys = args.only or [k for k in PROCESSES if k not in out["factors"]] + chosen
-    for key in keys:
-        ref, hits = resolve(descs, key, PROCESSES)
-        if ref is None:
-            out["unresolved"][key] = [h.name for h in hits[:15]]
-            print(f"  ?  {key}: {len(hits)} candidates, choose one and write its exact name in the map of the database")
-            for h in hits[:15]:
-                print(f"       - {h.name}   [{loc(h)}]")
-            continue
-        t0 = time.perf_counter()
-        try:
-            out["factors"][key] = unit_impacts(client, ref, method)
-            gwp = {k: v for k, v in out["factors"][key]["impacts"].items() if "climate" in k.lower()}
-            print(f"  ok {key}: {ref.name} [{loc(ref)}]  {gwp}  ({time.perf_counter() - t0:.1f}s)")
-        except Exception as exc:  # keep going, report at the end
-            out["unresolved"][key] = [f"calculation failed: {exc}"]
-            print(f"  !! {key}: {exc}")
+        known |= set(olca_extract.grid_processes(descs))
+    needed = required_factor_keys(args.specs, args.region)
+    unknown = [k for k in needed if k not in known and not k.startswith("proc:")]
+    if unknown:
+        raise SystemExit(f"The map of the database (data/databases/) has no names for: {unknown}")
+    return needed
 
-    os.makedirs("data/factors", exist_ok=True)
-    with open(path, "w") as fh:
-        json.dump(out, fh, indent=2)
+
+def show(done, total, message):
+    print(f"  [{done}/{total}] {message}")
+
+
+def report(path, out, strict):
+    """The last line every guide quotes, and, when keys were asked for by name, why one was not read."""
+    for key, why in out["unresolved"].items():
+        if why and not str(why[0]).startswith("calculation failed"):
+            print(f"  ?  {key}: {len(why)} candidates, choose one and write its exact name in the map of the database")
+            for name in why:
+                print(f"       - {name}")
     print(f"\nsaved {path}: {len(out['factors'])} factors, {len(out['unresolved'])} unresolved")
-    if out["unresolved"] and (args.specs or args.only):
+    if out["unresolved"] and strict:
         for key, why in out["unresolved"].items():
             print(f"NOT READ: {key}: " + ("no process of the database has this exact name (a flow may have it; "
                                           "use --find to see the process names)" if not why else "; ".join(map(str, why))))
         sys.exit(1)
+
+
+def main():
+    args = parse_args()
+    if args.map:
+        olca_extract.use_database_map(args.map)
+    database = args.database or olca_extract.DATABASE_MAP["database"]
+    client = ipc.Client(args.port)
+    if args.methods:
+        return list_methods(client)
+    descs = all_processes(client)
+    print(f"{len(descs)} processes in the open database")
+    if args.find:
+        return list_matching(descs, args.find)
+    method = olca_extract.find_method(client, args.method)
+    print(f"LCIA method: {method.name}")
+    path = f"data/factors/{database}_{re.sub(r'[^A-Za-z0-9]+', '_', method.name)}.json"
+    out = olca_extract.extract(client, path, method=args.method, database=database, all_grids=args.all_grids,
+                               keys=wanted_keys(args, descs), update=args.update, progress=show,
+                               keep_chosen=not (args.only or args.specs))
+    report(path, out, strict=bool(args.specs or args.only))
 
 
 if __name__ == "__main__":

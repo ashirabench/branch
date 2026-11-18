@@ -167,12 +167,14 @@ def unit_impacts(client, proc_ref, method_ref):
     # reference unit (e.g. MJ): BRANCH multiplies these factors by amounts in that unit.
     setup = o.CalculationSetup(target=system, impact_method=method_ref, amount=1.0,
                                unit=ref_ex.unit, flow_property=ref_ex.flow_property)
-    result = client.calculate(setup)
-    result.wait_until_ready()
-    try:
-        impacts = {i.impact_category.name: float(i.amount) for i in result.get_total_impacts()}
+    try:                              # the product system is removed again whatever openLCA answers
+        result = client.calculate(setup)
+        try:
+            result.wait_until_ready()
+            impacts = {i.impact_category.name: float(i.amount) for i in result.get_total_impacts()}
+        finally:
+            result.dispose()
     finally:
-        result.dispose()
         client.delete(system)
     return {"process": proc.name, "id": proc.id,
             "location": proc.location.name if proc.location else None,
@@ -191,7 +193,11 @@ def simulate_impacts(client, proc_ref, method_ref, runs, tick=None):
     system = client.create_product_system(proc_ref, linking(proc))
     setup = o.CalculationSetup(target=system, impact_method=method_ref, amount=1.0,
                                unit=ref_ex.unit, flow_property=ref_ex.flow_property)
-    result = client.simulate(setup)
+    try:
+        result = client.simulate(setup)
+    except Exception:
+        client.delete(system)         # nothing of this run stays in the database
+        raise
     out = {}
     try:
         result.wait_until_ready()
@@ -240,12 +246,24 @@ def citation_for(database):
             + (year.group(0) if year else "20XY"))
 
 
+def grid_processes(descs):
+    """{electricity_mv_<country code>: [name]} for every process the database names as a national grid."""
+    out = {}
+    for d in descs:
+        mm = GRID_PATTERN.match((d.name or "").strip())
+        if mm:
+            out.setdefault(f"electricity_mv_{mm.group(1)}", [d.name])
+    return out
+
+
 def extract(client, path, method="EF 3.1", database="bafu2026", all_grids=True, keys=None,
-            update=False, progress=print):
+            update=False, progress=print, keep_chosen=True):
     """Extract factors into the JSON file at path. Returns the saved dict.
 
     progress(done, total, message) is called after every dataset when it accepts three
-    arguments; a one argument callable (print) receives the message only."""
+    arguments; a one argument callable (print) receives the message only.
+    keep_chosen: read again the processes that people chose by name (keys "proc:...") and that the
+    file already holds, so that a full extraction does not lose them."""
     def say(i, n, msg):
         try:
             progress(i, n, msg)
@@ -262,14 +280,12 @@ def extract(client, path, method="EF 3.1", database="bafu2026", all_grids=True, 
             old = json.load(fh).get("factors", {})
         if update:
             out["factors"] = old
-        else:
+        elif keep_chosen:
             chosen = [k for k in old if k.startswith("proc:")]
     procs = dict(PROCESSES)
     if all_grids:
-        for d in descs:
-            mm = GRID_PATTERN.match((d.name or "").strip())
-            if mm:
-                procs.setdefault(f"electricity_mv_{mm.group(1)}", [d.name])
+        for key, names in grid_processes(descs).items():
+            procs.setdefault(key, names)
     todo = [k for k in list(keys or procs) + chosen if k not in out["factors"]]
     todo = list(dict.fromkeys(todo))
     for i, key in enumerate(todo, 1):
