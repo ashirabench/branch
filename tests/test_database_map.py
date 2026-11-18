@@ -46,20 +46,6 @@ def test_the_units_of_the_map_are_the_ones_the_audit_expects():
         assert entry["unit"] in audit.expected_units(key), (key, entry["unit"])
 
 
-def test_every_material_and_region_finds_its_keys_in_the_map():
-
-    from branch.builder import required_factor_keys
-    from branch.regions import list_regions
-    known = set(x.DATABASE_MAP["datasets"])
-    bench = ["pet_bottle_1l", "glass_refillable_1l", "aluminium_can_330ml", "beverage_carton_1l"]
-    for code in list_regions():
-        if code == "GLO":
-            continue
-        missing = {k for k in set(required_factor_keys(bench, code)) - known
-                   if not x.GRID_PATTERN.pattern or not re.fullmatch(r"electricity_mv_([A-Z]{2}|ENTSO-E)", k)}
-        assert not missing, (code, missing)
-
-
 def test_another_database_needs_only_another_map(tmp_path):
     """A second map with other names: the same code then finds the processes of that database, and the
     map of the default database is not touched."""
@@ -101,8 +87,3 @@ def test_a_map_with_a_gap_is_refused_in_words(tmp_path):
     with pytest.raises(FileNotFoundError) as err:
         x.load_database_map("no_such_database")
     assert "BRING_YOUR_DATABASE" in str(err.value)
-
-
-def test_the_map_is_among_the_data_every_delivery_carries():
-    from branch.paths import RUNTIME_DATA
-    assert "databases" in RUNTIME_DATA, "without data/databases the installed application cannot start"

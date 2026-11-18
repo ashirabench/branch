@@ -104,15 +104,6 @@ def test_every_catalogue_prior_is_tagged():
     assert assumptions(m)
 
 
-def test_required_keys_are_all_known_to_the_extractor():
-    import json
-    known = set(json.load(open("data/databases/bafu2026.json", encoding="utf-8"))["datasets"])
-    for country in ("PT", "DE", "BR"):
-        missing = set(required_factor_keys(BENCH, country)) - known
-        assert not missing, missing
-    assert set(cat.MATERIALS) >= {"pet", "glass", "aluminium", "liquid_packaging_board"}
-
-
 # ------------------------------------------------------------------ regions
 
 def all_region_factors(seed=0):

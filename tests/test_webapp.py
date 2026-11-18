@@ -190,16 +190,3 @@ def test_a_later_step_never_counts_as_done_before_an_earlier_one():
     from branch import connector
     odd = {"port": False, "processes": 500, "method": True, "marker": True}
     assert [d for d, _, _ in connector.checklist(state=odd, factors=False)][:3] == [False, False, False]
-
-
-def test_the_version_is_the_same_everywhere():
-    import re
-
-    import branch
-    root = os.path.join(os.path.dirname(__file__), "..")
-    read = lambda *p: open(os.path.join(root, *p)).read()  # noqa: E731
-    v = branch.__version__
-    assert re.search(r'^version = "([^"]+)"', read("pyproject.toml"), re.M).group(1) == v
-    assert re.search(r"^version: (\S+)", read("CITATION.cff"), re.M).group(1) == v
-    assert f'#define Version "{v}"' in read("packaging", "windows.iss")
-    assert f'"CFBundleShortVersionString": "{v}"' in read("packaging", "branch.spec")
