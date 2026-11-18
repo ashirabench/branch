@@ -30,7 +30,7 @@ class Result:
 class FakeOpenLCA:
     def __init__(self, factors, waste_keys=()):
         self.factors = factors["factors"]
-        self.store, self.key_of, self.calculations = {}, {}, 0
+        self.store, self.key_of = {}, {}
         self.group = o.UnitGroup(id="ug-items", name="Units of items",
                                  units=[o.Unit(id="u-item", name="Item(s)", is_ref_unit=True)])
         for i, (key, entry) in enumerate(sorted(self.factors.items())):
@@ -81,7 +81,6 @@ class FakeOpenLCA:
         return o.Ref(id=system.id, name=system.name)
 
     def calculate(self, setup):
-        self.calculations += 1
         process = self.store[self.store[setup.target.id].ref_process.id]
         totals = {}
         for e in process.exchanges:

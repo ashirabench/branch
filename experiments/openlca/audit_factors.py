@@ -4,7 +4,7 @@
 
 BRANCH multiplies every factor by an amount in a fixed unit, the one the map of the
 database states for it (data/databases/): kWh for electricity, t*km for transport, MJ
-for heat, items for a pallet and kg for everything else. A
+for heat and kg for everything else. A
 factor extracted per another unit (the MJ against kWh error found in the validation)
 is wrong by a constant, so this script checks the reference unit of every factor,
 flags empty or non positive climate results, and says which factors the openLCA
@@ -25,7 +25,6 @@ EXPECTED = [  # (key pattern, accepted unit names in openLCA)
     (r"^electricity_", {"kWh"}),
     (r"^(lorry_|transport_)", {"t*km", "tkm", "t km"}),
     (r"^heat_", {"MJ"}),
-    (r"^eur_pallet$", {"Item(s)", "Items", "Item"}),
     (r".*", {"kg"}),
 ]
 

@@ -32,12 +32,3 @@ def compare(spec_a, spec_b, region="PT", category=DEFAULT_CATEGORY, factors=None
     model = build_model(spec_a, spec_b, country or region, category, factors or load_factors(), xp=xp, **kw)
     model.meta["citation"] = model.meta.get("citation") or CITATION
     return model
-
-
-def pet_vs_refillable_glass(region="PT", category=DEFAULT_CATEGORY, factors=None, xp=np):
-    """1 L of beverage delivered: single use PET bottle (A) vs refillable glass bottle (B).
-
-    Built from data/benchmark/pet_bottle_1l.json and glass_refillable_1l.json.
-    Cut-off approach for recycling (ILCD Situation A, attributional).
-    """
-    return compare("pet_bottle_1l", "glass_refillable_1l", region, category, factors, xp)

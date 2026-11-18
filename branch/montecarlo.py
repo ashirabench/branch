@@ -52,8 +52,3 @@ def p_a_lower(delta: Any, xp: Any = None) -> float:
     """P(I_A < I_B) along the last axis."""
     return (delta < 0).mean(axis=-1)
 
-
-def p_flip(delta: Any, xp: Any) -> float:
-    """Probability that the current verdict is wrong: min(P, 1 - P)."""
-    p = p_a_lower(delta, xp)
-    return xp.minimum(p, 1.0 - p)

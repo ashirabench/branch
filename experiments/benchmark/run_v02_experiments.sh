@@ -5,11 +5,11 @@
 #   bash experiments/benchmark/run_v02_experiments.sh                # everything that the factor file allows
 #   bash experiments/benchmark/run_v02_experiments.sh families       # one block: families | elcd | cff | wash | uncertainty
 #   bash experiments/benchmark/run_v02_experiments.sh review         # equivalence | adverse | synthetic (plan, points 13 to 15)
-#   QUICK=1 bash experiments/benchmark/run_v02_experiments.sh        # 3 seeds, N = 5,000: checks that it runs, not a result
+#   QUICK=1 bash experiments/benchmark/run_v02_experiments.sh        # one region, two pairs, one seed, N = 2,000: checks that it runs
 #
 # Setting of the paper: tau 2.5%, three questions per round, N = 20,000, four strategies, experts
 # from the priors and from their tails. Seeds 200 to 229: new seeds, because 0 to 29 chose the
-# setting of the paper (FIRST_SEED=0 repeats the old ones); QUICK uses 900 to 902, so that a check
+# setting of the paper (FIRST_SEED=0 repeats the old ones); QUICK uses seed 900, so that a check
 # of the code never shows a seed of the results. Writes results/v02/<block>_<expert>/.
 # Sensitivity runs (not readings): wash_old, cff_heat_none, cff_heat_district, cff_pet_ssp,
 # uncertainty_correlated.
@@ -33,7 +33,7 @@ FAMILIES=(   # B2, fixed on 16 November 2026: "A B" per line
   "$E/carton_box_1l.json beverage_carton_1l"
 )
 STRATS=(decision_flip sobol entropy random)
-if [[ "${QUICK:-0}" == "1" ]]; then SEEDS=3; N=5000; else SEEDS=30; N=20000; fi
+if [[ "${QUICK:-0}" == "1" ]]; then SEEDS=1; N=2000; else SEEDS=30; N=20000; fi
 if [[ "${QUICK:-0}" == "1" ]]; then FIRST="${FIRST_SEED:-900}"; else FIRST="${FIRST_SEED:-200}"; fi
 has_factor() { python - "$BAFU" "$1" <<'PY'
 import json, sys
@@ -50,7 +50,8 @@ bench_pairs() { local i j; for ((i = 0; i < ${#BENCH[@]}; i++)); do for ((j = i 
   echo "${BENCH[$i]} ${BENCH[$j]}"; done; done; }
 
 run() {  # block name, factor file, regions (quoted list), pairs (function or "families"), extra run_grid options...
-  local block=$1 factors=$2 regions=$3 pairs=$4; shift 4
+  local block=$1 factors=$2 regions=$3 pairs=$4 limit=1000; shift 4
+  if [[ "${QUICK:-0}" == "1" ]]; then regions=${regions%% *}; limit=2; fi   # one region, two pairs
   for truth in ${TRUTHS:-prior tails}; do
     local out="v02/${block}_${truth}"
     rm -rf "results/$out"; mkdir -p "results/$out"
@@ -59,7 +60,7 @@ run() {  # block name, factor file, regions (quoted list), pairs (function or "f
         BRANCH_FACTORS="$factors" python experiments/benchmark/run_grid.py --case real --a "$a" --b "$b" --region "$region" \
           --batch 3 --seeds "$SEEDS" --first-seed "$FIRST" --n "$N" --tau 0.025 --truth "$truth" --strategies "${STRATS[@]}" \
           --tag "$out/${region}_$(name "$a")_vs_$(name "$b")" "$@" >/dev/null
-      done < <(if [[ "$pairs" == "families" ]]; then printf '%s\n' "${FAMILIES[@]}"; else bench_pairs; fi)
+      done < <(if [[ "$pairs" == "families" ]]; then printf '%s\n' "${FAMILIES[@]}"; else bench_pairs; fi | head -n "$limit")
     done
     python experiments/benchmark/summarize_benchmark.py "results/$out" >/dev/null
     echo "done: results/$out/ALL_summary.csv"
@@ -154,9 +155,9 @@ fi
 
 if want2 synthetic; then
   echo "== 15. Illustration: where decision flip and the Sobol index of the impact part (synthetic models)"
-  if [[ "${QUICK:-0}" == "1" ]]; then MODELS=$(seq 5900 5904); else MODELS=$(seq 5000 5099); fi
+  if [[ "${QUICK:-0}" == "1" ]]; then MODELS=$(seq 5900 5901); SYN_SEEDS=1; else MODELS=$(seq 5000 5099); SYN_SEEDS=5; fi
   python experiments/benchmark/run_grid.py --case lca --J 40 --case_seeds $MODELS --strategies decision_flip sobol entropy \
-    --batch 1 3 --seeds 5 --first-seed "$FIRST" --n "$N" --tau 0.025 --truth prior --tag v02/synthetic >/dev/null
+    --batch 1 3 --seeds "$SYN_SEEDS" --first-seed "$FIRST" --n "$N" --tau 0.025 --truth prior --tag v02/synthetic >/dev/null
   echo "done: results/v02/synthetic_runs.csv"
 fi
 python experiments/benchmark/v02_summary.py

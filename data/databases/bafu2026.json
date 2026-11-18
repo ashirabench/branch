@@ -242,18 +242,6 @@
    "unit": "kg",
    "note": "Several locations: the European one is preferred."
   },
-  "packaging_film_ldpe": {
-   "names": [
-    "Packaging film, LDPE, at plant"
-   ],
-   "unit": "kg"
-  },
-  "eur_pallet": {
-   "names": [
-    "EUR-flat pallet"
-   ],
-   "unit": "Item(s)"
-  },
   "pp_granulate": {
    "names": [
     "Polypropylene, granulate, at plant"

@@ -41,7 +41,7 @@ openLCA is used twice and never in between: once to read the unit factors, and a
 | The impact as a sum of terms, each an amount times a unit factor | `branch/lca_model.py` | `Term`, `Model` |
 | Common random numbers: one set of draws for every candidate question | `branch/lca_model.py` | `sample` |
 | Beliefs: the draws, and the difference of impact in each | `branch/montecarlo.py` | `State` |
-| The probability that A is lower, and the probability that the verdict is wrong | `branch/montecarlo.py` | `p_a_lower`, `p_flip` |
+| The probability p that A is lower; the verdict is wrong with probability min(p, 1 − p) | `branch/montecarlo.py` | `p_a_lower` |
 | What every possible answer to one question would do to the difference | `branch/montecarlo.py` | `conditional_deltas` |
 | Revising the beliefs with an answer, or keeping the prior after "I don't know" | `branch/montecarlo.py` | `fix`, `mark_unknown` |
 | The loop: compute, certify, ask, reconsider | `branch/agent.py` | `Session`, `next_question`, `answer` |
@@ -120,7 +120,7 @@ Which file of results supports which sentence is in [`CLAIMS.md`](CLAIMS.md); th
 
 ## One question, followed through the code
 
-1. `Session.next_question` in `branch/agent.py` computes the probability that the verdict is wrong (`p_flip`). Below the threshold, or with nothing left to ask, the session ends.
+1. `Session.next_question` in `branch/agent.py` computes the probability that the verdict is wrong, min(p, 1 − p). Below the threshold, or with nothing left to ask, the session ends.
 2. Otherwise it calls the strategy. For each open choice, `decision_flip` in `branch/query.py` asks `State.conditional_deltas` what the difference of impact would be under each possible answer, and scores the choice by how much the answers are expected to reduce p(1 − p).
 3. `conditional_deltas` in `branch/montecarlo.py` recomputes only the terms that depend on that choice, on the same draws, so the scores of all choices are comparable and take milliseconds.
 4. The three best choices are asked. `Session.answer` passes each answer to `State.fix`, which replaces one column of the draws, or to `State.mark_unknown`, which keeps the prior.

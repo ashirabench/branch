@@ -10,7 +10,7 @@ from branch import catalogue as cat
 from branch.agent import run_agent
 from branch.builder import build_model, load_spec, required_factor_keys
 from branch.cases import draw_truth
-from branch.real_cases import assumptions, pet_vs_refillable_glass
+from branch.real_cases import assumptions, compare
 from tests.legacy_pet_glass import legacy_pet_vs_refillable_glass
 
 CAT = "Climate change"
@@ -44,7 +44,7 @@ def fake_factors(seed=0):
 def test_builder_reproduces_hand_written_pet_vs_glass():
     data = fake_factors()
     old = legacy_pet_vs_refillable_glass(data, country=PLAIN)
-    new = pet_vs_refillable_glass(region=PLAIN, factors=data)
+    new = compare("pet_bottle_1l", "glass_refillable_1l", region=PLAIN, factors=data)
     assert set(LEGACY_NAMES.values()) == {c.name for c in new.choices}
     for c in old.choices:                     # same priors
         n = new.by_name[LEGACY_NAMES[c.name]]

@@ -102,8 +102,8 @@ def _fake_factors(tmp_path):
 
 
 def test_real_case_builds_from_factor_file_and_lists_assumptions(tmp_path):
-    from branch.real_cases import assumptions, load_factors, pet_vs_refillable_glass
-    m = pet_vs_refillable_glass("PT", factors=load_factors(_fake_factors(tmp_path)))
+    from branch.real_cases import assumptions, compare, load_factors
+    m = compare("pet_bottle_1l", "glass_refillable_1l", "PT", factors=load_factors(_fake_factors(tmp_path)))
     t = draw_truth(m, 0)
     r = run_agent(m, lambda n: t[n], n_samples=3000, truth=t)
     rep = markdown_report(r, m)

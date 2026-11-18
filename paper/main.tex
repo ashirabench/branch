@@ -214,10 +214,10 @@ database.
 LCA is linear in the amounts of each exchange. BRANCH therefore asks openLCA once, through its inter
 process communication interface, for the impact of every candidate dataset per unit (kg of material, kWh
 of electricity, tonne kilometre of transport, MJ of heat, kg of water) and stores it as a vector over all
-16 EF~3.1 categories. The extraction for the benchmark covers 115 factors and leaves no dataset unresolved. These factors
+16 EF~3.1 categories. The extraction for the benchmark covers 113 factors and leaves no dataset unresolved. These factors
 describe six packaging materials (PET, HDPE, LDPE, glass, aluminium and liquid packaging board) with their
-production and end of life processes, three transport modes, heat, water, three secondary packaging items
-(corrugated box, stretch film and pallet) and 82 electricity grids, of which 81 are national or regional
+production and end of life processes, three transport modes, heat, water, a corrugated box and 82 electricity
+grids, of which 81 are national or regional
 and one is global. Each material uses the current dataset of BAFU:2026 for that material where the database has one. PET uses its own incineration dataset and polyethylene its own datasets for both routes. Three stand-ins remain because the database offers nothing better. The landfill of PET uses the plastics mixture, since the PET landfill dataset is marked obsolete. The three packaging glass datasets are themselves marked obsolete, and the database has no current container glass (flat glass is a different product). The oil-fired plant of the isolated systems of Brazil uses the European average, since the database has that plant only for European countries. BRANCH computes every factor for one unit of the process's reference
 exchange, for example 1 kWh, because it writes its amounts in that unit. Nine more packaging materials need
 26 further factors, and the factor of any other process of the database is read when a person names it.

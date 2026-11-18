@@ -149,7 +149,7 @@ python experiments/openlca/read_database.py --db ~/openLCA-data-1.4/databases/<n
 
 ```bash
 bash reproduce.sh figures paper   # figures, tables and paper/main.pdf from the committed summaries; no openLCA
-QUICK=1 bash reproduce.sh    # every stage with 3 seeds and 5,000 draws (about 30 minutes on two cores); not a result
+QUICK=1 bash reproduce.sh    # every stage on a few cases, one seed, 2,000 draws (about 4 minutes on two cores); not a result
 bash reproduce.sh            # everything; the experiments take hours, by the number of cores
 ```
 

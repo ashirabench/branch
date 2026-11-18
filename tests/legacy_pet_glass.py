@@ -9,7 +9,6 @@ from branch.beliefs import Choice
 from branch.builder import factor as _factor
 from branch.lca_model import Model, Term
 
-CITATION = "Life Cycle Inventory database of the Swiss Federal Administration, BAFU:20XY"
 DEFAULT_CATEGORY = "Climate change"
 
 

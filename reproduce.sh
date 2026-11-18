@@ -3,7 +3,7 @@
 #
 #   bash reproduce.sh            # all stages below, in order
 #   bash reproduce.sh figures paper   # figures, tables and the PDF from the committed summaries
-#   QUICK=1 bash reproduce.sh    # 3 seeds and 5,000 draws: every stage runs (about 30 minutes on two cores), no result
+#   QUICK=1 bash reproduce.sh    # every stage on a few cases, one seed, 2,000 draws (about 4 minutes on two cores); no result
 #
 # Stages (run one or several by name: install data test experiments figures paper):
 #   1. install      Python packages (into the active conda env or venv, else a new .venv)

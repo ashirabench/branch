@@ -7,6 +7,7 @@
   4. An import inside a function is allowed only for what is optional (openLCA, the page, the GPU).
   5. The core of the agent depends on nothing but itself: no openLCA, no page, no report, no file.
   6. An error that is caught without knowing its kind is named and said, never swallowed.
+  7. No code that nothing uses: a class, function or constant that no other code calls is removed.
 """
 import ast
 import glob
@@ -129,3 +130,14 @@ def test_a_caught_error_of_unknown_kind_is_named_and_used():
             raises = any(isinstance(x, ast.Raise) for x in ast.walk(n))
             uses = n.name and any(isinstance(x, ast.Name) and x.id == n.name for x in ast.walk(n))
             assert raises or uses, f"{rel(path)} line {n.lineno}: the error is caught and not said"
+
+
+def test_no_code_that_nothing_uses():
+    """Rule 7. vulture lists every name defined outside the tests that no code reads. A name used only by
+    the tests counts as unused too, because the tests are left out of the search."""
+    import subprocess
+    import sys
+    pytest.importorskip("vulture")
+    paths = [os.path.join(ROOT, p) for p in ("branch", "experiments", "examples", "packaging", "app.py")]
+    run = subprocess.run([sys.executable, "-m", "vulture", *paths], capture_output=True, text=True)
+    assert run.returncode == 0, "code that nothing uses:\n" + run.stdout

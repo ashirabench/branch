@@ -4,7 +4,7 @@
 #   bash experiments/benchmark/run_proposal_experiments.sh            # everything (placebo first)
 #   bash experiments/benchmark/run_proposal_experiments.sh placebo    # only the check of the new code path
 #   bash experiments/benchmark/run_proposal_experiments.sh rest       # everything except the placebo
-#   QUICK=1 bash experiments/benchmark/run_proposal_experiments.sh    # 3 seeds, N = 5,000: checks that it runs
+#   QUICK=1 bash experiments/benchmark/run_proposal_experiments.sh    # PT, three pairs, one seed, N = 2,000: checks that it runs, not a result
 #
 # Chosen setting of the paper: tau 2.5%, three questions per round, 30 seeds, N = 20,000,
 # experts from the priors and from their tails, four strategies.
@@ -15,7 +15,11 @@ cd "$(dirname "$0")/../.."
 PRODUCTS=(pet_bottle_1l glass_refillable_1l aluminium_can_330ml beverage_carton_1l)
 REGIONS=(PT DE BR)
 STRATS=(decision_flip sobol entropy random)
-if [[ "${QUICK:-0}" == "1" ]]; then SEEDS=3; N=5000; else SEEDS=30; N=20000; fi
+if [[ "${QUICK:-0}" == "1" ]]; then
+  SEEDS=1; N=2000; REGIONS=(PT); PRODUCTS=(pet_bottle_1l glass_refillable_1l aluminium_can_330ml)
+else
+  SEEDS=30; N=20000
+fi
 ls data/factors/*.json >/dev/null 2>&1 || { echo "No factors in data/factors/."; exit 1; }
 
 run() {  # name, category, ablation

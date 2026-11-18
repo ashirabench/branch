@@ -7,6 +7,7 @@ model itself goes back to openLCA through olca_bridge.push_comparison.
 import math
 
 from .help import fmt_pct
+from .real_cases import assumptions
 from .whatif import indicators, reversals, stages
 
 
@@ -140,7 +141,7 @@ def _database_uncertainty(model):
 
 
 def _placeholders(model):
-    pending = [c.name for c in model.choices if c.source.startswith("ASSUMPTION")]
+    pending = assumptions(model)
     if not pending:
         return []
     return (["", "## Placeholder priors (to be replaced by sourced data)", ""]

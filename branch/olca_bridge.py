@@ -361,28 +361,6 @@ def write_jsonld(path, objs, created=()):
     return path
 
 
-class OpenLCA:
-    """Small helpers kept for interactive use."""
-
-    def __init__(self, port: int = 8080):
-        self.client = client(port)
-
-    def find_process(self, name: str):
-        for d in self.client.get_descriptors(o.Process):
-            if d.name == name:
-                return self.client.get(o.Process, d.id)
-        raise LookupError(name)
-
-    def find_method(self, name: str):
-        for d in self.client.get_descriptors(o.ImpactMethod):
-            if name in d.name:
-                return d
-        raise LookupError(name)
-
-    def push(self, model, result, **kw):
-        return push_comparison(self.client, model, result, **kw)
-
-
 def diagnose_in_openlca(c, model, result, labels=None):
     """Per exchange check: each linked BAFU exchange alone in a temporary process,
     calculated in openLCA and compared with amount x unit factor. Finds which

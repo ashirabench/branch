@@ -34,9 +34,6 @@ EF31 = [
     (("resource", "mineral"), ("Mineral and metal resource use", "kg Sb eq")),
 ]
 
-# Sub-indicators that only split another one; shown after the main sixteen.
-SUBCATEGORY_WORDS = ("fossil)", "biogenic", "(land use", "climate change - ", "climate change, ")
-
 
 def describe(category):
     """(plain name, unit) for a category name of the method."""
