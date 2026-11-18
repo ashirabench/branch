@@ -150,7 +150,8 @@ def finish(s, outdir=None):
     low, high = (m.label_a, m.label_b) if r["verdict_a_lower"] else (m.label_b, m.label_a)
     pct = abs(ma - mb) / max(ma, mb) * 100 if max(ma, mb) else 0
     sure = (1 - r["p_flip"]) * 100
-    head = (f"### {low} has the lower climate impact, about {pct:.0f}% less than {high}."
+    indicator = describe(m.meta.get("category", "Climate change"))[0].lower()
+    head = (f"### {low} has the lower impact on {indicator}, about {pct:.0f}% less than {high}."
             if r["certified"] else
             f"### Not settled yet: {low} looks lower, but BRANCH is only {sure:.0f}% confident.")
     summary = (f"{head}\n\nConfidence: {'more than 99%' if sure > 99 else f'{sure:.0f}%'}. "

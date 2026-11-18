@@ -1,4 +1,4 @@
-"""Materials added as data files (data/materials/): corrugated board."""
+"""Materials added as data files (data/materials/): corrugated board first, then every added material."""
 import numpy as np
 
 from branch.builder import required_factor_keys

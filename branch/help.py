@@ -20,8 +20,8 @@ HELP = {
         "The supplier's data sheet or certificate (for example a recycled content declaration) gives "
         "this share."),
     "recycled_ratio": (
-        "It says how much lighter recycled material is than new material, for materials where the "
-        "database has no recycled dataset.",
+        "It says how much lower the impact of recycled material is than that of new material, for "
+        "materials where the database has no recycled dataset.",
         "Leave the default unless an LCA consultant or a published study gives you a value."),
     "recycling_rate": (
         "Material that is collected and recycled avoids landfill or incineration at the end of life.",

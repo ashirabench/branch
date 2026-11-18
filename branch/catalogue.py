@@ -8,13 +8,12 @@ hidden default.
 
 Every prior carries a source string that starts with
     SOURCE:      it comes from a cited dataset or provision, or
-    ASSUMPTION:  it is a placeholder I chose, to be replaced before results
-                 are reported (real_cases.assumptions lists them).
+    ASSUMPTION:  it is a placeholder I chose; every report lists it as such
+                 (real_cases.assumptions).
 
 Priors may depend on the location: write {"default": prior, "PT": prior, ...}.
 The builder picks the country entry when it exists, else "default". This is
-where Eurostat, ENTSO-E and Brazilian National Energy Balance statistics go
-(data/priors/, Step 4).
+where national statistics go; the region files in data/regions/ override them.
 
 Factor keys are the keys of the map of the database (data/databases/*.json).
 Every factor is an impact per unit of the dataset's reference flow: per kg
@@ -57,7 +56,8 @@ def _plastics_eol(incineration, landfill):
     return {
         "model": "split",
         "recycling_rate": ("beta", {"a": 4, "b": 6},
-                           "ASSUMPTION: about 40% collected for recycling; replace with Eurostat env_waspac"),
+                           "ASSUMPTION: about 40% collected for recycling; region files replace it with "
+                           "national statistics"),
         "incineration_share": ("uniform", {"low": 0.2, "high": 0.8},
                                "ASSUMPTION: share of non recycled plastic incinerated, rest landfilled"),
         "incineration": incineration,
@@ -139,7 +139,8 @@ MATERIALS = {
         "end_of_life": {
             "model": "split",
             "recycling_rate": ("beta", {"a": 6, "b": 4},
-                               "ASSUMPTION: about 60% of cans collected for recycling; replace with Eurostat env_waspac"),
+                               "ASSUMPTION: about 60% of cans collected for recycling; region files replace it with "
+                               "national statistics"),
             "incineration_share": ("uniform", {"low": 0.2, "high": 0.8},
                                    "ASSUMPTION: share of non recycled aluminium incinerated, rest landfilled"),
             "incineration": "disposal_aluminium_incineration",
@@ -154,7 +155,8 @@ MATERIALS = {
         "end_of_life": {
             "model": "split",
             "recycling_rate": ("beta", {"a": 3, "b": 7},
-                               "ASSUMPTION: about 30% of beverage cartons recycled; replace with Eurostat env_waspac"),
+                               "ASSUMPTION: about 30% of beverage cartons recycled; region files replace it with "
+                               "national statistics"),
             "incineration_share": ("uniform", {"low": 0.2, "high": 0.8},
                                    "ASSUMPTION: share of non recycled board incinerated, rest landfilled"),
             "incineration": "disposal_board_incineration",

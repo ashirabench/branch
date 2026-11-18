@@ -9,9 +9,7 @@ Two kinds of numbers live here, and they must never be confused:
   * unit impact factors: REAL, read from the JSON file (per kg, kWh, tkm, MJ);
   * priors on the modelling choices: marked SOURCE when they come from a
     cited source and ASSUMPTION when they are placeholders I chose. Every
-    ASSUMPTION is listed by assumptions(model) and must be replaced by a
-    sourced prior (Eurostat, sector reports, published LCAs) before results
-    are reported.
+    ASSUMPTION is listed by assumptions(model), and every report lists it.
 """
 
 import numpy as np

@@ -188,7 +188,7 @@ if [[ -z "$REPO" ]]; then
   say "done (origin is not GitHub, so there are no installers to wait for)"
   exit 0
 fi
-say "8. waiting for GitHub to build the three installers (about 15 minutes; Ctrl C stops the waiting, not the build)"
+say "8. waiting for GitHub to build the three installers (it has taken from 5 to 45 minutes; Ctrl C stops the waiting, not the build)"
 echo "https://github.com/$REPO/actions"
 for minute in $(seq 1 45); do
   sleep 60

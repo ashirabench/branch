@@ -22,7 +22,8 @@ from .lca_model import Model
 from .montecarlo import State, p_a_lower
 from .query import STRATEGIES
 
-# The setting of the application (paper, Section "Experiments"): the certificate and the questions per round.
+# The setting of the application: the certificate and the questions per round, chosen on the benchmark
+# (paper, Sections "How many questions" and "The certificate").
 TAU = 0.025
 BATCH = 3
 
@@ -179,7 +180,7 @@ def run_agent(model, oracle, strategy="decision_flip", batch_size=1, n_samples=2
 
 
 def ask_human_cli(model, inp=input, out=print):
-    """Terminal oracle for the human study.
+    """Terminal oracle: a person answers in the terminal (examples/demo_cli.py).
 
     Empty answer or '?' = I don't know. Invalid input is asked again. A value
     outside the support of the prior must be confirmed, because it usually

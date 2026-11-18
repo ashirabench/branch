@@ -164,8 +164,8 @@ def build_model(spec_a, spec_b, region="PT", category="Climate change", factors=
              {"distribution_km": 120} or {"electricity": "national grid (SIN)"}.
     inventory_uncertainty  True: when the factor file carries the uncertainty of its datasets
              (written by experiments/openlca/extract_uncertainty.py), every factor varies in the Monte Carlo
-             draws as a choice that nobody is asked. Off by default: the results of the paper and
-             the app do not use it until it has been run and read (experiments/record/PLAN_2026-11-15.md, A3).
+             draws as a choice that nobody is asked. Off by default: the app and the main results of
+             the paper do not use it; its third ablation does (experiments/record/PLAN_2026-11-15.md, A3).
              "correlated": a sensitivity run in which one draw moves every factor together, the bound
              opposite to treating the factors as independent.
     cff_heat  heat that the steam of a waste-to-energy plant replaces in the Circular Footprint Formula:

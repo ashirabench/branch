@@ -15,7 +15,7 @@ Every file here adds a material to the catalogue without touching the code (`bra
   "recycled": null,
   "end_of_life": {
     "model": "split",
-    "recycling_rate": ["beta", {"a": 6, "b": 4}, "ASSUMPTION: about 60% of steel cans recycled; replace with Eurostat env_waspac"],
+    "recycling_rate": ["beta", {"a": 6, "b": 4}, "ASSUMPTION: about 60% of steel cans recycled; region files replace it with national statistics"],
     "incineration_share": ["uniform", {"low": 0.2, "high": 0.8}, "ASSUMPTION: share of non recycled steel incinerated"],
     "incineration": "disposal_steel_incineration",
     "landfill": "disposal_steel_landfill"

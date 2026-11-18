@@ -110,8 +110,8 @@ Simulated experts, comparisons that I built on real inventory data (BAFU:2026 wi
 
 ```bash
 bash reproduce.sh            # install, extract factors from openLCA, tests, experiments, figures, paper/main.pdf
-bash reproduce.sh paper      # figures, tables and the PDF from the committed summaries (no openLCA)
-QUICK=1 bash reproduce.sh    # 3 seeds and one question per round, to check the pipeline in minutes
+bash reproduce.sh figures paper   # figures, tables and the PDF from the committed summaries (no openLCA)
+QUICK=1 bash reproduce.sh    # 3 seeds and 5,000 draws: every stage runs (about 30 minutes on two cores), no result
 ```
 
 `pyproject.toml` names the packages without versions; [`constraints.txt`](constraints.txt) fixes the versions with which the committed results were checked (`pip install -e ".[all]" -c constraints.txt`).

@@ -220,7 +220,7 @@ production and end of life processes, three transport modes, heat, water, three 
 (corrugated box, stretch film and pallet) and 82 electricity grids, of which 81 are national or regional
 and one is global. Each material uses the current dataset of BAFU:2026 for that material where the database has one. PET uses its own incineration dataset and polyethylene its own datasets for both routes. Three stand-ins remain because the database offers nothing better. The landfill of PET uses the plastics mixture, since the PET landfill dataset is marked obsolete. The three packaging glass datasets are themselves marked obsolete, and the database has no current container glass (flat glass is a different product). The oil-fired plant of the isolated systems of Brazil uses the European average, since the database has that plant only for European countries. BRANCH computes every factor for one unit of the process's reference
 exchange, for example 1 kWh, because it writes its amounts in that unit. Nine more packaging materials need
-24 further factors, and the factor of any other process of the database is read when a person names it.
+26 further factors, and the factor of any other process of the database is read when a person names it.
 
 \paragraph{Regions.}
 A region is a file that inherits from its parent (global, then country, then subregion). Each file states
@@ -228,7 +228,8 @@ the electricity mix, distribution distances and the priors of waste statistics, 
 its provenance (published source or assumption). For Portugal, Germany and Brazil the priors of recycling
 rates, of the split between incineration and landfill and of recycled content come from national
 statistics (Eurostat and the packaging reports of APA for Portugal, BMUV, GVM and ZSVR for Germany, ABIPET,
-ABRALATAS, Tetra Pak and ABREMA for Brazil); trips, washing and distances remain assumptions. Every result below uses these national priors. The code also ships subregions such as the Brazilian
+ABRALATAS, Tetra Pak and ABREMA for Brazil), and so do the trips of refillable bottles in Germany; the other trips,
+washing and distances remain assumptions. Every result below uses these national priors. The code also ships subregions such as the Brazilian
 state of Amazonas, where the electricity question (national grid or isolated oil system) and a river leg
 in the supply chain become open choices.
 
@@ -329,8 +330,9 @@ The loop has four steps.
 numbers) and estimates $p=P(\Delta<0)$. With this $N$ the standard error of $p$ is at most 0.4
 percentage points, well below the 2.5\% certificate, and each step still takes milliseconds.
 \item In the \textbf{certify} step, the agent stops and reports if $\min(p,1-p)<\tau$.
-\item In the \textbf{ask} step, the agent first asks the value-laden choices, such as whether capital
-goods belong in the system boundary, which always stay with the human. Otherwise it scores every open choice and asks
+\item In the \textbf{ask} step, the agent first asks any value-laden choice, which always stays with the
+human (whether capital goods belong in the system boundary, in the small model of the code; the benchmark
+models have none). Otherwise it scores every open choice and asks
 the $b$ best, which form the batch. Ties keep the order of the model.
 \item In the \textbf{reconsider} step, the agent fixes each answered choice to its value, or keeps its
 prior if the answer is ``I don't know'', and returns to the first step.
@@ -343,8 +345,9 @@ The loop above is human in the loop in the sense of the course and of \citet{mun
 selects the queries, as in active learning, and the human answers them as the oracle, so the human is the
 source of the knowledge that the data cannot give. This is the base of BRANCH, and the ask and reconsider
 steps are where it happens. The human is in command, and the agent only assists, at three points. First,
-the value-laden choices, such as the system boundary, are always asked and never scored or delegated to
-the data. Second, the person can answer ``I don't know'', which keeps the prior, or finish the session at
+the value-laden choices are never scored or delegated to the data: in the application the person sets the
+rule for recycling and the indicator that decides the verdict, and the loop asks a choice marked value-laden
+before any other. Second, the person can answer ``I don't know'', which keeps the prior, or finish the session at
 any time, and the report then states the probability that the verdict is wrong. Third, the verdict is
 advice: the person decides what to do with it, and a comparison meant for the public goes to the critical
 review of ISO 14044. Every other choice is resolved by the human-in-the-loop process.
@@ -830,7 +833,7 @@ position of the carton and the drivers of the comparison between glass and PET. 
 allocation rules differ.
 
 \paragraph{The application.}
-Of the 219 automated tests, 15 cover the web application, and most of them run it as a person would use it. They check that a full
+Fourteen automated tests cover the web application, and most of them run it as a person would use it. They check that a full
 session produces the manager report and the technical report, that ``finish now'' closes the session on
 the current beliefs, that two skipped questions in a row bring the suggestion to finish, that an answer
 outside the possible range is refused in plain words, and that every question carries a plain language
@@ -906,14 +909,16 @@ default made visible. I can state this capability and its cost in questions. I c
 helps a real company, because no person outside the project has used it. Three limits bound the claim today.
 The catalogue holds 15 packaging materials: the six of the benchmark and nine added as data files
 (corrugated board, cartonboard, kraft paper, polypropylene, polystyrene, expanded polystyrene, PVC, PLA and steel sheet).
-No benchmark case uses the nine. Their computation agrees with openLCA (Section~\ref{sec:validation}), but their recycling rates are
-assumptions, except for polypropylene and, in Germany, for paper, board and steel. Steel sheet stands for tinplate without its tin coating, and the expansion of
+None of the \nCases{} beverage cases uses the nine; the ten other pairs do. Their computation agrees with openLCA (Section~\ref{sec:validation}). Their recycling rates
+come from statistics where those cover them: polypropylene takes the rate of all plastic packaging, and paper, board and steel have
+their own rates in Germany and in the countries written from Eurostat; elsewhere the rates are assumptions. Steel sheet stands for tinplate without its tin coating, and the expansion of
 polystyrene beads is not modelled. For a product that is not a container there are no codified rules and no sourced priors:
 the person chooses the processes and gives the ranges, and the amounts are treated as independent, so a mass and its
 disposal are two separate questions. This way is checked against openLCA but is not part of the benchmark. Only Portugal, Germany and Brazil have priors from national statistics,
-and even there 6 to 9 of the 31 priors of the benchmark are assumptions and 20 to 22 have a source for their centre only. A company in
-any other of the \nGrids{} electricity grids of the database can run BRANCH, but with default priors: for PET
-against refillable glass in France, 12 of the 14 open choices are assumptions. The certificate was chosen on climate change, and its share of wrong certificates exceeds 2.5\% in climate change and in fossil resources on the seeds of the benchmark
+and even there 6 to 9 of the 31 priors of the benchmark are assumptions and 20 to 22 have a source for their centre only. In the other
+European countries the recycling and disposal rates come from Eurostat, and for PET against refillable glass in France 7 of the 14
+open choices are assumptions. A company in any other of the \nGrids{} electricity grids of the database can run BRANCH with
+default priors, and there 10 of the 14 are assumptions (the United States, for the same pair). The certificate was chosen on climate change, and its share of wrong certificates exceeds 2.5\% in climate change and in fossil resources on the seeds of the benchmark
 with experts from the tails (Sections~\ref{sec:certificate} and~\ref{sec:robust}).
 
 \paragraph{What changed since the proposal.}
@@ -941,7 +946,7 @@ The simulated experts are not people. They answer every question with the true v
 may misremember a distance or guess a share \citep{ohagan2006}, so the results say nothing yet about real
 users. The benchmark covers four products and three regions, its tests concern climate change only, and only 5 to 8 of its
 cases are informative. The runs in three other impact categories and the two ablations reuse the same cases and are descriptive. The run with new seeds reuses the same cases. The priors treat the choices as
-independent; the recycling and disposal priors come from national statistics, but the component masses, the trips outside Germany, washing, the distribution distance, the recycled content of aluminium and, in Brazil, of PET, and the burden of recycled PET still rest on
+independent; the recycling and disposal priors come from national statistics, but the mass of the PET bottle and, in Brazil, of the glass bottle, the trips outside Germany, the electricity and heat for washing, the distribution distance, the recycled content of the aluminium foil of the carton and, in Brazil, of PET, and the burden of recycled PET still rest on
 assumptions, which every report marks. The strategy is myopic. The benchmark
 cases contain no value-laden choice, so $Q$ leaves out the questions a person would answer about scope. The surrogate is
 linear in the unit factors, which holds for attributional studies under ILCD Situation A

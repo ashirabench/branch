@@ -3,9 +3,9 @@
     python experiments/openlca/validate_openlca.py                 # 6 pairs x PT, DE, BR
     python experiments/openlca/validate_openlca.py --regions PT
     python experiments/openlca/validate_openlca.py --all-grids --pairs 1   # one pair in every country
-                                                                   # (writes results/validation_all_grids.csv)
+                                                                   # (writes paper/data/validation_all_grids.csv)
     python experiments/openlca/validate_openlca.py --specs data/examples/bag_in_box_3l.json glass_refillable_1l \
-        --out paper/data/validation_corrugated_board.csv           # a product with an added material
+        --out results/validation_corrugated_board.csv           # a product with an added material
 
 For each case the resolved model (most probable value of every choice) is pushed to the
 open openLCA database, openLCA builds and calculates the product systems, and the result
@@ -99,7 +99,7 @@ def check_pair(c, region, a, b, keep):
 
 def main():
     args = parse_args()
-    out_path = args.out or (os.path.join("results", "validation_all_grids.csv") if args.all_grids else OUT)
+    out_path = args.out or (os.path.join(os.path.dirname(OUT), "validation_all_grids.csv") if args.all_grids else OUT)
     pairs, regions = pairs_to_check(args), regions_to_check(args)
     if args.all_grids:
         print(f"{len(regions)} regions x {len(pairs)} pairs")

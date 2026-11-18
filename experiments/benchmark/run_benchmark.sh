@@ -47,4 +47,4 @@ for region in "${REGIONS[@]}"; do
 done
 
 python experiments/benchmark/summarize_benchmark.py "$OUT"
-echo "Done. Send me the folder $OUT (or the file $OUT/ALL_summary.csv and the PNG figures)."
+echo "done: $OUT/ALL_summary.csv"

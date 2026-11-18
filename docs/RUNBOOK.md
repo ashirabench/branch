@@ -1,6 +1,6 @@
 # Operating BRANCH: every task, what you should see, and what goes wrong
 
-One section per task. Each gives the command, the result that means it worked, and the failures that have happened, with their cause and their fix. Commands run in a terminal, from the top of the repository, with the environment active (`source .venv/bin/activate`), unless the section says otherwise.
+One section per task. Each gives the command, the result that means it worked, and the failures that have happened, with their cause and their fix. Commands run in a terminal, from the top of the repository, with the environment active (`source .venv/bin/activate`, or `conda activate branch`), unless the section says otherwise.
 
 | I want to | Section |
 |---|---|
@@ -110,7 +110,7 @@ python experiments/openlca/validate_probability.py                    # the prob
 
 **It worked when** the first two end with `N products checked, largest relative difference X` and X is of the order of 1e-8 or smaller (the paper reports 3.8e-9 and 2.0e-8). The third prints the largest relative difference over the worlds, in how many worlds the two agree on the winner, and `inside` or `OUTSIDE` for BRANCH's probability against the exact interval; the criteria were fixed beforehand in point 17 of [`experiments/record/PLAN_2026-11-15.md`](../experiments/record/PLAN_2026-11-15.md).
 
-These scripts remove what they create. With `validate_openlca.py`, add `--keep` to look at the objects in openLCA.
+These scripts remove what they create. With `validate_openlca.py`, add `--keep` to look at the objects in openLCA. The first two write the tables of the paper (`paper/data/validation_openlca.csv` and `validation_all_grids.csv`); add `--out <file>` to write elsewhere.
 
 | What you see | Cause | Fix |
 |---|---|---|
@@ -148,9 +148,9 @@ python experiments/openlca/read_database.py --db ~/openLCA-data-1.4/databases/<n
 ## 9. Repeat the experiments and rebuild the paper
 
 ```bash
-bash reproduce.sh paper      # figures, tables and paper/main.pdf from the committed summaries; no openLCA
-QUICK=1 bash reproduce.sh    # the whole pipeline with 3 seeds, to see that it runs
-bash reproduce.sh            # everything; the experiments take minutes to hours, by the number of cores
+bash reproduce.sh figures paper   # figures, tables and paper/main.pdf from the committed summaries; no openLCA
+QUICK=1 bash reproduce.sh    # every stage with 3 seeds and 5,000 draws (about 30 minutes on two cores); not a result
+bash reproduce.sh            # everything; the experiments take hours, by the number of cores
 ```
 
 **It worked when** the stage `paper` prints `paper/main.pdf: 15 pages` and the script ends with `== done`. The stage `paper` needs LaTeX (`latexmk`).

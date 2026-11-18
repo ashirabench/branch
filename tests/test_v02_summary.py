@@ -113,7 +113,8 @@ def test_equivalence_reading_needs_the_interval_inside_the_margin(tmp_path, monk
 
 
 def test_table_of_the_paper_matches_the_committed_summaries():
-    """The numbers of the table "Experiments after the audit" are typed by hand: they must be the ones
+    """The numbers of the table of the paper on the sessions that chose nothing (subsection "How many
+    questions") are typed by hand: they must be the ones
     of paper/data/v02_2026-11-16/."""
     root = os.path.dirname(HERE)
     tex = open(os.path.join(root, "paper", "main.tex")).read()

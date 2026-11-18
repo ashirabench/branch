@@ -2,7 +2,7 @@
 __version__ = "0.2.1"
 
 from .agent import ask_human_cli, run_agent
-from .beliefs import BeliefBase, Choice
+from .beliefs import Choice
 from .builder import build_model, load_spec, required_factor_keys
 from .lca_model import Model, Term
 from .montecarlo import State

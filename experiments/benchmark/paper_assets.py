@@ -168,7 +168,7 @@ def _p(v):
 
 
 def tab_main():
-    """Chosen setting (tau 2.5%, batch 2): questions, p value, calibration, both expert models."""
+    """Chosen setting (tau 2.5%, three questions per round): questions, p value, calibration, both expert models."""
     prior, tails = t("benchmark_tau0.025.csv"), t("benchmark_tails_tau0.025.csv")
     order = ["decision_flip", "sobol", "entropy", "least_confident", "margin", "random"]
     lines = []

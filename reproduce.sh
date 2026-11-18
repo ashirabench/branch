@@ -2,8 +2,8 @@
 # Master script: everything in the paper from a clean clone.
 #
 #   bash reproduce.sh            # all stages below, in order
-#   bash reproduce.sh paper      # only rebuild figures, tables and the PDF from the committed summaries
-#   QUICK=1 bash reproduce.sh    # 3 seeds and batch 1 only, to check the pipeline in minutes
+#   bash reproduce.sh figures paper   # figures, tables and the PDF from the committed summaries
+#   QUICK=1 bash reproduce.sh    # 3 seeds and 5,000 draws: every stage runs (about 30 minutes on two cores), no result
 #
 # Stages (run one or several by name: install data test experiments figures paper):
 #   1. install      Python packages (into the active conda env or venv, else a new .venv)
@@ -12,8 +12,9 @@
 #                   benchmark summaries committed in paper/data/.
 #   3. test         the unit tests (engine, lemma, builder, connector, web app)
 #   4. experiments  the full benchmark: 18 cases x 30 seeds x batch 1 to 5, priors and tails,
-#                   certificate 5% and 2.5%, the run with new seeds, then three other impact categories and
-#                   two knowledge ablations in the chosen setting (minutes to hours, by the number of cores)
+#                   certificate 5% and 2.5%, the run with new seeds; then three other impact categories and
+#                   two knowledge ablations, the larger run of 5,400 sessions, and the experiments after
+#                   the audit (docs/CLAIMS.md). Hours, by the number of cores
 #   5. figures      every figure and table of the paper (experiments/benchmark/paper_assets.py)
 #   6. paper        paper/main.pdf (latexmk)
 #
@@ -50,7 +51,7 @@ if want data; then
     $PY experiments/openlca/extract_factors.py --method "${BRANCH_METHOD:-EF 3.1}" --all-grids --port "${OLCA_PORT:-8080}"
   else
     cat <<'MSG'
-No factors and no openLCA on port 8080. To extract them (once, about 10 minutes):
+No factors and no openLCA on port 8080. To extract them (once):
   1. Install openLCA 2.6 and import BAFU:2026 and the openLCA LCIA methods (openLCA Nexus, free).
   2. In openLCA: open the database, then Tools > Developer tools > IPC Server > Start (port 8080).
   3. Run: bash reproduce.sh data
@@ -74,7 +75,7 @@ if want experiments; then
     CONFIRM=1 bash experiments/benchmark/run_benchmark.sh   # new seeds 1000 to 1029 for the chosen setting
     bash experiments/benchmark/run_proposal_experiments.sh  # other impact categories and knowledge ablations
     bash experiments/benchmark/run_more_seeds.sh            # the larger run: 5,400 sessions per category
-    bash experiments/benchmark/run_v02_experiments.sh       # experiments after the audit (docs/CLAIMS.md, rows 2 to 4 and 9 to 12)
+    bash experiments/benchmark/run_v02_experiments.sh       # experiments after the audit (docs/CLAIMS.md, rows 2 to 4, 9 to 12 and 17)
   else
     echo "skipped: no factors (see stage 2); the paper uses paper/data/*.csv"
   fi
@@ -82,8 +83,14 @@ fi
 
 if want figures; then
   say "5. figures and tables"
-  $PY experiments/benchmark/paper_assets.py
-  $PY experiments/benchmark/proposal_assets.py
+  # Fresh results feed the paper only when this same call ran the full experiments; otherwise a folder
+  # results/ left by an earlier, partial or QUICK run would replace the committed summaries.
+  if want experiments && have_factors && [[ "${QUICK:-0}" != "1" ]]; then
+    $PY experiments/benchmark/paper_assets.py
+    $PY experiments/benchmark/proposal_assets.py
+  else
+    $PY experiments/benchmark/paper_assets.py --from-snapshot
+  fi
 fi
 
 if want paper; then

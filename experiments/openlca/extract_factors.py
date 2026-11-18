@@ -15,8 +15,8 @@ openLCA LCIA Methods imported) and the IPC server running on port 8080.
 
 Output: data/factors/<database>_<method>.json (git ignored: the BAFU terms of
 use do not allow redistributing the data, so every user extracts locally).
-Source to cite: "Life Cycle Inventory database of the Swiss Federal
-Administration, BAFU:20XY".
+Source to cite: the citation in the map of the database (data/databases/); for BAFU:2026,
+"Life Cycle Inventory database of the Swiss Federal Administration, BAFU:2026".
 """
 import argparse
 import os

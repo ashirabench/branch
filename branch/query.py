@@ -10,8 +10,9 @@ Baseline from the LCA literature:
 Proposed (expected error reduction on the VERDICT, preposterior analysis,
 Howard 1966; "Expected Error Reduction" in the course slides):
     decision_flip      reduction of the smooth loss p(1-p), p = P(I_A < I_B).
-                       Equivalent to the first order Sobol index of the
-                       decision indicator 1{I_A < I_B} instead of the result.
+                       It equals p(1-p) times the first order Sobol index of
+                       the decision indicator 1{I_A < I_B} (docs/lemma.md), so it
+                       ranks the choices as that index does.
     decision_flip_min  ablation: the literal loss min(p, 1-p) from the
                        proposal. Its kink makes the myopic agent stall when
                        no single answer can flip the verdict.

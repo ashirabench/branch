@@ -13,7 +13,7 @@ would also draw the uncertainty of every exchange of the database):
    impacts must agree, and so must the product that wins, world by world.
 2. The integral on those worlds. The share of the K worlds in which openLCA says A wins is an estimate of
    the probability made with openLCA alone. Its exact 95% interval must contain the value of BRANCH.
-3. The draws. They come from scipy's distributions; tests/test_sampler.py compares them with the
+3. The draws. They come from scipy's distributions; tests/test_probability_checks.py compares them with the
    distributions written in the priors.
 
 Needs openLCA open with its IPC server started. Writes one line per world and product, and a summary.

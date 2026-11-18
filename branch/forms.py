@@ -244,11 +244,3 @@ def search_text(results):
         name = r["name"] + (f" @{r['location']}" if names.count(r["name"]) > 1 and r["location"] else "")
         lines.append(f"| {name} | {r['location'] or ''} | {r['unit'] or ''} |")
     return "\n".join(lines)
-
-
-# --------------------------------------------------------------- session
-
-# Certificate and questions per round chosen from the benchmark (re-run on 13 Nov 2026 with
-# the national priors): with tau = 2.5% and 3 questions per round, 2.2% of certified verdicts
-# are wrong under tail experts on new seeds 1000 to 1029 (4.3% with 2 per round) and at most
-# 0.7% under prior experts, for about half a question more than 2 per round.

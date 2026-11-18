@@ -307,7 +307,7 @@ def _public_notice(public, st):
 def _about(f, st):
     meta = f.meta
     recycling = ("Circular Footprint Formula of the EU Product Environmental Footprint for recycling "
-                 "(Annex C parameters; energy recovery credits not included)."
+                 "(parameters of Part C of Annex II; the energy recovered by incineration is credited, B = 0)."
                  if meta.get("system_model") == "cff" else "cut-off approach for recycling.")
     return [Paragraph("About this report", st.H2),
             Paragraph("Method: attributional life cycle assessment following ISO 14040 and ISO 14044 "

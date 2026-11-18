@@ -1,4 +1,4 @@
-"""Interactive BRANCH session in the terminal (human study prototype).
+"""Interactive BRANCH session in the terminal, with the setting of the application.
 
     python examples/demo_cli.py                      # real factors, Portugal
     python examples/demo_cli.py --region DE
