@@ -84,7 +84,7 @@ python experiments/openlca/extract_factors.py --method "EF 3.1"
 python app.py
 ```
 
-It uses the newest file in `data/factors/`. To send the model of a comparison to openLCA (needs section 3): press **Send to openLCA** on the page, after ticking that the database is a copy or has a backup. In openLCA the objects appear in the folder **BRANCH** of processes, flows and product systems. If the navigation does not show them, close the database and open it again (right click on it). [`docs/EXAMPLE.md`](EXAMPLE.md) shows what arrives.
+It uses the newest file in `data/factors/`. To serve the page to other computers, the command is the same with three variables: `BRANCH_HOST=0.0.0.0 PORT=7860 BRANCH_FACTORS=<factor file> python app.py`. Put it behind HTTPS. The factor file stays on the server: the page shows results and never offers the file, every report cites the database, and before hosting, check that the terms of use of the database allow a hosted calculator and keep a copy of them. To send the model of a comparison to openLCA (needs section 3): press **Send to openLCA** on the page, after ticking that the database is a copy or has a backup. In openLCA the objects appear in the folder **BRANCH** of processes, flows and product systems. If the navigation does not show them, close the database and open it again (right click on it). [`docs/EXAMPLE.md`](EXAMPLE.md) shows what arrives.
 
 Sending the same comparison again updates the objects; it does not add copies.
 

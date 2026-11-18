@@ -194,7 +194,7 @@ def write_tsv(path, rows):
 def report_datasets(db, factors=None):
     files = [factors] if factors else sorted(glob.glob(os.path.join(ROOT, "data", "factors", "*.json")))
     if not files:
-        sys.exit("no factor file in data/factors/: extract the factors first (docs/USAGE.md)")
+        sys.exit("no factor file in data/factors/: extract the factors first (docs/RUNBOOK.md, section 4)")
     entries = json.load(open(files[-1], encoding="utf-8"))["factors"]
     ids = sorted({e["id"] for e in entries.values() if e.get("id")})
     quoted = ", ".join("'" + i.replace("'", "") + "'" for i in ids)

@@ -7,7 +7,7 @@ Four folders, by what a script needs and what it is for.
 | [`benchmark/`](benchmark/) | The experiments the paper reports and the scripts that turn them into its tables and figures | no |
 | [`openlca/`](openlca/) | Reading unit factors from openLCA and checking BRANCH against it | yes |
 | [`data/`](data/) | Building data files from public sources: European regions from Eurostat, the second database from ELCD | no |
-| [`record/`](record/) | The plans written before each run, and the scripts of the sessions already run. Kept as a record; nothing here needs running again | |
+| [`record/`](record/) | The plans written before each run: what is measured, with which seeds, and what would count as a failure | |
 
 To repeat everything, use [`reproduce.sh`](../reproduce.sh) at the top of the repository. To see which file supports which statement of the paper, read [`docs/CLAIMS.md`](../docs/CLAIMS.md).
 
@@ -25,7 +25,7 @@ To repeat everything, use [`reproduce.sh`](../reproduce.sh) at the top of the re
 | `interaction_check.py` | First order and total index of the verdict for every open choice, to see what the score misses |
 | `prior_sources.py` | Counts how much of each prior a source supports |
 | `paper_assets.py`, `proposal_assets.py` | Figures, tables and numbers of the paper from the summaries |
-| `analyze.py`, `bench_latency.py`, `make_notebook.py` | Plots of one run, time to choose a question, the walkthrough notebook |
+| `analyze.py`, `bench_latency.py` | Plots of one run, time to choose a question |
 
 ## openlca
 

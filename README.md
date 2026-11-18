@@ -63,7 +63,7 @@ python experiments/openlca/extract_factors.py --method "EF 3.1"     # once
 python app.py                                                       # the same page, now with real factors
 ```
 
-[`docs/EXAMPLE.md`](docs/EXAMPLE.md) walks through one comparison from the bill of materials to the parametrised model in openLCA. [`docs/USAGE.md`](docs/USAGE.md) has every other way of using BRANCH: the terminal, product files, regions, products that are not containers, the PDF report, hosting. Installers of the desktop connector for macOS and Windows are on the [releases page](https://github.com/ashirabench/branch/releases/latest).
+[`docs/EXAMPLE.md`](docs/EXAMPLE.md) walks through one comparison from the bill of materials to the parametrised model in openLCA. [`docs/USAGE.md`](docs/USAGE.md) explains the product file, the regions, products that are not containers and the question strategies; [`docs/RUNBOOK.md`](docs/RUNBOOK.md) has every task, with the result to expect. Installers of the desktop connector for macOS and Windows are on the [releases page](https://github.com/ashirabench/branch/releases/latest).
 
 ## What it covers
 
@@ -103,7 +103,7 @@ Simulated experts, comparisons that I built on real inventory data (BAFU:2026 wi
 | [`examples/`](examples/) | A terminal demonstration |
 | [`tests/`](tests/) | The tests, run on every push. [`test_review.py`](tests/test_review.py) repeats the review of the repository: numbers written by hand against the data, every link, one version, nothing of the licensed database |
 | [`paper/`](paper/) | The paper and the summaries its numbers come from |
-| [`docs/`](docs/) | [Where each idea of the paper lives in the code](docs/ARCHITECTURE.md), the claims and their evidence, the example, the usage guide, the [operating guide](docs/RUNBOOK.md) (every task, the result to expect, the known failures), the proof of the identity behind the score, the deployment guide |
+| [`docs/`](docs/) | [Where each idea of the paper lives in the code](docs/ARCHITECTURE.md), the claims and their evidence, the example, the usage guide, the [operating guide](docs/RUNBOOK.md) (every task, the result to expect, the known failures), the proof of the identity behind the score |
 | [`packaging/`](packaging/) | The desktop connector for macOS and Windows |
 
 ## Reproducing the paper
@@ -120,17 +120,7 @@ The numbers of the benchmark are generated into `paper/tables/numbers.tex`, and 
 
 ## Citation
 
-```bibtex
-@misc{benchimol2026branch,
-  title  = {Asking Only What Can Flip the Verdict: A Human-in-the-Loop {BDI} Agent
-            for Comparative Life Cycle Assessment},
-  author = {Benchimol, Ashira},
-  year   = {2026},
-  note   = {Lab project paper, Human-Centered Artificial Intelligence,
-            Department of Informatics Engineering, University of Coimbra},
-  url    = {https://github.com/ashirabench/branch}
-}
-```
+GitHub shows how to cite this work (button **Cite this repository**, from [`CITATION.cff`](CITATION.cff)).
 
 ## Independence
 

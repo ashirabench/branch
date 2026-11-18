@@ -2,6 +2,8 @@
 
 Thank you for your interest. BRANCH is a research prototype developed for the Human-Centered AI course at the University of Coimbra, so issues and suggestions are very welcome.
 
+Be respectful, assume good faith, and keep criticism on ideas and code.
+
 ## Issues
 
 Please open a GitHub issue with a short description, the command you ran, and the full error message. For questions about LCA modelling choices, cite the ISO 14044 clause or ILCD Handbook section you have in mind.

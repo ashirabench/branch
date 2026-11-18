@@ -16,7 +16,6 @@
 #                   two knowledge ablations in the chosen setting (minutes to hours, by the number of cores)
 #   5. figures      every figure and table of the paper (experiments/benchmark/paper_assets.py)
 #   6. paper        paper/main.pdf (latexmk)
-#   notebook        (on request) executes notebooks/branch_walkthrough.ipynb
 #
 # Data: Life Cycle Inventory database of the Swiss Federal Administration, BAFU:2026.
 # Its terms forbid redistribution, so factors are extracted locally and never committed.
@@ -36,7 +35,7 @@ if want install; then
     source .venv/bin/activate
   fi
   $PY -m pip install --quiet --upgrade pip
-  $PY -m pip install --quiet -e ".[olca,experiments,report,app,dev,notebook]"
+  $PY -m pip install --quiet -e ".[olca,experiments,report,app,dev]"
 fi
 [[ -f .venv/bin/activate && -z "${VIRTUAL_ENV:-}" && -z "${CONDA_DEFAULT_ENV:-}" ]] && source .venv/bin/activate
 
@@ -91,11 +90,5 @@ if want paper; then
   say "6. paper"
   (cd paper && latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex >/dev/null && \
      echo "paper/main.pdf: $(pdfinfo main.pdf 2>/dev/null | awk '/Pages/ {print $2}') pages")
-fi
-if want notebook; then
-  say "notebook"
-  $PY -c "import nbformat, nbconvert, ipykernel" 2>/dev/null || $PY -m pip install --quiet nbformat nbconvert ipykernel
-  $PY experiments/benchmark/make_notebook.py
-  $PY -m jupyter nbconvert --to notebook --execute --inplace notebooks/branch_walkthrough.ipynb
 fi
 say "done"

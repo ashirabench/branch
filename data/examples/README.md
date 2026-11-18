@@ -2,7 +2,7 @@
 
 Product files that show how to describe a product with a material added in `data/materials/`.
 They are not part of the benchmark of the paper, and every mass is an illustrative assumption,
-labelled as such. `experiments/record/new_materials_session.sh` uses them to check each added material
+labelled as such. `experiments/openlca/validate_materials.py` uses them to check each added material
 against openLCA.
 
 | File | Material shown |

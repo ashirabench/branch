@@ -1,60 +1,8 @@
-# Using BRANCH in detail
+# The product file, regions, other products, strategies
 
-The [README](../README.md) has the short version. This page has every way of using BRANCH.
+What the [README](../README.md) and the [operating guide](RUNBOOK.md) do not cover: how to describe a product, how a region works, how to compare products that are not containers, and which question strategies exist.
 
-## Web App for Companies
-
-No Python and no openLCA needed on the company's side: a browser page where you pick the region, type two bills of materials (part, material, grams), answer the few questions BRANCH asks, and download a one page manager report (PDF, plain English) plus the technical report.
-
-```bash
-pip install -e ".[app]"
-BRANCH_DEMO=1 python app.py                                          # interface with illustrative numbers
-python app.py                                                       # real factors: newest file in data/factors/
-```
-
-Open http://127.0.0.1:7860. To host it for companies (the factors stay on the server and are never served), see [`docs/DEPLOY.md`](DEPLOY.md).
-
-## Quick Start
-
-```bash
-git clone https://github.com/ashirabench/branch.git
-cd branch
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[all]"
-pytest
-```
-
-Run the agent on the toy case with a simulated human:
-
-```python
-from branch import run_agent
-from branch.cases import toy_packaging, draw_truth
-
-model = toy_packaging()                      # PET vs refillable glass, PLACEHOLDER numbers
-truth = draw_truth(model, seed=0)            # a simulated expert answers from this world
-
-result = run_agent(model, oracle=lambda name: truth[name], strategy="decision_flip", truth=truth)
-print(result["verdict"], result["p_flip"], result["certified"], result["questions"])
-# Glass < PET 0.00135 True 3
-```
-
-`oracle(name)` returns the human's answer, or `None` for "I don't know". The result also holds `decided_by` (human, prior or unknown for every choice), the impact intervals of both alternatives, and the full trace.
-
-## Detailed Usage
-
-<details>
-<summary>Talk to the agent in the terminal</summary>
-
-```bash
-python examples/demo_cli.py --toy                  # placeholder toy case, no openLCA needed
-python examples/demo_cli.py --region PT           # real BAFU:2026 factors (any code in data/regions)
-```
-
-The agent asks whether the comparison will be disclosed to the public (if so, it states that ISO 14044 requires a critical review panel, which BRANCH prepares for but does not replace) and writes `outputs/report.md`.
-</details>
-
-<details>
-<summary>Compare any two products</summary>
+## A product file
 
 A product is a bill of materials in a JSON file. Anything you state is fixed; anything you leave out is completed from the codified rules in [`branch/catalogue.py`](../branch/catalogue.py) and becomes an explicit choice the agent may ask about.
 
@@ -76,19 +24,13 @@ model = compare("aluminium_can_330ml", "beverage_carton_1l", region="DE")   # be
 model = compare("my_product.json", "pet_bottle_1l", region="PT")           # or your own file
 ```
 
-```bash
-python examples/demo_cli.py --a aluminium_can_330ml --b beverage_carton_1l --region DE
-```
-
 Materials in the catalogue: PET, HDPE, LDPE, glass, aluminium and liquid packaging board (the six of the benchmark), and nine added as data files that no benchmark case uses: corrugated board, cartonboard, kraft paper, polypropylene, polystyrene, expanded polystyrene, PVC, PLA and steel sheet (a proxy for tinplate, without the tin coating). These materials come with codified rules for containers (forming, distribution, refill, end of life). Any other product is described by processes chosen from the database: see [Any product](#any-product). The benchmark products are in [`data/benchmark/`](../data/benchmark). Before comparing new products, extract only the factors they need:
 
 ```bash
 python experiments/openlca/extract_factors.py --update --specs aluminium_can_330ml beverage_carton_1l --region DE
 ```
-</details>
 
-<details>
-<summary>Regions, from Portugal to the Amazon</summary>
+## Regions
 
 A region is a JSON file in [`data/regions/`](../data/regions) that states only what differs from its parent: electricity mix (or a question, such as national grid versus isolated system), delivery and supply legs by transport mode (lorry, barge, rail), and regional priors such as recycling rates.
 
@@ -107,7 +49,6 @@ For Portugal, Germany and Brazil the recycling rates, the split between incinera
 For the 25 other countries of the European Union, Iceland and Norway, the recycling rates of plastic, aluminium, steel, paper and glass packaging and the split between incineration and landfill come from two Eurostat tables (`env_waspacr` and `env_wasmun`, years 2022 to 2024) kept in [`data/eurostat/`](../data/eurostat). `python experiments/data/make_eu_regions.py` writes those 28 files from the tables and states its rules; nobody edits them by hand. Eurostat gives one rate for all plastic packaging and none for beverage cartons, and each file says so.
 
 To add a place, copy the closest file, set `parent`, and change only what is different. Every prior keeps its `SOURCE:` or `ASSUMPTION:` tag, and `sources_needed` lists the data still to collect; both appear in the reports.
-</details>
 
 ## Any product
 
@@ -134,8 +75,7 @@ The agent, its questions and its certificate do not depend on packaging. Packagi
 
 What this way does not give: sourced starting values (the ranges are yours) and links between amounts (a mass and its disposal are two separate inputs). Examples: [`data/examples/cotton_bag.json`](../data/examples/cotton_bag.json) and [`pp_bag.json`](../data/examples/pp_bag.json).
 
-<details>
-<summary>More materials, and how to see everything openLCA can assess</summary>
+## More materials
 
 openLCA has no fixed list of materials: it can assess anything whose processes are in the database you load. To see what BAFU:2026 (or any database) offers:
 
@@ -145,56 +85,8 @@ python experiments/openlca/list_datasets.py --grep tinplate --full  # with refer
 ```
 
 Then add a material as a data file, without code: [`data/materials/README.md`](../data/materials/README.md).
-</details>
 
-<details>
-<summary>Manager report (PDF)</summary>
-
-```python
-from branch.manager_report import manager_pdf
-manager_pdf(result, model, "outputs/report.pdf", public=False)
-```
-
-The answer in one sentence and how sure BRANCH is, where the impact comes from (disposal on its own), the smallest change that would flip the answer, what the person said and what BRANCH assumed, and the ISO 14044 notice on public comparisons, always printed.
-</details>
-
-<details>
-<summary>Send the result to openLCA (connector)</summary>
-
-With openLCA open on the database the factors came from and the IPC server running, BRANCH writes the resolved comparison back into it: one process per alternative, every exchange linked to the BAFU process it came from, one parameter per modelling choice with its value, question, source and who decided it, and a product system ready to calculate. It then calculates both systems in openLCA and compares them with its own numbers.
-
-```bash
-python examples/demo_cli.py --a aluminium_can_330ml --b beverage_carton_1l --region DE --push --jsonld outputs/branch.zip
-```
-
-```python
-from branch import olca_bridge
-out = olca_bridge.push_comparison(olca_bridge.client(8080), model, result, verify=True)
-out["check"]   # openLCA vs BRANCH, per alternative
-```
-
-The amounts are those of one world: the human's answers and the most probable value of every remaining choice. The distributions, the verdict and its probability of being wrong stay in the BRANCH report.
-</details>
-
-<details>
-<summary>Use real impact factors from openLCA</summary>
-
-The real case needs unit impact factors extracted once from openLCA 2.x with the IPC server running on port 8080. See [`data/README.md`](../data/README.md).
-
-```bash
-python experiments/openlca/extract_factors.py --method "EF 3.1"
-```
-
-```python
-from branch.real_cases import pet_vs_refillable_glass, assumptions
-
-model = pet_vs_refillable_glass(region="PT", category="Climate change")
-print(assumptions(model))   # priors that are still placeholders
-```
-</details>
-
-<details>
-<summary>Choose a query strategy</summary>
+## Question strategies
 
 | Strategy | What it ranks |
 |---|---|
@@ -209,31 +101,15 @@ print(assumptions(model))   # priors that are still placeholders
 ```python
 run_agent(model, oracle, strategy="margin", batch_size=3, n_samples=20_000, tau=0.05)
 ```
-</details>
 
-<details>
-<summary>Run on the GPU</summary>
+## On the GPU
 
 The same code runs on NumPy or CuPy. Install `pip install cupy-cuda12x` and set `BRANCH_BACKEND=cupy`.
 
 ```bash
 BRANCH_BACKEND=cupy python experiments/benchmark/bench_latency.py
 ```
-</details>
 
-## Experiments
+## Reference
 
-The grid mirrors Faria et al. (2022): every configuration of strategy, batch size and sample size runs over many seeds, and each seed draws a different simulated expert world.
-
-```bash
-python experiments/benchmark/run_grid.py --case lca --J 40 --case_seeds 4 --batch 1 3 --seeds 30 --n 10000 --tag lca_J40
-python experiments/benchmark/analyze.py results/lca_J40      # boxplots, P(flip) curves, Wilcoxon table
-python experiments/benchmark/bench_latency.py                # time to choose one question
-```
-
-`--case` is `toy` (placeholder packaging case), `lca` (synthetic linear LCA with J choices), `sym` (synthetic symmetric case) or `real` (any two product files with extracted factors):
-
-```bash
-python experiments/benchmark/run_grid.py --case real --a pet_bottle_1l --b glass_refillable_1l --region PT --seeds 30
-```
-
+Settles, Burr. 2009. *Active Learning Literature Survey*. Computer Sciences Technical Report 1648. Madison: University of Wisconsin–Madison.

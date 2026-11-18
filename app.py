@@ -4,7 +4,7 @@
     BRANCH_DEMO=1 python app.py   # illustrative numbers
 
 Finds a free port on its own (7860 if free, else the next one), prints the address and
-opens it in the browser. See docs/DEPLOY.md to host it for companies (BRANCH_HOST and PORT).
+opens it in the browser. docs/RUNBOOK.md, section 5, says how to host it on a server (BRANCH_HOST and PORT).
 """
 import os
 
