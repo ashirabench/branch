@@ -93,7 +93,7 @@ Simulated experts, comparisons that I built on real inventory data (BAFU:2026 wi
 - The uncertainty that the database states for its datasets is not in the results: the copy of BAFU:2026 used here has waste outputs whose lognormal geometric mean has the opposite sign of the amount, a known kind of database error, and a Monte Carlo simulation in openLCA then subtracts the treatment of waste ([`experiments/openlca/openlca_lognormal/`](experiments/openlca/openlca_lognormal/)). Two runs bound what that uncertainty would cost: between 1.3 and 4.6 more questions per comparison.
 - BRANCH covers attributional studies (ILCD Situation A). It does not replace the critical review that ISO 14044 requires for comparative assertions disclosed to the public.
 
-## Two observations for the developers of openLCA
+## Observations
 
 - In the copy of BAFU:2026 used here, 14,167 waste outputs carry a lognormal distribution whose geometric mean has the opposite sign of the amount, so a Monte Carlo simulation in openLCA subtracts the treatment of waste that a calculation adds (`python experiments/openlca/read_database.py --db <database folder> signs`). GreenDelta has described the same pattern as an error of the database for ecoinvent 3.9.1 (ask.openLCA 2023, question 6159).
 - In openLCA 2.6.2, the value entered as the geometric mean of a lognormal distribution is the arithmetic mean of the draws, so their median lies below it ([`experiments/openlca/openlca_lognormal/`](experiments/openlca/openlca_lognormal/)). BRANCH compensates for it when it sends a prior as the uncertainty of a parameter.
