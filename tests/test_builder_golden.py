@@ -1,10 +1,13 @@
 """The model builder gives exactly the models it gave before it was split into small functions.
 
 For a set of comparisons with the illustrative factors (branch/demo_factors.py, no licensed value), the
-names and order of the choices, their priors, the terms, the Monte Carlo difference and the inventory
-written to openLCA are reduced to one line each and compared with tests/golden/builder.json, which was
-written by the code of 18 November 2026 before the split. The order in which choices are created is the
-order of the columns of the draws, so a change there changes every result: this test is what catches it.
+names and order of the choices, their texts and quantiles, the terms, the Monte Carlo difference and the
+inventory written to openLCA are compared with tests/golden/builder.json. The file was first written by the
+code of 18 November 2026 before the split; it was written again the same day with numbers in place of
+digests, by code that the first file still accepted, because Windows computes the last digit of some
+quantiles differently and a digest cannot allow for that. Numbers are compared to a relative 1e-9. The
+order in which choices are created is the order of the columns of the draws, so a change there changes
+every result: this test is what catches it.
 
 To accept a change made on purpose:  python tests/test_builder_golden.py --write
 """
@@ -19,6 +22,7 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 GOLDEN = os.path.join(HERE, "golden", "builder.json")
+QUANTILES = np.array([0.01, 0.25, 0.5, 0.75, 0.99])
 BENCH = ["pet_bottle_1l", "glass_refillable_1l", "aluminium_can_330ml", "beverage_carton_1l"]
 
 
@@ -29,17 +33,16 @@ def _h(data):
 def _line(model):
     from branch.montecarlo import State
     state = State(model, model.sample(2000, 7))
-    choices = [(c.name, c.kind, c.source, c.question, bool(c.value_laden),
-                _h(np.asarray(c.ppf(np.linspace(0.01, 0.99, 25))).astype(float).round(12).tobytes()))
-               for c in model.choices]
+    texts = [(c.name, c.kind, c.source, c.question, bool(c.value_laden)) for c in model.choices]
     world = {c.name: float(np.asarray(c.ppf(np.array([0.5])))[0]) for c in model.choices}
-    inventory = [(t.name, sorted((k, round(float(a), 10)) for k, a in t.inventory(world).items()))
-                 for t in model.terms if t.inventory]
-    return {"choices": [c[0] for c in choices],
-            "priors": _h(json.dumps(choices).encode()),
+    inventory = [[t.name, k, float(a)] for t in model.terms if t.inventory
+                 for k, a in sorted(t.inventory(world).items())]
+    return {"choices": [c.name for c in model.choices],
+            "texts": _h(json.dumps(texts).encode()),
+            "quantiles": [[float(q) for q in np.asarray(c.ppf(QUANTILES), dtype=float)] for c in model.choices],
             "terms": [(t.name, list(t.deps), t.sign) for t in model.terms],
-            "delta": [round(float(x), 9) for x in np.percentile(np.asarray(state.delta, dtype=float), [5, 50, 95])],
-            "inventory": _h(json.dumps(inventory, sort_keys=True).encode())}
+            "delta": [float(x) for x in np.percentile(np.asarray(state.delta, dtype=float), [5, 50, 95])],
+            "inventory": inventory}
 
 
 def cases():
@@ -62,9 +65,14 @@ def test_the_builder_gives_the_models_it_gave_before():
     got = cases()
     assert set(got) == set(expected)
     for name in expected:
-        for part in ("choices", "terms", "priors", "inventory"):
-            assert got[name][part] == expected[name][part], f"{name}: {part} changed"
-        assert np.allclose(got[name]["delta"], expected[name]["delta"], rtol=1e-9, atol=0), f"{name}: the result changed"
+        g, e = got[name], expected[name]
+        for part in ("choices", "texts", "terms"):
+            assert g[part] == e[part], f"{name}: {part} changed"
+        assert [x[:2] for x in g["inventory"]] == [x[:2] for x in e["inventory"]], f"{name}: the exchanges changed"
+        for part, a, b in (("quantiles", g["quantiles"], e["quantiles"]), ("delta", g["delta"], e["delta"]),
+                           ("inventory", [x[2] for x in g["inventory"]], [x[2] for x in e["inventory"]])):
+            assert np.allclose(np.array(a, dtype=float), np.array(b, dtype=float), rtol=1e-9, atol=1e-12), \
+                f"{name}: the {part} changed"
 
 
 if __name__ == "__main__" and "--write" in sys.argv:
