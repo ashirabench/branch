@@ -25,7 +25,7 @@ pip install -e ".[all]"
 pytest -q
 ```
 
-With conda, replace the second line by `conda create -n branch python=3.12 && conda activate branch`.
+With conda, replace the second line by `conda create -n branch python=3.12 && conda activate branch`. On Windows, in PowerShell, the second line is `py -3.13 -m venv .venv; .venv\Scripts\Activate.ps1`; the scripts that end in `.sh` need Git Bash, and the page, the checks and the tests run as they are.
 
 **It worked when** the last line reads `N passed` with no `failed`. One or two tests are skipped when no factor file is present; that is expected.
 
