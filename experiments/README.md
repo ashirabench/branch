@@ -38,15 +38,16 @@ To repeat everything, use [`reproduce.sh`](../reproduce.sh) at the top of the re
 | `validate_probability.py` | Checks the probability, not only the central value: 200 random worlds calculated by openLCA, world by world |
 | `read_database.py` | Reads a copy of the database file with SQL, without openLCA open: the counts the paper states (processes, exchanges, pedigree entries, lognormal exchanges, lognormal exchanges with the wrong sign) and the exchanges of every dataset BRANCH uses. Needs `pip install -e ".[database]"` |
 | `clean_branch_objects.py` | Lists, and with `--delete` removes, the product systems, processes and flows that BRANCH wrote into the open database |
-| `extract_uncertainty.py` | Monte Carlo runs of each dataset in openLCA (not used in the results; see the paper) |
+| `extract_uncertainty.py` | Monte Carlo runs of each dataset in openLCA, used only by the third ablation (paper, Robustness) |
 | `openlca_lognormal/` | A minimal check of how openLCA draws a lognormal value |
+| `checks.py` | What the checks share: the connection, the cause of a difference, the removal of what they wrote, the table |
 
 ## data
 
 | Script | What it does |
 |---|---|
-| `make_eu_regions.py` | Writes the 27 European regions from the Eurostat tables in `data/eurostat/` |
-| `second_database/read_elcd.py` | Computes 21 unit factors from the ELCD 3.2 database |
+| `make_eu_regions.py` | Writes the region files of 27 European countries and of the EU from the Eurostat tables in `data/eurostat/` |
+| `second_database/read_elcd.py`, `Query.java` | Computes 21 unit factors from the ELCD 3.2 database; the Java file runs its SQL on the database file |
 | `make_hybrid_factors.py` | Builds the factor file that mixes those 21 factors with BAFU:2026 |
 
 ## Names used in the result folders
@@ -61,5 +62,5 @@ The result folders keep the short names of the plan. `results/benchmark*` are th
 | `eq_families`, `eq_bench` | The equivalence test with the Sobol index of the impact, on new seeds |
 | `stress_families`, `stress_bench` | The second wrong expert |
 | `wash_old`, `cff_heat_none`, `cff_heat_district`, `cff_pet_ssp` | Sensitivity runs |
-| `uncertainty`, `uncertainty_correlated` | Runs with the uncertainty of the datasets (not used in the results) |
+| `uncertainty`, `uncertainty_consistent`, `uncertainty_correlated` | The third ablation: the uncertainty of all 30 datasets, of the 19 whose runs are consistent, and of all 30 moved by one draw (a sensitivity run) |
 | `_prior`, `_tails`, `_adverse` | The simulated expert: drawn from the priors, from their tails, or wrong on the side against the verdict |

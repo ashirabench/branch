@@ -8,8 +8,8 @@ A product is a bill of materials in a JSON file. Anything you state is fixed; an
 
 ```json
 {
-  "id": "can",
-  "name": "Aluminium can 330 ml",
+  "id": "my_can",
+  "name": "My can 330 ml",
   "volume_l": 0.33,
   "refillable": false,
   "components": [{"id": "body_and_lid", "material": "aluminium", "mass_g": 13}],
@@ -21,10 +21,12 @@ A product is a bill of materials in a JSON file. Anything you state is fixed; an
 from branch.real_cases import compare
 
 model = compare("aluminium_can_330ml", "beverage_carton_1l", region="DE")   # benchmark names
-model = compare("my_product.json", "pet_bottle_1l", region="PT")           # or your own file
+model = compare("my_can.json", "pet_bottle_1l", region="PT")               # or your own file
 ```
 
-Materials in the catalogue: PET, HDPE, LDPE, glass, aluminium and liquid packaging board (the six of the benchmark), and nine added as data files that no benchmark case uses: corrugated board, cartonboard, kraft paper, polypropylene, polystyrene, expanded polystyrene, PVC, PLA and steel sheet (a proxy for tinplate, without the tin coating). These materials come with codified rules for containers (forming, distribution, refill, end of life). Any other product is described by processes chosen from the database: see [Any product](#any-product). The benchmark products are in [`data/benchmark/`](../data/benchmark). Before comparing new products, extract only the factors they need:
+The file above is an illustration that states the mass and the recycled content, so BRANCH asks neither. The four products of the benchmark, in [`data/benchmark/`](../data/benchmark), state less and leave more to ask.
+
+Materials in the catalogue: PET, HDPE, LDPE, glass, aluminium and liquid packaging board (the six of the benchmark), and nine added as data files, which the 18 beverage cases do not use and the ten other pairs of the paper do: corrugated board, cartonboard, kraft paper, polypropylene, polystyrene, expanded polystyrene, PVC, PLA and steel sheet (a proxy for tinplate, without the tin coating). These materials come with codified rules for containers (forming, distribution, refill, end of life). Any other product is described by processes chosen from the database: see [Any product](#any-product). The benchmark products are in [`data/benchmark/`](../data/benchmark). Before comparing new products, extract only the factors they need:
 
 ```bash
 python experiments/openlca/extract_factors.py --update --specs aluminium_can_330ml beverage_carton_1l --region DE
@@ -44,7 +46,7 @@ GLO ── PT, DE
 compare("aluminium_can_330ml", "beverage_carton_1l", region="BR-AM")
 ```
 
-For Portugal, Germany and Brazil the recycling rates, the split between incineration and landfill, the recycled content and (for Germany) the trips of refillable bottles come from national statistics: Eurostat and the APA packaging reports for Portugal, BMUV, GVM and ZSVR for Germany, ABIPET, ABRALATAS, Tetra Pak and ABREMA for Brazil. Each value names its document and year in the `SOURCE:` tag. Component masses, trips (outside Germany), washing, distribution distance, the recycled content of aluminium, the recycled content of PET in Brazil and the burden of recycled PET are still `ASSUMPTION:` priors, and the subregions BR-N and BR-AM still rest on assumptions.
+For Portugal, Germany and Brazil the recycling rates, the split between incineration and landfill, the recycled content and (for Germany) the trips of refillable bottles come from national statistics: Eurostat and the APA packaging reports for Portugal, BMUV, GVM and ZSVR for Germany, ABIPET, ABRALATAS, Tetra Pak and ABREMA for Brazil. Each value names its document and year in the `SOURCE:` tag. In the benchmark, these priors are still `ASSUMPTION:` in every region: the distribution distance, the mass of the PET bottle, the burden of recycled PET, the electricity and the heat to wash a glass bottle, and the recycled content of the aluminium foil of the carton. Add the trips of the glass bottle in Portugal and Brazil, and in Brazil the recycled content of PET and the mass of the glass bottle. The subregions BR-N and BR-AM still rest on assumptions.
 
 For the 25 other countries of the European Union, Iceland and Norway, the recycling rates of plastic, aluminium, steel, paper and glass packaging and the split between incineration and landfill come from two Eurostat tables (`env_waspacr` and `env_wasmun`, years 2022 to 2024) kept in [`data/eurostat/`](../data/eurostat). `python experiments/data/make_eu_regions.py` writes those 28 files from the tables and states its rules; nobody edits them by hand. Eurostat gives one rate for all plastic packaging and none for beverage cartons, and each file says so.
 
@@ -90,7 +92,7 @@ Then add a material as a data file, without code: [`data/materials/README.md`](.
 
 | Strategy | What it ranks |
 |---|---|
-| `decision_flip` | expected reduction of p(1 − p), p = P(I_A < I_B); the first order Sobol index of the verdict (proposed) |
+| `decision_flip` | expected reduction of p(1 − p), p = P(I_A < I_B), which equals p(1 − p) times the first order Sobol index of the verdict ([lemma](lemma.md)); the proposed strategy |
 | `decision_flip_min` | ablation with the literal loss min(p, 1 − p); scores near zero when no single answer can flip the verdict, so it asks more questions |
 | `decision_entropy` | ablation with the binary entropy of p |
 | `decision_flip_tp`, `decision_flip_min_tp` | ablations that estimate the two losses by total probability instead of the plug-in estimate |
@@ -99,7 +101,7 @@ Then add a material as a data file, without code: [`data/materials/README.md`](.
 | `random` | random order |
 
 ```python
-run_agent(model, oracle, strategy="margin", batch_size=3, n_samples=20_000, tau=0.05)
+run_agent(model, oracle, strategy="margin", batch_size=3, n_samples=20_000, tau=0.025)
 ```
 
 ## On the GPU

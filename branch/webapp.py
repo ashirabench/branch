@@ -87,7 +87,7 @@ def _header(gr, ctx):
     if ctx.error:
         gr.Markdown("**Not ready yet:** BRANCH needs the impact factors of your openLCA database. "
                     "Open the **openLCA connection** panel below and press **Read factors from openLCA** "
-                    "(once, about 15 minutes).")
+                    "(once; it takes several minutes).")
 
 
 def _connection_panel(gr, ctx, w):
@@ -99,7 +99,7 @@ def _connection_panel(gr, ctx, w):
         w.olca_msg = gr.Markdown(msg + "\n\n" + connector.checklist_markdown(factors=have) + in_use)
         with gr.Row():
             w.check_btn = gr.Button("Check again")
-            w.read_btn = gr.Button("Read factors from openLCA (once, about 15 minutes)")
+            w.read_btn = gr.Button("Read factors from openLCA (once; it takes several minutes)")
         w.read_msg = gr.Markdown()
 
 

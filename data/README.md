@@ -1,6 +1,6 @@
 # Data
 
-No BAFU data is stored in this repository. The terms of use of the BAFU database allow use in calculators but not redistribution, so every user extracts the unit impact factors locally ([`docs/RUNBOOK.md`](../docs/RUNBOOK.md), section 4). The only LCA values kept here are 21 factors computed from ELCD 3.2, whose licence allows distribution with credit (`second_database/`).
+No BAFU data is stored in this repository. The terms of use of the BAFU database allow use in calculators but not redistribution, so every user extracts the unit impact factors locally ([`docs/RUNBOOK.md`](../docs/RUNBOOK.md), section 4). The only LCA values kept here come from ELCD 3.2, whose licence allows distribution with credit: 21 factors (`second_database/`) and the energy recovered per kg burnt (`cff/energy_recovery.json`).
 
 | Folder | Content | In git |
 |---|---|---|

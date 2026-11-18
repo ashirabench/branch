@@ -25,6 +25,8 @@ pip install -e ".[all]"
 pytest -q
 ```
 
+With conda, replace the second line by `conda create -n branch python=3.12 && conda activate branch`.
+
 **It worked when** the last line reads `N passed` with no `failed`. One or two tests are skipped when no factor file is present; that is expected.
 
 | What you see | Cause | Fix |
@@ -69,7 +71,7 @@ Needs section 3.
 python experiments/openlca/extract_factors.py --method "EF 3.1"
 ```
 
-**It worked when** the last line reads `saved data/factors/<database>_<method>.json: N factors, 0 unresolved`. It takes about ten minutes. The file stays on your computer: git ignores `data/factors/`, because the licence of the database does not allow publishing its values.
+**It worked when** the last line reads `saved data/factors/<database>_<method>.json: N factors, 0 unresolved`. The file stays on your computer: git ignores `data/factors/`, because the licence of the database does not allow publishing its values.
 
 | What you see | Cause | Fix |
 |---|---|---|
@@ -84,9 +86,17 @@ python experiments/openlca/extract_factors.py --method "EF 3.1"
 python app.py
 ```
 
-It uses the newest file in `data/factors/`. To serve the page to other computers, the command is the same with three variables: `BRANCH_HOST=0.0.0.0 PORT=7860 BRANCH_FACTORS=<factor file> python app.py`. Put it behind HTTPS. The factor file stays on the server: the page shows results and never offers the file, every report cites the database, and before hosting, check that the terms of use of the database allow a hosted calculator and keep a copy of them. To send the model of a comparison to openLCA (needs section 3): press **Send to openLCA** on the page, after ticking that the database is a copy or has a backup. In openLCA the objects appear in the folder **BRANCH** of processes, flows and product systems. If the navigation does not show them, close the database and open it again (right click on it). [`docs/EXAMPLE.md`](EXAMPLE.md) shows what arrives.
+It uses the newest file in `data/factors/`. To send the model of a comparison to openLCA (needs section 3): press **Send to openLCA** on the page, after ticking that the database is a copy or has a backup. In openLCA the objects appear in the folder **BRANCH** of processes, flows and product systems. If the navigation does not show them, close the database and open it again (right click on it). [`docs/EXAMPLE.md`](EXAMPLE.md) shows what arrives.
 
 Sending the same comparison again updates the objects; it does not add copies.
+
+To serve the page to other computers, use the same command with three variables, and put the page behind HTTPS:
+
+```bash
+BRANCH_HOST=0.0.0.0 PORT=7860 BRANCH_FACTORS=<factor file> python app.py
+```
+
+The factor file stays on the server: the page shows results and never offers the file, and every report cites the database. Before hosting, check that the terms of use of the database allow a hosted calculator, and keep a copy of them.
 
 ## 6. Check BRANCH against openLCA
 
@@ -171,6 +181,8 @@ bash release.sh 0.2.2          # the same checks, then version, commit, tag, pus
 ```bash
 cd ~/branch && git pull --ff-only && source .venv/bin/activate && pip install -q -e ".[all]" && pytest -q
 ```
+
+With conda, write `conda activate branch` in place of `source .venv/bin/activate`.
 
 | What you see | Cause | Fix |
 |---|---|---|

@@ -1,6 +1,7 @@
 # Runs fixed in experiments/record/PLAN_2026-11-13.md
 
-Summaries of the runs of 13 November 2026 in the chosen setting (tau 2.5%, three questions per round,
+Summaries of the runs fixed on 13 November 2026, run again on 16 November 2026 with the corrected
+model of aluminium, in the chosen setting (tau 2.5%, three questions per round,
 seeds 0 to 29, 18 cases, 540 sessions per row): `<run>_prior.csv` with experts from the priors and
 `<run>_tails.csv` with experts from their tails.
 

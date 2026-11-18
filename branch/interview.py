@@ -17,7 +17,7 @@ import numpy as np
 from . import catalogue as cat
 from . import connector
 from . import help as qhelp
-from .agent import ISO_PUBLIC_NOTICE, Session
+from .agent import BATCH, ISO_PUBLIC_NOTICE, TAU, Session
 from .builder import build_model
 from .demo_factors import demo_factors
 from .factors import load_factors
@@ -44,9 +44,6 @@ def load_server_factors():
     raise RuntimeError("No impact factors configured on this server. Set BRANCH_FACTORS to the file made "
                        "by experiments/openlca/extract_factors.py (or BRANCH_DEMO=1 for illustrative numbers).")
 
-
-TAU = 0.025
-BATCH = 3
 
 # When the person does not know the answers, the agent keeps asking until nothing is left:
 # "I don't know" keeps the prior and settles nothing. After this many skips in a row the app

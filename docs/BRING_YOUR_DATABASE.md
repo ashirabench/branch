@@ -67,7 +67,7 @@ Do these checks in this order. Each kind of check has found a real error in this
 | BRANCH and openLCA give the same result for whole products | `BRANCH_FACTORS=... python experiments/openlca/validate_openlca.py --regions DE --out results/validation_mydb.csv` ([`RUNBOOK.md`](RUNBOOK.md), section 6) | A gap of 2.3% for the refillable glass bottle: the factor per MJ used per kWh |
 | Each material uses the dataset of its own kind | Read the list from `list_datasets.py` beside your map | PET and polyethylene were using the disposal datasets of a plastics mixture (up to 5.1% of the impact of a product) |
 | No dataset is counted twice | Open in openLCA each dataset of the map and read what it already contains | A production mix of aluminium that already held recycled metal, used beside a recycled content |
-| The uncertainty the database states can be used | `python experiments/openlca/read_database.py --db <database folder> signs` | 14,167 waste outputs of BAFU:2026 whose lognormal mean has the opposite sign of the amount |
+| The uncertainty the database states can be used | `python experiments/openlca/read_database.py --db <database folder> signs` | 14,167 waste outputs of BAFU:2026 whose lognormal geometric mean has the opposite sign of the amount |
 
 Always pass `--out` to the validation: without it the script writes the table of the paper, `paper/data/validation_openlca.csv`.
 

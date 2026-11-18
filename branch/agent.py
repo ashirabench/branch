@@ -22,6 +22,10 @@ from .lca_model import Model
 from .montecarlo import State, p_a_lower
 from .query import STRATEGIES
 
+# The setting of the application (paper, Section "Experiments"): the certificate and the questions per round.
+TAU = 0.025
+BATCH = 3
+
 ISO_PUBLIC_NOTICE = (
     "This comparison will be disclosed to the public. ISO 14044 requires a critical "
     "review by a panel of independent interested parties for comparative assertions "

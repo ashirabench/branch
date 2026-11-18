@@ -17,7 +17,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from branch.agent import ask_human_cli, ask_public_comparison, run_agent  # noqa: E402
+from branch.agent import BATCH, TAU, ask_human_cli, ask_public_comparison, run_agent  # noqa: E402
 from branch.cases import toy_packaging  # noqa: E402
 from branch.real_cases import compare  # noqa: E402
 from branch.report import markdown_report  # noqa: E402
@@ -114,7 +114,8 @@ def main():
     model = the_model(args)
     public = False if args.defaults else ask_public_comparison()
     oracle = (lambda name: None) if args.defaults else ask_human_cli(model)
-    result = run_agent(model, oracle, strategy="decision_flip", public_comparison=public)
+    result = run_agent(model, oracle, strategy="decision_flip", batch_size=BATCH, tau=TAU,
+                       public_comparison=public)
     report = markdown_report(result, model)
     os.makedirs("outputs", exist_ok=True)
     with open("outputs/report.md", "w") as fh:

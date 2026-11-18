@@ -9,21 +9,22 @@ two product files + region            data/benchmark/*.json, data/examples/, dat
 unit impact factors (read once)       data/factors/*.json, never committed; found by the map data/databases/*.json
         |
         v
-spec.py         reads and checks the two product files
-builder.py      completes what the files leave out, from the rules of catalogue.py and regions.py
-        |       every completed choice becomes a Choice with a prior and its source
-product_terms.py   writes the terms of each product, one small function per stage of the life cycle
-        v
-lca_model.py    Model = choices + terms; the difference of impact is a sum of terms
+spec.py           reads and checks the two product files
+builder.py        completes what the files leave out, from the rules of catalogue.py and regions.py;
+        |         every completed choice becomes a Choice with a prior and its source
+product_terms.py  writes the terms of each product, one small function per stage of the life cycle
         |
         v
-montecarlo.py   State = 20,000 draws of every open choice, and the difference in each draw
+lca_model.py      Model = choices + terms; the difference of impact is a sum of terms
         |
         v
-agent.py        Session: compute p, certify or ask, take the answer, compute again
-        |       interview.py runs a session for a person; webapp.py is only the page
-        |       query.py scores the open choices; the best three are asked
+montecarlo.py     State = 20,000 draws of every open choice, and the difference in each draw
+        |
         v
+agent.py          Session: compute p, certify or ask, take the answer, compute again;
+        |         query.py scores the open choices, and the best three are asked
+        v
+interview.py      a session for a person, from the two forms to the reports; webapp.py is only the page
 report.py, manager_report.py, whatif.py     the technical report, the PDF for a manager
 olca_bridge.py, formulas.py                 the same model as processes with parameters in openLCA
 ```
@@ -53,7 +54,7 @@ openLCA is used twice and never in between: once to read the unit factors, and a
 | The identity with the Sobol index of the verdict (the lemma) | `branch/query.py` | `decision_flip_tp`, `_total_probability_reduction` |
 | The baselines: Sobol index of the impact, entropy, least confident, margin, random | `branch/query.py` | `sobol`, `entropy`, `least_confident`, `margin`, `random_strategy` |
 | The literal loss min(p, 1 − p) and the entropy of the verdict (ablations) | `branch/query.py` | `decision_flip_min`, `decision_entropy` |
-| The setting of the application: certificate of 2.5%, three questions per round | `branch/interview.py` | `TAU`, `BATCH` |
+| The setting of the application: certificate of 2.5%, three questions per round | `branch/agent.py` | `TAU`, `BATCH` |
 
 The proof of the identity is in [`lemma.md`](lemma.md) and its numerical check in `tests/test_lemma.py`.
 

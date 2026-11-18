@@ -34,7 +34,7 @@ For m(p) = min(p, 1 − p): if, for choice j, every answer leaves the verdict on
 
 **Proof.** Take p ≤ 1/2 and p_j(x) ≤ 1/2 for all x. Then m(p_j(x)) = p_j(x), so E[m(p_j)] = E[p_j] = p = m(p), and R_m(j) = 0. The case p ≥ 1/2 is symmetric with m(q) = 1 − q. ∎
 
-**Consequence.** When no single answer can carry p across 1/2, which is the usual situation once the verdict leans one way but is not yet certified, every open choice scores exactly zero. The myopic agent has no ranking: it picks arbitrarily and behaves like `random` until a lucky answer moves p. This is the plateau seen in the curve of 26 October. By contrast g(p) = p(1 − p) is strictly concave, so R_g(j) = Var(p_j) > 0 as soon as the answer to j changes the verdict probability at all (Jensen's inequality), and the ranking never collapses.
+**Consequence.** When no single answer can carry p across 1/2, which is the usual situation once the verdict leans one way but is not yet certified, every open choice scores exactly zero. The myopic agent has no ranking: it picks arbitrarily and behaves like `random` until a lucky answer moves p. This plateau is why proposal v2 replaced min(p, 1 − p) by p(1 − p). By contrast g(p) = p(1 − p) is strictly concave, so R_g(j) = Var(p_j) > 0 as soon as the answer to j changes the verdict probability at all (Jensen's inequality), and the ranking never collapses.
 
 ## Proposition 3 (the two losses certify the same thing)
 
@@ -53,7 +53,7 @@ m(p) ≤ 2 p(1 − p) ≤ 2 m(p).
 - `decision_flip` (the strategy of the paper) takes the loss before the answer at the sample estimate of p. Its score is R(j) = [g(p) − g(p̄_j)] + Var_k(p_j(x_k)), with p̄_j = Σ_k w_k p_j(x_k). The bracket is a discretisation gap: it carries no information about j, but it differs between choices and can reorder them when the verdict probability sits in the tails that K quantile points do not represent.
 - `decision_flip_tp` takes the loss before the answer at p̄_j, as the law of total probability requires. Its score is exactly p̄_j(1 − p̄_j) S_j(D), and `decision_flip_min_tp` scores exactly zero in the case of Proposition 2.
 
-In a first check on 40 synthetic runs (40 choices, 5 000 samples) the total probability version asked more questions (2.35 against 1.38) and made no wrong certification (against 2). The benchmark of the paper reports both as an ablation, and the paper keeps `decision_flip`. `tests/test_lemma.py` checks the three propositions and both decompositions numerically.
+The benchmark of the paper compares both as an ablation (the table of the losses), and the paper keeps `decision_flip`. `tests/test_lemma.py` checks the three propositions and both decompositions numerically.
 
 ## References
 

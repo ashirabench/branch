@@ -144,7 +144,7 @@ Settles, Burr. 2009. *Active Learning Literature Survey*. Computer Sciences Tech
 
 Wooldridge, Michael. 2009. *An Introduction to MultiAgent Systems*. 2nd ed. Chichester: Wiley.
 
-The full reference list is in the [proposal](docs/BRANCH_Project_Proposal_v2.pdf).
+The full reference list is in the [paper](paper/main.pdf).
 
 ## License
 

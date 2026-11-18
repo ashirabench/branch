@@ -1,7 +1,8 @@
 # Examples
 
 Product files that show how to describe a product with a material added in `data/materials/`.
-They are not part of the benchmark of the paper, and every mass is an illustrative assumption,
+The nine files of the table below make the ten other pairs of the paper, on which its one confirmatory test ran
+(`experiments/benchmark/run_v02_experiments.sh`, block `families`). Every mass is an assumption,
 labelled as such. `experiments/openlca/validate_materials.py` uses them to check each added material
 against openLCA.
 

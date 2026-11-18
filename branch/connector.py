@@ -67,7 +67,7 @@ SETUP_STEPS = (
     ("The open database is BAFU:2026 with the EF 3.1 method",
      GET_BAFU + " In openLCA, import the database with **File > Import**, then open it."),
     ("BRANCH has read the impact factors",
-     "Press **Read factors from openLCA** below (once, about 15 minutes)."),
+     "Press **Read factors from openLCA** below (once; it takes several minutes)."),
 )
 
 
