@@ -56,7 +56,7 @@ print(result["verdict"], result["p_flip"], result["certified"], result["question
 
 ## With your own openLCA
 
-BRANCH never ships inventory data. It reads the unit impact factors once from the database open in your openLCA 2.x (IPC server on port 8080), computes with them, and writes the comparison back.
+BRANCH never ships inventory data. It reads the unit impact factors once from the database open in your openLCA 2.6 (IPC server on port 8080; the version every check ran with), computes with them, and writes the comparison back.
 
 ```bash
 python experiments/openlca/extract_factors.py --method "EF 3.1"     # once

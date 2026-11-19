@@ -52,7 +52,7 @@ BRANCH_DEMO=1 python app.py
 
 This happens **in openLCA**, not in the terminal.
 
-1. Open openLCA 2 and open the database (double click on it; its name turns bold).
+1. Open openLCA 2.6 and open the database (double click on it; its name turns bold).
 2. Menu **Tools**, **Developer tools**, **IPC Server**. Leave the port at 8080 and press the green start button.
 3. **Leave that small window open.** Closing it stops the server.
 

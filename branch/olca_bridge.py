@@ -23,7 +23,7 @@ continuous ones. Sending the same comparison again updates it in place.
 BRANCH writes into the database that is open in openLCA. Work on a copy, or
 make a backup first (in openLCA: right click the database, Backup database).
 
-Requires openLCA 2.x with the IPC server running (Tools > Developer tools >
+Requires openLCA 2.6 (the version checked) with the IPC server running (Tools > Developer tools >
 IPC Server, port 8080) and the database the factors were extracted from.
 """
 import logging
