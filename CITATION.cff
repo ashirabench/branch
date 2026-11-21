@@ -5,8 +5,8 @@ authors:
   - family-names: Benchimol
     given-names: Ashira
     affiliation: "Department of Informatics Engineering, University of Coimbra"
-version: 0.2.1
-date-released: 2026-11-16
+version: 0.2.2
+date-released: 2026-11-21
 license: MPL-2.0
 repository-code: "https://github.com/ashirabench/branch"
 keywords:

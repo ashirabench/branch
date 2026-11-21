@@ -110,7 +110,7 @@ python experiments/openlca/validate_probability.py                    # the prob
 
 **It worked when** the first two end with `N products checked, largest relative difference X` and X is of the order of 1e-8 or smaller (the paper reports 3.8e-9 and 2.0e-8). The third prints the largest relative difference over the worlds, in how many worlds the two agree on the winner, and `inside` or `OUTSIDE` for BRANCH's probability against the exact interval; the criteria were fixed beforehand in point 17 of [`experiments/record/PLAN_2026-11-15.md`](../experiments/record/PLAN_2026-11-15.md).
 
-These scripts remove what they create. With `validate_openlca.py`, add `--keep` to look at the objects in openLCA. The first two write the tables of the paper (`paper/data/validation_openlca.csv` and `validation_all_grids.csv`); add `--out <file>` to write elsewhere.
+These scripts remove what they create. With `validate_openlca.py`, add `--keep` to look at the objects in openLCA. The three write the tables of the paper (`paper/data/validation_openlca.csv`, `validation_all_grids.csv` and `validation_probability.csv` with its `_summary`); add `--out <file>` to write elsewhere.
 
 | What you see | Cause | Fix |
 |---|---|---|

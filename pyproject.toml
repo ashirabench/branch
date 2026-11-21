@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "branch-lca"
-version = "0.2.1"
+version = "0.2.2"
 description = "BRANCH: a non-LLM BDI agent that completes an openLCA Life Cycle Assessment from a bill of materials and a location, asking the human only the questions that can flip the verdict."
 readme = "README.md"
 license = { text = "MPL-2.0" }

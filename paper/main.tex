@@ -517,7 +517,7 @@ model.
 \begin{table*}[t]
 \centering
 \small
-\setlength{\tabcolsep}{5pt}
+\setlength{\tabcolsep}{4.5pt}
 \begin{tabular}{lccccccc}
 \toprule
 & & & \multicolumn{3}{c}{$Q$, experts from priors} & Entropy minus & W\%, experts \\
@@ -809,11 +809,20 @@ Brazilian regions. Over these \nGridProducts{} products the largest relative dif
 \maxDiffGrids{}. No region uses the global grid, so I could not check it this way. On 14 November 2026 I added nine
 materials and extracted the factors they need (26 after the correction of the disposal datasets), all per kg. For each of their 14 dataset options I pushed an example
 product to openLCA in Portugal, Germany and Brazil. Over these 42 products the largest relative difference was
-$4.2\times10^{-9}$ in the run of 15 November 2026 (\texttt{experiments/openlca/validate\_materials.py}). The same day I checked the second way of describing
+$4.2\times10^{-9}$ in the run of 15 November 2026 (\path{experiments/openlca/validate_materials.py}). The same day I checked the second way of describing
 a product with two shopping bags that are not containers, a cotton bag and a polypropylene bag, each described by
 processes named in the database (fabric or granulate, forming, sea freight and disposal). openLCA and BRANCH
 differ by at most $4.7\times10^{-10}$ for the two products, and three processes read by name gave exactly the factors
 of the same processes read through the catalogue.
+These checks compare one value per product, the impact at the central choices, but the verdict of BRANCH
+is a probability over the priors. On 20 November 2026 I therefore checked the probability itself, with
+criteria fixed before the run (\texttt{experiments/record/PLAN\_2026-11-15.md}, point 17). For 200 worlds drawn from the
+priors of single-use PET against refillable glass in Portugal, a case whose probability is near one half, every
+askable choice was fixed at the value of the world and openLCA calculated both products. The largest relative
+difference was $3.2\times10^{-8}$, and openLCA and BRANCH named the same winner in all 200 worlds. openLCA found PET
+lower in 80 of them, a share of 0.400 with an exact 95\% interval of 0.332 to 0.471, which contains the 0.434 that
+BRANCH estimates from 20,000 draws of the same priors (\path{experiments/openlca/validate_probability.py},
+\texttt{paper/data/validation\_probability.csv}).
 
 \paragraph{Agreement with published studies.}
 With every choice resolved in the same way (the median of the trips prior, 19 in Portugal and Brazil and 34
@@ -840,10 +849,10 @@ outside the possible range is refused in plain words, and that every question ca
 explanation. They also check the connection panel, which lists the four steps before the first comparison
 (openLCA open with its IPC server, a database open, the BAFU:2026 database with EF~3.1, the factors read)
 and names the next one to do. A further check uses the whole application with a real openLCA, through the same web
-interface as the browser (\texttt{experiments/openlca/check\_app\_with\_openlca.py}). On 14 November 2026 it searched the database, filled
+interface as the browser (\path{experiments/openlca/check_app_with_openlca.py}). On 20 November 2026 it searched the database, filled
 the form with the two shopping bags, pressed Compare, after which the application read the factors of six processes
 from openLCA by itself, answered one of seven questions and skipped the others, opened both reports and sent the comparison to openLCA,
-where the two products differed from BRANCH by at most $3.8\times10^{-8}$\%. GitHub Actions builds the installers for macOS and Windows and checks that each built
+where the two products differed from BRANCH by at most $5.4\times10^{-8}$\%. GitHub Actions builds the installers for macOS and Windows and checks that each built
 application starts, shows its version and completes one whole comparison up to the manager report. These tests show that the application works as designed. They do
 not show that a manager understands the questions or trusts the report, because no person outside the
 project has used it yet, and that is the main gap of this validation.

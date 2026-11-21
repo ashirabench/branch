@@ -75,7 +75,7 @@ def parse_args():
     ap.add_argument("--first-seed", type=int, default=FIRST_SEED)
     ap.add_argument("--n", type=int, default=20000, help="draws of BRANCH for its own probability")
     ap.add_argument("--port", type=int, default=8080)
-    ap.add_argument("--out", default=os.path.join("results", "validation_probability.csv"))
+    ap.add_argument("--out", default=os.path.join("paper", "data", "validation_probability.csv"))
     return ap.parse_args()
 
 

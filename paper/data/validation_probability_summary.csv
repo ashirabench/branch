@@ -1,0 +1,2 @@
+case,worlds,largest_relative_difference,same_winner,p_openlca_worlds,p_openlca_low,p_openlca_high,p_branch,branch_inside_interval
+"pet_bottle_1l vs glass_refillable_1l, PT",200,3.222179923165343e-08,200,0.4,0.33154626373563956,0.47146432720295395,0.4342,True

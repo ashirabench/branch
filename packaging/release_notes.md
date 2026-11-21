@@ -1,6 +1,6 @@
 BRANCH for openLCA, free and open source (MPL 2.0). BRANCH is an independent project. It is not affiliated with, sponsored by or endorsed by GreenDelta GmbH, the developer of openLCA; "for openLCA" says only which software BRANCH works with. openLCA and the other product names mentioned here belong to their owners.
 
-Version 0.2.0 corrects an error of versions 0.1.1 and 0.1.2, which counted secondary aluminium twice and made the aluminium can and the foil of cartons look better than they are. Please update. Version 0.2.1 has the same model and results as 0.2.0 and adds the Windows installer, which 0.2.0 lacked.
+Version 0.2.0 corrects an error of versions 0.1.1 and 0.1.2, which counted secondary aluminium twice and made the aluminium can and the foil of cartons look better than they are. Please update. Version 0.2.1 has the same model and results as 0.2.0 and adds the Windows installer, which 0.2.0 lacked. Version 0.2.2 has the same model and results again; on Windows it shows the sources of the data correctly (0.2.1 garbled characters such as "Paraná"), and the probability it reports is now checked against openLCA.
 
 On a Mac, open the .dmg for your chip and drag BRANCH into Applications. The first time, right click the app in Finder and choose Open.
 On Windows, run the setup file. If SmartScreen warns you, click More info and then Run anyway.

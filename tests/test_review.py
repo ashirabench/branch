@@ -106,6 +106,21 @@ def test_the_interactions_as_written():
     assert f"the same first question in {first} and the same first three in {three}" in row
 
 
+def test_the_check_of_the_probability_as_written():
+    s = pd.read_csv(os.path.join(ROOT, "paper", "data", "validation_probability_summary.csv")).iloc[0]
+    worlds, wins = int(s.worlds), round(s.p_openlca_worlds * s.worlds)
+    assert bool(s.branch_inside_interval) and int(s.same_winner) == worlds and s.largest_relative_difference < 1e-6
+    largest = f"{s.largest_relative_difference:.1e}".split("e")
+    share = (f"{s.p_openlca_worlds:.3f}", f"{s.p_openlca_low:.3f}", f"{s.p_openlca_high:.3f}", f"{s.p_branch:.3f}")
+    assert f"${largest[0]}\\times10^{{{int(largest[1])}}}$" in TEX
+    assert f"same winner in all {worlds} worlds" in TEX and f"lower in {wins} of them" in TEX
+    assert (f"a share of {share[0]} with an exact 95\\% interval of {share[1]} to {share[2]}, which contains "
+            f"the {share[3]}") in TEX
+    row = next(x for x in CLAIMS.split("\n") if x.startswith("| 20 |"))
+    assert f"{largest[0]} × 10⁻⁸" in row and f"same winner in all {worlds}" in row
+    assert f"a share of {share[0]} (exact 95% interval {share[1]} to {share[2]}), which contains BRANCH's {share[3]}" in row
+
+
 def test_the_results_table_of_the_readme():
     flip, ent = block("families", "prior"), block("families", "prior", "entropy")
     lo, hi = ent.dq_ci95_pair.split(" to ")
