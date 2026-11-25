@@ -24,7 +24,14 @@ from .lca_model import Model
 from .product_terms import product_terms
 from .quantities import COMMON_FACTOR_DRAW, MEDIAN_TOLERANCE, Param, Scaled, consistent_uncertainty  # noqa: F401  (re-exported)
 from .regions import load_region
-from .spec import BENCHMARK_DIR, STAGES, load_spec, parse_process_key, process_key, required_factor_keys  # noqa: F401  (re-exported)
+from .spec import (  # noqa: F401  (re-exported)
+    BENCHMARK_DIR,
+    STAGES,
+    load_spec,
+    parse_process_key,
+    process_key,
+    required_factor_keys,
+)
 
 
 class _Builder:

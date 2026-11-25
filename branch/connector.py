@@ -116,7 +116,7 @@ def checklist(port=PORT, state=None, factors=False):
     raw = [bool(st["port"]), st["processes"] > 0, bool(st["marker"] and st["method"]),
            bool(factors)]
     steps, ok = [], True
-    for (title, todo), done in zip(SETUP_STEPS[:3], raw[:3]):
+    for (title, todo), done in zip(SETUP_STEPS[:3], raw[:3], strict=True):
         ok = ok and done
         steps.append((ok, title, todo))
     # The factors stay on this computer, so step 4 can be done while openLCA is closed.

@@ -17,16 +17,27 @@ import os
 from dataclasses import dataclass, field
 from typing import Callable
 
+from graders import (
+    answers_read_as_meant,
+    asked_nothing,
+    asked_something,
+    at_most_one_question,
+    certified_and_right,
+    not_certified,
+    right_if_certified,
+    right_verdict,
+    says_equal,
+    scale_changes_nothing,
+    swap_keeps_the_winner,
+    value_laden_all_asked,
+)
+from harness import record_session
+
 from branch.agent import Session
 from branch.builder import build_model
 from branch.cases import draw_truth, draw_truth_adverse, toy_packaging
 from branch.interview import parse_answer
 from branch.paths import data_path
-
-from graders import (answers_read_as_meant, asked_nothing, asked_something, at_most_one_question,
-                     certified_and_right, not_certified, right_if_certified, right_verdict,
-                     scale_changes_nothing, swap_keeps_the_winner, value_laden_all_asked)
-from harness import record_session
 
 PACKAGES = ["pet_bottle_1l", "glass_refillable_1l", "aluminium_can_330ml", "beverage_carton_1l"]
 REGIONS = ["PT", "DE", "BR"]
@@ -101,6 +112,19 @@ def _gap_and_tie(factors, region):
     ]
 
 
+def _identical(factors):
+    """The same bottle twice, every choice given the same answer: the agent must say they are equal."""
+    def run(trial):
+        m = build_model(_spec("pet_bottle_1l"), _variant("pet_bottle_1l", "pet_same"), REGIONS[trial % 3],
+                        CATEGORY, factors)
+        for c in m.choices:
+            c.fix(c.labels[0] if c.kind == "categorical" else float(c.ppf(0.5)))
+        return [record_session(m, _truth_oracle({}), seed=trial)]
+    return Task("identical_products", "regression",
+                "the same product twice with the same answers: say they are equal, certify nothing",
+                run, [says_equal, not_certified])
+
+
 def _stop_public_laden(factors):
     def pet_glass(trial, **extra):
         m = build_model("pet_bottle_1l", "glass_refillable_1l", "PT", CATEGORY, factors)
@@ -145,10 +169,12 @@ def _metamorphic(factors):
                  scale, [right_if_certified], [scale_changes_nothing])]
 
 
-# what a person may type, and what the application must make of it: a number, "don't know", or a refusal
+# what a person may type, and what the application must make of it: a number, "don't know", or a refusal.
+# A value outside the default's range but possible in the world is the person's answer and is taken.
 ANSWERS = [("distribution_km", "250", 250.0), ("distribution_km", "250,5", 250.5),
            ("distribution_km", "", None), ("distribution_km", "?", None),
            ("distribution_km", "far", "refused"), ("distribution_km", "-5", "refused"),
+           ("distribution_km", "450", 450.0),           # beyond the default's range, but a real distance
            ("pet.pet.recycling_rate", "40%", 0.4), ("pet.pet.recycling_rate", "40", 0.4),
            ("pet.pet.recycling_rate", "140", "refused"), ("glass.trips", "0", "refused"),
            ("glass.glass.end_of_life", "landfill", 1.0), ("glass.glass.end_of_life", "sea", "refused")]
@@ -173,7 +199,7 @@ def _answers(factors):
 
 def regression_tasks(factors):
     out = [t for r in REGIONS for t in _gap_and_tie(factors, r)]
-    return out + _stop_public_laden(factors) + _metamorphic(factors) + [_answers(factors)]
+    return out + [_identical(factors)] + _stop_public_laden(factors) + _metamorphic(factors) + [_answers(factors)]
 
 
 # ---------------------------------------------------------------- capability: the benchmark comparisons

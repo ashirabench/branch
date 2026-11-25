@@ -30,14 +30,15 @@ About two minutes for both suites with ten trials. The results go to `results/ev
 | `clear_gap_*` | PET against the same bottle three times heavier: certify and ask nothing | `near_tie_*` |
 | `near_tie_*` | PET against an identical bottle: ask before any verdict | `clear_gap_*` |
 | `near_tie_all_unknown_*` | The same tie when every answer is "I don't know": do not certify | `clear_gap_*` |
+| `identical_products` | The same product twice with the same answers: say they are equal, certify nothing | `clear_gap_*` |
 | `finish_after_one_question` | The person stops after one answer: the report says honestly whether the verdict is certified | |
 | `public_comparison` | A comparison for the public: the report carries the ISO 14044 notice | every other task, which must not |
 | `value_laden_choice` | A value laden choice is always asked, and first (only the toy model of the README has one, so this task skips the check of sources, which are placeholders there) | |
 | `swap_products` | A against B and B against A, same expert: the same product wins | |
 | `scale_all_factors` | Every unit factor times ten: the same questions, probability and verdict | |
-| `answers_typed_in_the_form` | Numbers, commas, percent, blanks and nonsense are read as meant, or refused with a message | |
+| `answers_typed_in_the_form` | Numbers, commas, percent, blanks and nonsense are read as meant, or refused with a message; a real value beyond the default's range is taken | |
 
-Every session of every task is also graded by the rules of the loop (`SESSION_GRADERS`): no question twice; only open choices asked; value laden choices first; no round opened after the certificate is reached; the session stops for a stated reason; each question asked is among the best ranked of its round; no question asked whose score says it cannot change the verdict; the certified flag and the report agree with the probability; every default is labelled SOURCE or ASSUMPTION and appears in the report; a skipped question keeps its prior; the ISO notice appears exactly when the comparison is public.
+Every session of every task is also graded by the rules of the loop (`SESSION_GRADERS`): no question twice; only open choices asked; value laden choices first; no round opened after the certificate is reached; the session stops for the reason it states, and the state agrees with it (certified, nothing left, no question left that can change the verdict, the limit, or the person stopped); each question asked is among the best ranked of its round; no question asked whose score says it cannot change the verdict; the certified flag and the report agree with the probability; every default is labelled SOURCE or ASSUMPTION and appears in the report; a skipped question keeps its prior; the ISO notice appears exactly when the comparison is public.
 
 **Capability.** The 18 comparisons of the paper (four beverage packages, Portugal, Germany and Brazil) with three kinds of simulated expert:
 
@@ -50,6 +51,10 @@ Every session of every task is also graded by the rules of the loop (`SESSION_GR
 ## pass@k and pass^k
 
 For each task, from *n* trials of which *c* passed: pass@k is the chance that at least one of *k* trials passes, pass^k the chance that all *k* pass (`metrics.py`). A person relies on BRANCH in every session, so pass^k is the measure that matters; the report gives both.
+
+## Does the rule on useless questions change the paper?
+
+`check_useless_questions.py` runs the settings of the paper with the agent's strategy and counts the sessions in which a best ranked question had a score of zero or below. Only those sessions differ from the code before 25 November 2026; every other one is the same draw for draw.
 
 ## The graders are checked too
 

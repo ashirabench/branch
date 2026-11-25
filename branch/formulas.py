@@ -10,7 +10,9 @@ stays fixed at the option of the world that is sent, because an openLCA paramete
 Only + - * / are traced: an amount that needs anything else keeps its number, and `trace`
 reports it.
 """
+import ast
 import logging
+import operator
 from decimal import Decimal
 
 log = logging.getLogger(__name__)
@@ -64,6 +66,27 @@ class Sym:
     def __float__(self): return self.value
 
 
+_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul, ast.Div: operator.truediv}
+
+
+def evaluate(text, env):
+    """The value of a formula written by Sym: numbers, parameter names, + - * / and brackets.
+
+    Not Python's eval: anything else in the text (a call, an attribute, a power) is refused, so a
+    formula can never run code, whatever a parameter name or a product file contains."""
+    def value(node):
+        if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+            return float(node.value)
+        if isinstance(node, ast.Name):
+            return float(env[node.id])
+        if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+            return _OPS[type(node.op)](value(node.left), value(node.right))
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
+            return -value(node.operand)
+        raise ValueError(f"not a formula of BRANCH: {ast.dump(node)}")
+    return value(ast.parse(text, mode="eval").body)
+
+
 def _agree(traced, numbers):
     return set(traced) == set(numbers) and all(
         abs(float(traced[k]) - float(numbers[k])) <= 1e-9 * max(1e-12, abs(float(numbers[k]))) for k in numbers)
@@ -79,7 +102,7 @@ def _holds_elsewhere(term, traced, plain, names):
         log.debug("%s cannot be evaluated at the moved world, so nothing is compared there: %s", term.name, exc)
         return True
     env = {names[d]: moved[d] for d in moved if d in names}
-    values = {k: (eval(a.text, {"__builtins__": {}}, env) if isinstance(a, Sym) else float(a)) for k, a in traced.items()}
+    values = {k: (evaluate(a.text, env) if isinstance(a, Sym) else float(a)) for k, a in traced.items()}
     return _agree(values, numbers)
 
 

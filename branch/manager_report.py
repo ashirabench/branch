@@ -108,7 +108,7 @@ def _chart(model, st, unit):
         vals = [max(st[lab].get(k, 0.0), 0.0) for lab in labels]
         ax.barh(labels, vals, left=left, color=palette.get(k, "#cccccc"), edgecolor="white",
                 label=words.get(k, k.replace("_", " ")))
-        left = [a + b for a, b in zip(left, vals)]
+        left = [a + b for a, b in zip(left, vals, strict=True)]
     ax.invert_yaxis()
     ax.set_xlabel(f"{unit} per functional unit (average)", fontsize=8, color=MUTED)
     ax.tick_params(labelsize=8, colors=INK)

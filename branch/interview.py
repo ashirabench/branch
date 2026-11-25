@@ -25,6 +25,7 @@ from .forms import available_regions, explain_unresolved, missing_process_keys, 
 from .indicators import available, describe
 from .manager_report import manager_pdf
 from .report import markdown_report
+from .spec import physical_range
 
 DEFAULT_CATEGORY = "Climate change"
 PRIVATE_NOTICE = "Before any public claim, read the ISO 14044 notice in the report."
@@ -129,10 +130,11 @@ def parse_answer(s, name, raw):
     except ValueError:
         raise ValueError("Type a number.") from None
     k = 100.0 if pct else 1.0
-    a, b = c._frozen().support()
+    a, b = physical_range(name)       # what is possible in the world, not only what the default expected
     if not (k * a <= v <= k * b):
         u = "%" if pct else ""
-        raise ValueError(f"{v:g}{u} is outside what is possible here ({k * a:g}{u} to {k * b:g}{u}).")
+        top = "" if b == float("inf") else f" and {k * b:g}{u}"
+        raise ValueError(f"{v:g}{u} is outside what is possible here: it must be at least {k * a:g}{u}{top}.")
     return v / k
 
 
@@ -151,7 +153,9 @@ def finish(s, outdir=None):
     pct = abs(ma - mb) / max(ma, mb) * 100 if max(ma, mb) else 0
     sure = (1 - r["p_flip"]) * 100
     indicator = describe(m.meta.get("category", "Climate change"))[0].lower()
-    head = (f"### {low} has the lower impact on {indicator}, about {pct:.0f}% less than {high}."
+    head = (f"### {m.label_a} and {m.label_b} have the same impact on {indicator} in every case BRANCH considered."
+            if r.get("same_impact") else
+            f"### {low} has the lower impact on {indicator}, about {pct:.0f}% less than {high}."
             if r["certified"] else
             f"### Not settled yet: {low} looks lower, but BRANCH is only {sure:.0f}% confident.")
     summary = (f"{head}\n\nConfidence: {'more than 99%' if sure > 99 else f'{sure:.0f}%'}. "

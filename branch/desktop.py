@@ -26,7 +26,7 @@ def main():
         os.environ.setdefault("GRADIO_ANALYTICS_ENABLED", "False")
     from branch.webapp import build_ui
     ui = build_ui()
-    start = int(os.environ.get("PORT", 7860))
+    start = int(os.environ.get("PORT", "7860"))
     for port in range(start, start + 50):
         if not port_free(port):
             continue

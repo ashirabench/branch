@@ -8,6 +8,7 @@ import os
 import re
 
 from . import catalogue as cat
+from .beliefs import Choice
 from .regions import list_regions, load_region
 from .spec import BENCHMARK_DIR, load_spec, parse_process_key, process_key
 
@@ -90,7 +91,7 @@ def template_fields(name):
             m = c["mass_g"]
         else:
             dist, params, _ = c["mass_prior"][:3]
-            m = params.get("mode", params.get("mean", (params.get("low", 0) + params.get("high", 0)) / 2))
+            m = params["mode"] if "mode" in params else float(Choice(c["id"], "continuous", (dist, params), "").ppf(0.5))
         rows.append([c["id"].replace("_", " "), c["material"], float(m)])
     return spec["name"], float(spec["volume_l"]), bool(spec["refillable"]), rows
 

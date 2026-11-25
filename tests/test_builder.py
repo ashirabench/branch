@@ -2,6 +2,7 @@
 and build any pair of benchmark products. No openLCA needed: the unit impact
 factors are synthetic numbers with the same keys as a real extraction."""
 import os
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -162,7 +163,7 @@ def test_an_override_with_an_unknown_option_is_refused(tmp_path, monkeypatch):
 
     from branch import regions
     for code in ("GLO", "PT"):
-        (tmp_path / f"{code}.json").write_text(open(f"data/regions/{code}.json", encoding="utf-8").read(), encoding="utf-8")
+        (tmp_path / f"{code}.json").write_text(Path(f"data/regions/{code}.json").read_text(encoding="utf-8"), encoding="utf-8")
     bad = json.loads((tmp_path / "PT.json").read_text(encoding="utf-8"))
     bad["priors"]["glass.end_of_life"] = {"weights": {"reuse": 1.0}, "source": "SOURCE: x"}
     (tmp_path / "PT.json").write_text(json.dumps(bad), encoding="utf-8")
@@ -176,7 +177,7 @@ def test_every_region_needs_only_known_factor_keys():
     import re
 
     from branch.regions import list_regions
-    known = set(json.load(open("data/databases/bafu2026.json", encoding="utf-8"))["datasets"])
+    known = set(json.loads(Path("data/databases/bafu2026.json").read_text(encoding="utf-8"))["datasets"])
     for code in list_regions():
         if code == "GLO":
             continue
@@ -428,3 +429,23 @@ def test_washing_electricity_includes_the_one_measurement():
     """0.044 kWh per bottle (Tua, Grosso and Rigamonti 2020) lies inside the prior since 16 November 2026."""
     dist, params = cat.REFILLABLE["wash_kwh"][:2]
     assert dist == "uniform" and params["low"] < 0.044 < params["high"]
+
+
+def _negative_mass(spec):
+    spec["components"][0].pop("mass_prior")
+    spec["components"][0]["mass_g"] = -10
+
+
+@pytest.mark.parametrize("change,message", [
+    (_negative_mass, "mass_g"),
+    (lambda s: s.update(materials={"pet": {"recycled_content": 1.5}}), "impossible"),
+    (lambda s: s["components"][0].update(mass_prior=["triangular", {"low": 40, "mode": 30, "high": 20}, "x"]),
+     "triangular"),
+    (lambda s: s["components"][0].update(mass_prior=["normal", {"mean": 30, "sd": 20}, "x"]), "negative"),
+    (lambda s: s.update(refillable=True, reuse={"trips": 0}), "trips"),
+])
+def test_a_product_file_with_an_impossible_value_is_refused(change, message):
+    spec = load_spec("pet_bottle_1l")
+    change(spec)
+    with pytest.raises(ValueError, match=message):
+        load_spec(spec)

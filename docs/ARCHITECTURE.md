@@ -46,6 +46,8 @@ openLCA is used twice and never in between: once to read the unit factors, and a
 | Revising the beliefs with an answer, or keeping the prior after "I don't know" | `branch/montecarlo.py` | `fix`, `mark_unknown` |
 | The loop: compute, certify, ask, reconsider | `branch/agent.py` | `Session`, `next_question`, `answer` |
 | The certificate: stop when the probability of a wrong verdict is below the threshold | `branch/agent.py` | `next_question` |
+| A question that cannot change the verdict (score of zero or below) is never asked; the session then stops and says why | `branch/agent.py` | `ASKS_ONLY_USEFUL`, `_best` |
+| Two impacts equal up to rounding are a tie, which counts one half, so identical products are never certified as different | `branch/montecarlo.py` | `RELATIVE_TIE`, `_snap`, `p_a_lower` |
 | Value laden choices are asked first and never scored | `branch/agent.py` | `value_laden_first` |
 | The person ends the session; the report then says the verdict is not certified | `branch/agent.py` | `finish_early` |
 | The whole loop with a simulated expert, for the experiments | `branch/agent.py` | `run_agent` |
@@ -63,6 +65,7 @@ The proof of the identity is in [`lemma.md`](lemma.md) and its numerical check i
 | Idea of the paper | File | Name in the code |
 |---|---|---|
 | The product file: components, materials and masses, read and checked | `branch/spec.py` | `load_spec` |
+| What a value can be in the world (a share between 0 and 1, at least one trip, no negative amount), for the product file and the answers of the page | `branch/spec.py` | `physical_range` |
 | What the product file does not state becomes a choice; the model of the comparison | `branch/builder.py` | `build_model`, `_Builder` |
 | The life cycle of one product, a function per stage | `branch/product_terms.py` | `product_terms` |
 | Material, recycled content and conversion of a component | `branch/product_terms.py` | `_material_term`, `_recycled_content` |

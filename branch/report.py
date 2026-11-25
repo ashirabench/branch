@@ -41,7 +41,8 @@ def _verdict(result, title):
             f"**Verdict:** {result['verdict']}  ",
             f"**Probability the verdict is wrong:** {result['p_flip']:.1%} "
             f"({'certified' if result['certified'] else 'NOT certified'} at tau = {fmt_pct(result['tau'])})  ",
-            f"**Questions asked:** {result['questions']}", ""]
+            f"**Questions asked:** {result['questions']}  ",
+            f"**Why the questions stopped:** {result.get('stop_reason') or 'not recorded'}", ""]
 
 
 def _study(meta):

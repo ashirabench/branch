@@ -8,6 +8,7 @@ import pytest
 from branch.agent import run_agent
 from branch.builder import build_model, factor
 from branch.cases import draw_truth, toy_packaging
+from branch.formulas import evaluate
 from branch.montecarlo import State, p_a_lower
 from branch.report import markdown_report
 from branch.whatif import point_world, reversals, stages
@@ -167,7 +168,7 @@ def test_amounts_in_openlca_are_formulas_of_the_choices():
                     continue
                 key = e.description.split(": ")[1]
                 assert e.amount_formula, key        # every amount of these products depends on a choice
-                assert np.isclose(eval(e.amount_formula, {"__builtins__": {}}, env), inv[label][key], rtol=1e-9)
+                assert np.isclose(evaluate(e.amount_formula, env), inv[label][key], rtol=1e-9)
                 seen += 1
         assert seen >= 8
 
@@ -293,3 +294,10 @@ def test_push_adds_number_of_items_when_the_database_has_none(tmp_path):
     added = [x for x in c.store.values() if isinstance(x, (o.UnitGroup, o.FlowProperty))]
     assert {x.name for x in added} == {"Units of items", "Number of items"}
     assert len(out["processes"]) == 2 and (tmp_path / "branch.zip").exists()
+
+
+def test_a_formula_is_read_without_running_code():
+    assert evaluate("(a * 2.5) / b - -1", {"a": 2.0, "b": 5.0}) == pytest.approx(2.0)
+    for text in ("__import__('os').system('true')", "a ** 2", "a.real", "[a]"):
+        with pytest.raises(ValueError):
+            evaluate(text, {"a": 1.0})

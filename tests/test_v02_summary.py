@@ -1,6 +1,7 @@
 """Intervals by pair of products, the reading by size of effect and the count of sourced priors."""
 import os
 import sys
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -117,7 +118,7 @@ def test_table_of_the_paper_matches_the_committed_summaries():
     questions") are typed by hand: they must be the ones
     of paper/data/v02_2026-11-16/."""
     root = os.path.dirname(HERE)
-    tex = open(os.path.join(root, "paper", "main.tex"), encoding="utf-8").read()
+    tex = Path(os.path.join(root, "paper", "main.tex")).read_text(encoding="utf-8")
     rows = {"Other product families": "families", "Beverage packages, cut-off": "cutoff",
             "Beverage packages, Circular Footprint Formula": "cff", "Portugal and Germany, BAFU factors": "bafu12",
             "Portugal and Germany, 21 factors from ELCD": "elcd"}

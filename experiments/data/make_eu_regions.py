@@ -35,6 +35,7 @@ import json
 import math
 import os
 import sys
+from pathlib import Path
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SRC = os.path.join(ROOT, "data", "eurostat")
@@ -205,7 +206,7 @@ def main():
     for code, data in sorted(build().items()):
         path, text = os.path.join(OUT, f"{code}.json"), dump(data)
         if args.check:
-            if not os.path.exists(path) or open(path, encoding="utf-8").read() != text:
+            if not os.path.exists(path) or Path(path).read_text(encoding="utf-8") != text:
                 bad.append(code)
         else:
             with open(path, "w", encoding="utf-8") as fh:

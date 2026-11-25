@@ -46,12 +46,64 @@ import os
 import re
 
 from . import catalogue as cat
+from .beliefs import Choice
 from .paths import data_path
 from .regions import load_region
 
 BENCHMARK_DIR = data_path("benchmark")
 
 STAGES = ("material", "manufacturing", "transport", "use", "end_of_life", "other")
+
+
+# What a value can be in the world, whatever the prior says: a share lies between 0 and 1, a
+# container is used at least once, and every other quantity (mass, distance, energy, water) is not
+# negative. A stated value outside these is an error of typing; a value outside the prior only is not.
+SHARES = ("recycled_content", "recycling_rate", "incineration_share", "recycled_ratio", "recycling_ratio")
+
+
+def physical_range(name):
+    """(lowest, highest) a choice can take in the world, from the last part of its name."""
+    field = str(name).rsplit(".", 1)[-1]
+    if field in SHARES:
+        return 0.0, 1.0
+    if field == "trips":
+        return 1.0, float("inf")
+    return 0.0, float("inf")
+
+
+def _check_value(where, name, value):
+    lo, hi = physical_range(name)
+    if not lo <= float(value) <= hi:
+        bound = f"at least {lo:g}" if hi == float("inf") else f"between {lo:g} and {hi:g}"
+        raise ValueError(f"{where}: {name.rsplit('.', 1)[-1]} = {value} is impossible; it must be {bound}")
+
+
+def _check_mass_prior(where, prior):
+    """A mass prior must be a distribution BRANCH knows, with sensible parameters, and never negative."""
+    dist, params = prior[0], prior[1]
+    if dist == "triangular" and not params["low"] <= params["mode"] <= params["high"]:
+        raise ValueError(f"{where}: a triangular prior needs low <= mode <= high")
+    frozen = Choice(where, "continuous", (dist, params), "check")._frozen()
+    if not frozen.ppf(1e-9) >= 0:
+        raise ValueError(f"{where}: this mass prior gives negative masses; use triangular, uniform or lognormal")
+
+
+def _check_component(spec, c):
+    where = f"{spec['id']}.{c['id']}"
+    if "mass_g" in c and not float(c["mass_g"]) > 0:
+        raise ValueError(f"{where}: mass_g must be more than 0")
+    if "mass_g" not in c:
+        _check_mass_prior(where, c["mass_prior"])
+
+
+def _check_stated(spec):
+    """Every value the product file states for a material or for reuse is possible in the world."""
+    for mid, known in spec["materials"].items():
+        for field, value in known.items():
+            if field in SHARES:
+                _check_value(f"{spec['id']}.{mid}", field, value)
+    for field, value in (spec.get("reuse") or {}).items():
+        _check_value(f"{spec['id']}.reuse", field, value)
 
 
 def process_key(name, location=None):
@@ -140,8 +192,10 @@ def load_spec(spec):
                              f"known: {sorted(materials)}")
         if "mass_g" not in c and "mass_prior" not in c:
             raise ValueError(f"{spec['id']}.{c['id']}: give mass_g or mass_prior")
+        _check_component(spec, c)
     if spec["volume_l"] <= 0:
         raise ValueError(f"{spec['id']}: volume_l must be positive")
+    _check_stated(spec)
     _check_exchanges(spec)
     return spec
 

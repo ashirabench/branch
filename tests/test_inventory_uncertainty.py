@@ -105,8 +105,10 @@ def test_the_agent_never_asks_about_the_database_and_counts_it_in_the_risk():
     st = State(m, m.sample(2000, 0))
     assert not noise & set(st.open) and len(st.open) == len(m.choices) - len(noise)
     truth = draw_truth(m, 3)
-    r = run_agent(m, lambda n: truth[n], n_samples=3000, tau=0.0, truth=truth)     # tau 0: it asks everything it can
-    assert not noise & set(r["asked"]) and r["questions"] == len(m.choices) - len(noise)
+    r = run_agent(m, lambda n: truth[n], n_samples=3000, tau=0.0, truth=truth)     # tau 0: it asks all that can matter
+    assert not noise & set(r["asked"])
+    assert (r["questions"] == len(m.choices) - len(noise)
+            or r["stop_reason"] == "no question left can change the verdict")
     assert all(r["decided_by"][n].startswith("nobody: uncertainty of the database") for n in noise)
     for n in list(st.open):                                # every question answered:
         st.fix(n, truth[n])

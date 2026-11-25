@@ -11,6 +11,7 @@ import json
 import os
 import re
 import subprocess
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -181,7 +182,7 @@ def test_every_link_of_a_document_leads_somewhere(doc):
         full = os.path.normpath(os.path.join(here, path)) if path else os.path.join(ROOT, doc)
         assert os.path.exists(full), f"{doc}: the link {target} leads to nothing"
         if frag and full.endswith(".md"):
-            heads = [anchor(h) for h in re.findall(r"^#+ (.+)$", open(full, encoding="utf-8").read(), re.M)]
+            heads = [anchor(h) for h in re.findall(r"^#+ (.+)$", Path(full).read_text(encoding="utf-8"), re.M)]
             assert frag in heads, f"{doc}: no heading #{frag} in {os.path.relpath(full, ROOT)}"
 
 
@@ -310,7 +311,7 @@ def test_no_value_of_the_database_is_in_a_tracked_file():
             if len(digits.rstrip("0")) >= 9:               # round numbers say nothing
                 values.add(digits)
     for path in factors:
-        for entry in json.load(open(path, encoding="utf-8"))["factors"].values():
+        for entry in json.loads(Path(path).read_text(encoding="utf-8"))["factors"].values():
             collect(entry.get("impacts"))
     assert len(values) > 100
     number = re.compile(r"\d+\.\d+(?:[eE][-+]?\d+)?|\d+[eE][-+]?\d+")

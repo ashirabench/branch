@@ -48,7 +48,6 @@ def _late(s):
 
 def _no_reason(s):
     s["result"].update(certified=False, p_flip=0.3)
-    s["open_left"], s["stopped_early"] = 2, False
 
 
 def _bad_rank(s):

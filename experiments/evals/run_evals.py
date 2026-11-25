@@ -10,21 +10,21 @@ trial), tasks.csv (pass rate, pass@k and pass^k of every task) and report.md.
 import os as _os
 import sys as _sys
 
-_HERE = _os.path.dirname(_os.path.abspath(__file__))
-_sys.path[:0] = [_os.path.dirname(_os.path.dirname(_HERE)), _HERE]
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))
 
 import argparse
 import csv
 import json
 import os
 
-from branch.demo_factors import demo_factors
-from branch.factors import load_factors
-
+from eval_report import write_report
 from graders import SESSION_GRADERS, grade
 from metrics import pass_at_k, pass_hat_k
-from eval_report import write_report
 from tasks import capability_tasks, regression_tasks
+
+from branch.demo_factors import demo_factors
+from branch.factors import load_factors
 
 KS = (1, 3, 5, 10)
 

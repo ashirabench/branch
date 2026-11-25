@@ -1,6 +1,7 @@
 """Web app logic without a browser: form -> specs -> session -> reports."""
 import os
 import re
+from pathlib import Path
 
 import pytest
 
@@ -54,7 +55,7 @@ def test_full_session_produces_both_reports(tmp_path):
         n += 1
     summary, pdf, md = webapp.finish(s, outdir=str(tmp_path))
     assert os.path.getsize(pdf) > 10_000 and "ISO 14044" in summary
-    assert "What would reverse the verdict" in open(md, encoding="utf-8").read()
+    assert "What would reverse the verdict" in Path(md).read_text(encoding="utf-8")
 
 
 def test_finish_now_closes_the_session_on_the_defaults(tmp_path):
@@ -114,7 +115,7 @@ def test_the_page_builds_and_offers_the_entry_points_the_checks_call():
     assert {"/on_start", "/answer", "/skip", "/on_finish", "/on_find", "/on_send", "/on_check", "/on_read"} <= offered
     root = os.path.join(os.path.dirname(__file__), "..")
     for script in (("packaging", "smoke_session.py"), ("experiments", "openlca", "check_app_with_openlca.py")):
-        called = set(re.findall(r'api_name="(/\w+)"', open(os.path.join(root, *script), encoding="utf-8").read()))
+        called = set(re.findall(r'api_name="(/\w+)"', Path(os.path.join(root, *script)).read_text(encoding="utf-8")))
         assert called and called <= offered, f"{script[-1]} calls {sorted(called - offered)}, which the page does not offer"
 
 
@@ -211,3 +212,44 @@ def test_a_hosted_page_never_reaches_an_openlca_on_the_server(monkeypatch):
     with pytest.raises(RuntimeError, match="never connects"):
         connector.client()
     assert connector.probe()["port"] is False
+
+
+def test_a_real_value_beyond_the_default_range_is_taken():
+    """The default for the distance runs from 50 to 400 km; a bottler 450 km away is a fact, not an error."""
+    factors, _ = webapp.load_server_factors()
+    a = webapp.spec_from_fields(*webapp.template_fields("Refillable glass"))
+    b = webapp.spec_from_fields(*webapp.template_fields("PET single use"), used_ids={a["id"]})
+    s = webapp.start_session("PT", a, b, factors, n_samples=2000)
+    assert webapp.parse_answer(s, "distribution_km", "450") == pytest.approx(450.0)
+    with pytest.raises(ValueError, match="outside"):
+        webapp.parse_answer(s, "distribution_km", "-5")
+
+
+def _form(template):
+    name, volume, refillable, rows = webapp.template_fields(template)
+    return name, volume, refillable, rows, 1.0, []
+
+
+def test_the_buttons_of_the_page_from_the_first_form_to_the_reports(tmp_path):
+    """What a person does on the page, through the functions its buttons call: prepare, answer or skip,
+    finish, and the messages on demo numbers instead of a send to openLCA."""
+    s = interview.prepare("PT", _form("Refillable glass"), _form("PET single use"), "", "Climate change",
+                          "cut-off", False)
+    first = True
+    while not (view := interview.question_view(s))["done"]:
+        assert interview.question_hint(view)
+        if view["kind"] == "categorical":
+            interview.answer(s, view["name"], view["options"][0], None, False)
+        elif first:
+            assert "typical" in interview.number_label(view)
+            with pytest.raises(ValueError, match="Give an answer"):
+                interview.answer(s, view["name"], None, "", False)
+            interview.answer(s, view["name"], None, None, True)        # "I don't know"
+            first = False
+        else:
+            interview.answer(s, view["name"], None, str(view["default"]), False)
+    summary, pdf, md = interview.finish(s, str(tmp_path))
+    assert summary.startswith("###") and os.path.getsize(pdf) > 0 and os.path.getsize(md) > 0
+    assert "demo numbers" in interview.send(s) and "demo numbers" in interview.search("glass", True)
+    assert interview.send(None) == "Run a comparison first."
+    assert interview.default_of([("a", 1), ("b", 2)], 2) == 2 and interview.default_of([("a", 1)], 9) == 1

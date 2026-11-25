@@ -50,7 +50,7 @@ def _model_facts(model):
             "sources": {c.name: c.source for c in model.choices}}
 
 
-KEPT = ("verdict", "verdict_a_lower", "certified", "p_flip", "questions", "asked", "unknown",
+KEPT = ("verdict", "same_impact", "verdict_a_lower", "certified", "p_flip", "stop_reason", "questions", "asked", "unknown",
         "correct", "trace", "decided_by", "notices", "tau", "batch_size", "seed")
 
 

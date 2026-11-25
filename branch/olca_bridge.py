@@ -339,7 +339,7 @@ def verify_in_openlca(c, model, result, systems):
         return {"error": f"impact method {method_name!r} not found in the open database"}
     inv = model.inventory(point_world(model, result))
     out = {}
-    for (label, exchanges), system in zip(inv.items(), systems):
+    for (label, exchanges), system in zip(inv.items(), systems, strict=True):
         olca = _impact(c, system, method, category)
         branch = sum(a * factor(model.factor_data, k, category) for k, a in exchanges.items())
         out[label] = {"openLCA": olca, "BRANCH": branch, "relative_difference": _relative(olca, branch)}

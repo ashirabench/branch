@@ -39,12 +39,18 @@ def no_question_after_certificate(s):
 
 
 def stops_for_a_stated_reason(s):
-    """The session ends certified, with nothing left to ask, at the limit, or at the person's request."""
+    """The session ends for a reason it states, and the state agrees with that reason."""
     r = s["result"]
-    reasons = {"certified": r["certified"], "nothing left": s["open_left"] == 0,
-               "limit": r["questions"] >= s["max_questions"], "person stopped": s["stopped_early"]}
-    ok = any(reasons.values())
-    return ok, "" if ok else f"stopped with p_flip {r['p_flip']:.4f}, {s['open_left']} open, no reason"
+    last_round = s["rounds"][-1] if s["rounds"] else {"open": [], "scores": {}}
+    holds = {"certified": r["certified"],
+             "nothing left to ask": s["open_left"] == 0,
+             "question limit": r["questions"] >= s["max_questions"],
+             "stopped by the person": s["stopped_early"],
+             "no question left can change the verdict": all(
+                 last_round["scores"].get(n, 0.0) <= 0.0 for n in last_round["open"])}
+    honest = r["certified"] == (r["stop_reason"] == "certified") or r["stop_reason"] == "stopped by the person"
+    ok = holds.get(r["stop_reason"], False) and honest
+    return ok, "" if ok else f"stop reason {r['stop_reason']!r} with p_flip {r['p_flip']:.4f}, {s['open_left']} open"
 
 
 def asks_the_best_ranked(s):
@@ -134,6 +140,12 @@ def right_verdict(s):
     r = s["result"]
     ok = r["verdict_a_lower"] == s["expert_a_lower"]
     return ok, "" if ok else f"ended on {r['verdict']} (p_flip {r['p_flip']:.4f}), the expert's world says the opposite"
+
+
+def says_equal(s):
+    r = s["result"]
+    ok = "=" in r["verdict"] and "=" in s["report"]["verdict_line"]
+    return ok, "" if ok else f"verdict {r['verdict']} for two identical products"
 
 
 def at_most_one_question(s):

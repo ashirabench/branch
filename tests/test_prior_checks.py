@@ -5,6 +5,7 @@ them would be wrong, so this test fails when a prior is narrowed past a publishe
 """
 import csv
 import os
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -23,7 +24,7 @@ def factors():
             "factors": {k: {"impacts": {CAT: float(rng.uniform(0.01, 5))}} for k in keys}}
 
 
-ROWS = [r for r in csv.DictReader(open(os.path.join(ROOT, "data", "prior_checks.csv"), encoding="utf-8"))
+ROWS = [r for r in csv.DictReader(Path(os.path.join(ROOT, "data", "prior_checks.csv")).read_text(encoding="utf-8").splitlines())
         if r["read_in_original"] == "yes" and r["comparable"] == "yes"]
 
 

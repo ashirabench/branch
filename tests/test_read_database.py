@@ -2,6 +2,7 @@
 import importlib.util
 import os
 import zipfile
+from pathlib import Path
 
 import pytest
 
@@ -63,7 +64,7 @@ def test_what_is_not_a_database_stops(tmp_path):
 
 def test_numbers_of_the_reader_are_the_ones_of_the_paper():
     """The reader compares with these; the paper states them. One place must not drift from the other."""
-    tex = open(os.path.join(os.path.dirname(HERE), "paper", "main.tex"), encoding="utf-8").read()
+    tex = Path(os.path.join(os.path.dirname(HERE), "paper", "main.tex")).read_text(encoding="utf-8")
     for key in ("processes", "exchanges", "with_pedigree", "wrong_sign_waste_outputs"):
         assert f"{reader.PAPER[key]:,}" in tex, key
 

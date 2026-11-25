@@ -27,6 +27,12 @@ from .query import STRATEGIES
 TAU = 0.025
 BATCH = 3
 
+# The strategies of the agent score a choice by the expected reduction of the risk of a wrong verdict.
+# A score of zero or below means no answer to that choice can change the verdict (in the draws the
+# agent holds), so the agent does not ask it: the question would cost the person time for nothing.
+# The baselines and the ablations keep asking by their own ranking, as the paper describes them.
+ASKS_ONLY_USEFUL = {"decision_flip", "decision_flip_tp"}
+
 ISO_PUBLIC_NOTICE = (
     "This comparison will be disclosed to the public. ISO 14044 requires a critical "
     "review by a panel of independent interested parties for comparative assertions "
@@ -68,6 +74,7 @@ class Session:
         self.pending = ([n for n in self.state.open if model.by_name[n].value_laden]
                         if value_laden_first else [])
         self.done = False
+        self.stop_reason = None
 
     def p_a_lower(self) -> float:
         return float(p_a_lower(self.state.delta))
@@ -88,16 +95,27 @@ class Session:
         if self.done:
             return None
         pf = self._record()
-        if pf < self.tau or not self.state.open or len(self.asked) >= self.max_q:
-            self.done = True
+        reason = ("certified" if pf < self.tau else "nothing left to ask" if not self.state.open
+                  else "question limit" if len(self.asked) >= self.max_q else None)
+        if reason is None:
+            self.pending = self._best()
+            reason = None if self.pending else "no question left can change the verdict"
+        if reason is not None:
+            self.done, self.stop_reason = True, reason
             return None
+        return self.pending[0]
+
+    def _best(self):
+        """The best ranked open choices of this round, without those that cannot change the verdict."""
         t0 = time.perf_counter()
         scores = self.score_fn(self.state, self.rng)
         sync(self.model.xp)
         self.latencies.append(time.perf_counter() - t0)
         k = min(self.batch_size, self.max_q - len(self.asked), len(self.state.open))
-        self.pending = sorted(self.state.open, key=lambda n: scores[n], reverse=True)[:k]
-        return self.pending[0]
+        ranked = sorted(self.state.open, key=lambda n: scores[n], reverse=True)
+        if self.strategy in ASKS_ONLY_USEFUL:
+            ranked = [n for n in ranked if scores[n] > 0.0]
+        return ranked[:k]
 
     def answer(self, name: str, value: Optional[float]) -> None:
         """Engine number for the answer, or None for "I don't know"."""
@@ -120,7 +138,7 @@ class Session:
         """
         self.pending = []
         self._record()
-        self.done = True
+        self.done, self.stop_reason = True, "stopped by the person"
 
     def result(self) -> dict:
         if not self.done:
@@ -146,12 +164,16 @@ class Session:
             else:
                 decided_by[c.name] = f"prior ({c.source})"
         lat = self.latencies
+        tie = bool((state.delta == 0).all())       # the same impact in every draw: nothing to choose
         return {
             "strategy": self.strategy, "batch_size": self.batch_size, "n_samples": self.n_samples,
             "seed": self.seed, "tau": self.tau,
             "questions": len(asked), "asked": list(asked), "unknown": list(state.unknown),
             "certified": final["p_flip"] < self.tau, "p_flip": final["p_flip"],
-            "verdict": verdict_label(final["verdict_a_lower"], model),
+            "stop_reason": self.stop_reason,
+            "verdict": (f"{model.label_a} = {model.label_b}" if tie
+                        else verdict_label(final["verdict_a_lower"], model)),
+            "same_impact": tie,
             "verdict_a_lower": final["verdict_a_lower"],
             "correct": final["correct"],
             "latency_mean_s": float(np.mean(lat)) if lat else 0.0,
@@ -191,7 +213,7 @@ def ask_human_cli(model, inp=input, out=print):
         out(f"\n{c.question or name}   [source of the default: {c.source}]")
         while True:
             if c.kind == "categorical":
-                for i, (label, p) in enumerate(zip(c.labels, c.probs)):
+                for i, (label, p) in enumerate(zip(c.labels, c.probs, strict=True)):
                     out(f"  [{i}] {label}   (prior {p:.0%})")
                 raw = inp("Answer number (Enter or ? if you don't know): ").strip()
                 if raw in ("", "?"):
