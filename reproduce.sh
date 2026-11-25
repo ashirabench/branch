@@ -14,7 +14,8 @@
 #   4. experiments  the full benchmark: 18 cases x 30 seeds x batch 1 to 5, priors and tails,
 #                   certificate 5% and 2.5%, the run with new seeds; then three other impact categories and
 #                   two knowledge ablations, the larger run of 5,400 sessions, and the experiments after
-#                   the audit (docs/CLAIMS.md). Hours, by the number of cores
+#                   the audit (docs/CLAIMS.md), and the evaluation of the agent as an agent (experiments/evals/).
+#                   Hours, by the number of cores
 #   5. figures      every figure and table of the paper (experiments/benchmark/paper_assets.py)
 #   6. paper        paper/main.pdf (latexmk)
 #
@@ -76,6 +77,13 @@ if want experiments; then
     bash experiments/benchmark/run_proposal_experiments.sh  # other impact categories and knowledge ablations
     bash experiments/benchmark/run_more_seeds.sh            # the larger run: 5,400 sessions per category
     bash experiments/benchmark/run_v02_experiments.sh       # experiments after the audit (docs/CLAIMS.md, rows 2 to 4, 9 to 12 and 17)
+    if [[ "${QUICK:-0}" == "1" ]]; then                     # the evaluation of the agent (docs/CLAIMS.md, row 21)
+      $PY experiments/evals/run_evals.py --trials 2 --tag quick
+      $PY experiments/evals/check_useless_questions.py --quick
+    else
+      $PY experiments/evals/run_evals.py
+      $PY experiments/evals/check_useless_questions.py
+    fi
   else
     echo "skipped: no factors (see stage 2); the paper uses paper/data/*.csv"
   fi

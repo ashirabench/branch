@@ -155,6 +155,15 @@ bash reproduce.sh            # everything; the experiments take hours, by the nu
 
 **It worked when** the stage `paper` prints `paper/main.pdf: 15 pages` and the script ends with `== done`. The stage `paper` needs LaTeX (`latexmk`).
 
+To evaluate the agent alone (about two minutes, with the factors read from openLCA):
+
+```bash
+python experiments/evals/run_evals.py                 # results/evals/real/report.md
+python experiments/evals/check_useless_questions.py   # about ten minutes
+```
+
+**It worked when** every task of the regression suite in `results/evals/real/report.md` shows 10/10. A task below 10/10 is a defect of the agent or of a grader: the section "Failed graders" of the report names the trials, and `results/evals/real/transcripts.jsonl` holds each of them whole ([`experiments/evals/README.md`](../experiments/evals/README.md)).
+
 An experiment is never run before its plan is written and committed in [`experiments/record/`](../experiments/record/): what is measured, with which seeds, and what result would count as a failure. Which file supports which sentence of the paper is in [`docs/CLAIMS.md`](CLAIMS.md).
 
 ## 10. Publish a version
