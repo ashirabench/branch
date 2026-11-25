@@ -1,12 +1,13 @@
 # Experiments
 
-Four folders, by what a script needs and what it is for.
+Five folders, by what a script needs and what it is for.
 
 | Folder | What is in it | Needs openLCA |
 |---|---|---|
 | [`benchmark/`](benchmark/) | The experiments the paper reports and the scripts that turn them into its tables and figures | no |
 | [`openlca/`](openlca/) | Reading unit factors from openLCA and checking BRANCH against it | yes |
 | [`data/`](data/) | Building data files from public sources: European regions from Eurostat, the second database from ELCD | no |
+| [`evals/`](evals/) | The evaluation of the agent as an agent: tasks, trials, graders by code, transcripts, pass@k and pass^k ([method](evals/README.md)) | no |
 | [`record/`](record/) | The plans written before each run: what is measured, with which seeds, and what would count as a failure | |
 
 To repeat everything, use [`reproduce.sh`](../reproduce.sh) at the top of the repository. To see which file supports which statement of the paper, read [`docs/CLAIMS.md`](../docs/CLAIMS.md).
