@@ -5,8 +5,10 @@ session that keeps the rule and one that breaks it, and must tell them apart; th
 runs a few tasks end to end on the illustrative factors.
 """
 import copy
+import csv
 import importlib
 import os
+import re
 import sys
 
 import pytest
@@ -124,3 +126,23 @@ def test_a_small_run_writes_every_file(tmp_path, monkeypatch):
     for name in ("transcripts.jsonl", "grades.csv", "tasks.csv", "report.md"):
         assert (out / name).stat().st_size > 0
     assert "ILLUSTRATIVE" in (out / "report.md").read_text(encoding="utf-8")
+
+
+def test_the_paper_gives_the_numbers_of_the_committed_evaluation():
+    """The paragraph on the evaluation of the agent cites the run of 25 November 2026; its numbers are those files."""
+    data = os.path.join(ROOT, "paper", "data", "evals_2026-11-25")
+    with open(os.path.join(data, "report.md"), encoding="utf-8") as fh:
+        report = fh.read()
+    with open(os.path.join(data, "useless_questions.csv"), encoding="utf-8") as fh:
+        rows = list(csv.DictReader(fh))
+    with open(os.path.join(ROOT, "paper", "main.tex"), encoding="utf-8") as fh:
+        tex = " ".join(fh.read().split())
+    regression = re.findall(r"^\| `\w+` \|.*\| (\d+)/(\d+) \| ([\d.]+) \|$", report, re.M)
+    assert len(regression) == 16 and all(p == n == "10" and h == "1.000" for p, n, h in regression)
+    assert "| prior | 18 | 177/180 |" in report and "| adverse | 18 | 169/180 |" in report
+    assert "| fixed | 18 | 180/180 |" in report and "right_if_certified** failed 14 time(s)" in report
+    acted, sessions = sum(int(r["rule_acted"]) for r in rows), sum(int(r["sessions"]) for r in rows)
+    assert (acted, sessions) == (53, 14040)
+    for text in ("all 16 tasks passed in all ten trials", "180 of 180 trials", "3 of 180 trials",
+                 "11 of 180", "53 of 14,040 sessions (0.4\\%)"):
+        assert text in tex

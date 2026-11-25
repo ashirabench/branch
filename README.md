@@ -83,6 +83,7 @@ Simulated experts, comparisons that I built on real inventory data (BAFU:2026 wi
 | As few questions as the Sobol index of the impact, the ranking an LCA practitioner would use | Difference of 0.03 question on 30 cases and 0.01 on 18, inside a margin of half a question fixed beforehand |
 | Fewer questions than the Sobol index of the impact | Shown only on 100 synthetic models with one question per round (0.43 fewer, 0.07 to 0.82); not shown with three per round or on real comparisons |
 | The certificate, when the expert's answers contradict the agent's beliefs | 2.4% to 5.2% of the certified verdicts of the 18 beverage cases are wrong against a target of 2.5%; 1.6% in the 30 other cases |
+| The agent keeps its own rules, evaluated as an agent ([`experiments/evals/`](experiments/evals/)) | All 16 regression tasks pass in 10 of 10 trials; with one fixed expert and new draws, the agent ends on the expert's verdict in 180 of 180 trials |
 | Agreement with openLCA | Largest relative difference of 2.0 × 10⁻⁸ over 166 products in 83 regions |
 
 ## What it does not claim

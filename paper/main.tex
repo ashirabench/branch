@@ -841,6 +841,35 @@ the supply arrives by river, the impact of the refillable bottle falls by about 
 position of the carton and the drivers of the comparison between glass and PET. Absolute values differ between studies, because databases, system boundaries and
 allocation rules differ.
 
+\paragraph{Evaluation of the agent.}
+The benchmark measures how many questions the agent asks and how often a certified verdict is wrong. It does
+not check, session by session, that the agent keeps its own rules. Following a guide to the evaluation of
+agents \citep{anthropicEvals}, I wrote tasks with a criterion of success, ran ten trials of each, graded every
+trial with code that reads its whole record (each round of scores, each question and answer, the result and
+the report), and report pass$^k$, the chance that all $k$ trials of a task pass, beside pass@$k$, the chance
+that at least one does \citep{chen2021}. A person relies on the agent in every session, so pass$^k$ is the
+measure that matters. Eleven rules of the loop are graded in every session, among them that no question is
+asked twice, that each question asked is among the best ranked of its round, that no round opens once the
+certificate is reached, and that the certified flag and the report agree with the probability. Each grader is
+itself tested: it must pass a real record and fail the same record broken in the way it is meant to catch.
+The regression suite has 16 tasks, most of them in opposite pairs: a clear gap that must be certified with no
+question against a near tie that must be asked about, a comparison for the public with the ISO notice against
+private ones without it, the two products in either order, every factor multiplied by ten, the same product
+twice, and answers typed in the form. Its first run on BAFU:2026 found two defects. When every earlier answer
+was ``I don't know'', the agent went on to ask a question whose score said it could not change the verdict
+(in 20 of the 30 trials of the tie), and two identical products were certified as different, because rounding
+gave their difference the same sign in every draw. The agent now leaves out a question whose score is zero or
+below and says why it stopped, and a difference below a billionth of the impacts that make it is a tie, which
+counts one half. After these corrections all 16 tasks passed in all ten trials (pass$^{10}=1$). The capability
+suite runs the \nCases{} cases with three kinds of simulated expert. With one fixed expert and new Monte Carlo
+draws in each trial, the agent ended on the expert's verdict in 180 of 180 trials, so its verdict does not
+depend on its draws. With a new expert drawn from the priors in each trial, the certified verdict was wrong in
+3 of 180 trials, and with experts whose world is chosen against the agent in 11 of 180, the limit of a
+certificate computed under the agent's own beliefs (Section~\ref{sec:certificate}). The experiments of this
+paper ran before the rule on useless questions. In their settings the rule acts in 53 of 14,040 sessions
+(0.4\%), and there it only removes questions that the agent's own score gave no power to change the verdict
+(\path{experiments/evals/}, \path{paper/data/evals_2026-11-25/}).
+
 \paragraph{The application.}
 The automated tests of the web application run it as a person would use it. They check that a full
 session produces the manager report and the technical report, that ``finish now'' closes the session on
